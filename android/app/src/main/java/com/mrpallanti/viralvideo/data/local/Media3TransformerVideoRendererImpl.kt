@@ -69,10 +69,12 @@ class Media3TransformerVideoRendererImpl(
                 .setClippingConfiguration(clippingConfiguration)
                 .build()
 
-            // 9:16 vertical presentation aspect ratio
-            val presentationEffect = Presentation.createForAspectRatio(
-                9f / 16f,
-                Presentation.LAYOUT_SCALE_TO_FIT
+            // 9:16 vertical full HD (1080x1920) center-crop effect:
+            // Scales the 16:9 video and crops left & right edges evenly, centering the main characters
+            val presentationEffect = Presentation.createForWidthAndHeight(
+                1080,
+                1920,
+                Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP
             )
 
             val editedMediaItem = EditedMediaItem.Builder(mediaItem)
