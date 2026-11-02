@@ -27,7 +27,10 @@ class MainActivity : ComponentActivity() {
                     extractYoutubeStreamUseCase = app.extractYoutubeStreamUseCase,
                     downloadYoutubeVideoUseCase = app.downloadYoutubeVideoUseCase,
                     analyzeViralHooksUseCase = app.analyzeViralHooksUseCase,
-                    renderVerticalShortUseCase = app.renderVerticalShortUseCase
+                    renderVerticalShortUseCase = app.renderVerticalShortUseCase,
+                    getRecentShortsUseCase = app.getRecentShortsUseCase,
+                    saveGeneratedShortUseCase = app.saveGeneratedShortUseCase,
+                    deleteGeneratedShortUseCase = app.deleteGeneratedShortUseCase
                 ) as T
             }
         }

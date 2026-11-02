@@ -1,10 +1,13 @@
 package com.mrpallanti.viralvideo.domain.usecase
 
+import com.mrpallanti.viralvideo.domain.model.GeneratedShortItem
+import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
 import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
+import com.mrpallanti.viralvideo.domain.repository.GeneratedShortsRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
 import kotlinx.coroutines.flow.Flow
@@ -60,8 +63,27 @@ class RenderVerticalShortUseCase(
     operator fun invoke(
         inputUri: String,
         trimRange: TrimRange,
-        hookText: String
+        hookText: String,
+        overlayConfig: OverlayConfig = OverlayConfig()
     ): Flow<RenderJob> {
-        return repository.renderShort(inputUri, trimRange, hookText)
+        return repository.renderShort(inputUri, trimRange, hookText, overlayConfig)
     }
+}
+
+class GetRecentShortsUseCase(
+    private val repository: GeneratedShortsRepository
+) {
+    operator fun invoke(): Flow<List<GeneratedShortItem>> = repository.getRecentShorts()
+}
+
+class SaveGeneratedShortUseCase(
+    private val repository: GeneratedShortsRepository
+) {
+    suspend operator fun invoke(item: GeneratedShortItem) = repository.saveShort(item)
+}
+
+class DeleteGeneratedShortUseCase(
+    private val repository: GeneratedShortsRepository
+) {
+    suspend operator fun invoke(id: String) = repository.deleteShort(id)
 }

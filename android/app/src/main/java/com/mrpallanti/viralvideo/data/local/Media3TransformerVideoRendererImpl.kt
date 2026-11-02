@@ -10,7 +10,9 @@ import android.os.Looper
 import android.provider.MediaStore
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
+import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.Crop
+import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.Presentation
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
@@ -19,6 +21,8 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
+import com.google.common.collect.ImmutableList
+import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
 import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
@@ -40,7 +44,8 @@ class Media3TransformerVideoRendererImpl(
     override fun renderShort(
         inputUri: String,
         trimRange: TrimRange,
-        hookText: String
+        hookText: String,
+        overlayConfig: OverlayConfig
     ): Flow<RenderJob> = callbackFlow {
         val jobId = UUID.randomUUID().toString().substring(0, 8)
         val tempOutput = File(context.cacheDir, "viral_short_${jobId}.mp4")
@@ -52,7 +57,8 @@ class Media3TransformerVideoRendererImpl(
                 outputUri = "",
                 trimRange = trimRange,
                 hookText = hookText,
-                progressPercent = 5
+                progressPercent = 5,
+                overlayConfig = overlayConfig
             )
         )
 
@@ -93,8 +99,28 @@ class Media3TransformerVideoRendererImpl(
                 .setClippingConfiguration(clippingConfiguration)
                 .build()
 
+            val videoEffects = mutableListOf<androidx.media3.common.Effect>(cropEffect, presentationEffect)
+
+            val overlayBitmap = VideoOverlayHelper.createOverlayBitmap(
+                context = context,
+                width = 1080,
+                height = 1920,
+                hookText = hookText,
+                overlayConfig = overlayConfig
+            )
+
+            if (overlayBitmap != null) {
+                try {
+                    val bitmapOverlay = BitmapOverlay.createStaticBitmapOverlay(overlayBitmap)
+                    val overlayEffect = OverlayEffect(ImmutableList.of(bitmapOverlay))
+                    videoEffects.add(overlayEffect)
+                } catch (t: Throwable) {
+                    // Safe fallback if overlay effect cannot be attached
+                }
+            }
+
             val editedMediaItem = EditedMediaItem.Builder(mediaItem)
-                .setEffects(Effects(emptyList(), listOf(cropEffect, presentationEffect)))
+                .setEffects(Effects(emptyList(), videoEffects))
                 .build()
 
             var isFinished = false
@@ -115,7 +141,8 @@ class Media3TransformerVideoRendererImpl(
                                         outputUri = "",
                                         trimRange = trimRange,
                                         hookText = hookText,
-                                        progressPercent = currentProgress
+                                        progressPercent = currentProgress,
+                                        overlayConfig = overlayConfig
                                     )
                                 )
                             }
@@ -142,7 +169,8 @@ class Media3TransformerVideoRendererImpl(
                             trimRange = trimRange,
                             hookText = hookText,
                             progressPercent = 100,
-                            isComplete = true
+                            isComplete = true,
+                            overlayConfig = overlayConfig
                         )
                     )
                     channel.close()

@@ -3,15 +3,22 @@ package com.mrpallanti.viralvideo.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrpallanti.viralvideo.domain.model.AuthUser
+import com.mrpallanti.viralvideo.domain.model.GeneratedShortItem
+import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
+import com.mrpallanti.viralvideo.domain.model.TextOverlayPosition
 import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
 import com.mrpallanti.viralvideo.domain.model.ViralClip
+import com.mrpallanti.viralvideo.domain.model.WatermarkPosition
 import com.mrpallanti.viralvideo.domain.repository.AuthRepository
 import com.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
+import com.mrpallanti.viralvideo.domain.usecase.DeleteGeneratedShortUseCase
 import com.mrpallanti.viralvideo.domain.usecase.DownloadYoutubeVideoUseCase
 import com.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
+import com.mrpallanti.viralvideo.domain.usecase.GetRecentShortsUseCase
 import com.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
+import com.mrpallanti.viralvideo.domain.usecase.SaveGeneratedShortUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +31,13 @@ import okhttp3.Request
 import java.io.File
 import java.io.FileOutputStream
 
+enum class StudioTab {
+    STUDIO,    // AI Hooks, virality ranking, 1-tap presets
+    CLIPPER,   // In-App Player + interactive custom duration scrubber
+    BRANDING,  // Watermark logo, custom hook text, opacity, positions
+    LIBRARY    // Recently generated videos with instant preview & share
+}
+
 data class StudioUiState(
     // Auth State
     val isLoggedIn: Boolean = false,
@@ -31,6 +45,9 @@ data class StudioUiState(
     val isAuthenticating: Boolean = false,
     val authError: String? = null,
     val pendingSharedUrl: String? = null,
+
+    // Navigation Tab
+    val currentTab: StudioTab = StudioTab.STUDIO,
 
     // Studio State
     val urlInput: String = "",
@@ -41,6 +58,18 @@ data class StudioUiState(
     val selectedClip: ViralClip? = null,
     val trimRange: TrimRange = TrimRange(0f, 30f),
     val hookText: String = "",
+
+    // Custom Overlay & Branding
+    val overlayConfig: OverlayConfig = OverlayConfig(),
+
+    // Recently Generated Videos
+    val recentShorts: List<GeneratedShortItem> = emptyList(),
+    val playingShort: GeneratedShortItem? = null,
+
+    // In-App Video Playback & Scrubber State
+    val playerCurrentPositionSec: Float = 0f,
+
+    // Rendering State
     val isRendering: Boolean = false,
     val renderJob: RenderJob? = null,
     val errorMessage: String? = null,
@@ -53,7 +82,10 @@ class StudioViewModel(
     private val extractYoutubeStreamUseCase: ExtractYoutubeStreamUseCase,
     private val downloadYoutubeVideoUseCase: DownloadYoutubeVideoUseCase,
     private val analyzeViralHooksUseCase: AnalyzeViralHooksUseCase,
-    private val renderVerticalShortUseCase: RenderVerticalShortUseCase
+    private val renderVerticalShortUseCase: RenderVerticalShortUseCase,
+    private val getRecentShortsUseCase: GetRecentShortsUseCase,
+    private val saveGeneratedShortUseCase: SaveGeneratedShortUseCase,
+    private val deleteGeneratedShortUseCase: DeleteGeneratedShortUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -65,6 +97,21 @@ class StudioViewModel(
     val uiState: StateFlow<StudioUiState> = _uiState.asStateFlow()
 
     private val httpClient = OkHttpClient()
+
+    init {
+        viewModelScope.launch {
+            getRecentShortsUseCase().collect { list ->
+                _uiState.update { it.copy(recentShorts = list) }
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+    // NAVIGATION
+    // ----------------------------------------------------
+    fun setTab(tab: StudioTab) {
+        _uiState.update { it.copy(currentTab = tab) }
+    }
 
     // ----------------------------------------------------
     // AUTHENTICATION
@@ -141,17 +188,120 @@ class StudioViewModel(
     }
 
     fun onHookTextChanged(newText: String) {
-        _uiState.update { it.copy(hookText = newText) }
+        _uiState.update {
+            it.copy(
+                hookText = newText,
+                overlayConfig = it.overlayConfig.copy(customText = newText)
+            )
+        }
     }
 
     fun updateTrimRange(start: Float, end: Float) {
-        _uiState.update { it.copy(trimRange = TrimRange(start, end)) }
+        val maxDuration = _uiState.value.currentVideo?.durationSeconds?.toFloat() ?: 600f
+        val cleanStart = start.coerceIn(0f, maxDuration - 1f)
+        val cleanEnd = end.coerceIn(cleanStart + 1f, maxDuration)
+        _uiState.update { it.copy(trimRange = TrimRange(cleanStart, cleanEnd)) }
+    }
+
+    fun setStartToCurrentPlayback(positionSec: Float) {
+        val currentEnd = _uiState.value.trimRange.endSeconds
+        val newStart = positionSec.coerceAtLeast(0f)
+        val newEnd = if (newStart >= currentEnd) (newStart + 30f) else currentEnd
+        updateTrimRange(newStart, newEnd)
+        _uiState.update { it.copy(successMessage = "Start set to ${formatSeconds(newStart)}") }
+    }
+
+    fun setEndToCurrentPlayback(positionSec: Float) {
+        val currentStart = _uiState.value.trimRange.startSeconds
+        val newEnd = positionSec.coerceAtLeast(currentStart + 1f)
+        updateTrimRange(currentStart, newEnd)
+        _uiState.update { it.copy(successMessage = "End set to ${formatSeconds(newEnd)}") }
+    }
+
+    fun setPresetDuration(targetDurationSec: Float) {
+        val currentStart = _uiState.value.trimRange.startSeconds
+        val maxDuration = _uiState.value.currentVideo?.durationSeconds?.toFloat() ?: 600f
+        val newEnd = (currentStart + targetDurationSec).coerceAtMost(maxDuration)
+        updateTrimRange(currentStart, newEnd)
+    }
+
+    fun updatePlayerPosition(positionSec: Float) {
+        _uiState.update { it.copy(playerCurrentPositionSec = positionSec) }
     }
 
     fun dismissVideoPickerPrompt() {
         _uiState.update { it.copy(showVideoPickerPrompt = false) }
     }
 
+    // ----------------------------------------------------
+    // BRANDING & CUSTOM OVERLAY CONTROLS
+    // ----------------------------------------------------
+    fun updateOverlayConfig(config: OverlayConfig) {
+        _uiState.update { it.copy(overlayConfig = config) }
+    }
+
+    fun setCustomLogoUri(uriString: String?) {
+        _uiState.update {
+            it.copy(
+                overlayConfig = it.overlayConfig.copy(logoUri = uriString),
+                successMessage = if (uriString != null) "Logo attached!" else "Logo cleared"
+            )
+        }
+    }
+
+    fun setWatermarkText(text: String) {
+        _uiState.update {
+            it.copy(overlayConfig = it.overlayConfig.copy(watermarkText = text))
+        }
+    }
+
+    fun setWatermarkPosition(position: WatermarkPosition) {
+        _uiState.update {
+            it.copy(overlayConfig = it.overlayConfig.copy(watermarkPosition = position))
+        }
+    }
+
+    fun setWatermarkOpacity(opacity: Float) {
+        _uiState.update {
+            it.copy(overlayConfig = it.overlayConfig.copy(watermarkOpacity = opacity))
+        }
+    }
+
+    fun setTextOverlayPosition(position: TextOverlayPosition) {
+        _uiState.update {
+            it.copy(overlayConfig = it.overlayConfig.copy(textPosition = position))
+        }
+    }
+
+    fun setTextColorHex(hex: String) {
+        _uiState.update {
+            it.copy(overlayConfig = it.overlayConfig.copy(textColorHex = hex))
+        }
+    }
+
+    fun setTextBgColorHex(hex: String) {
+        _uiState.update {
+            it.copy(overlayConfig = it.overlayConfig.copy(textBgColorHex = hex))
+        }
+    }
+
+    // ----------------------------------------------------
+    // RECENT SHORTS & LIBRARY
+    // ----------------------------------------------------
+    fun setPlayingShort(item: GeneratedShortItem?) {
+        _uiState.update { it.copy(playingShort = item) }
+    }
+
+    fun deleteGeneratedShort(id: String) {
+        viewModelScope.launch {
+            deleteGeneratedShortUseCase(id)
+            _uiState.update { it.copy(successMessage = "Short removed from history") }
+        }
+    }
+
+    // ----------------------------------------------------
+    // VIDEO LOADING & ANALYSIS
+    // ----------------------------------------------------
     fun onLocalVideoSelected(uriString: String, title: String, durationSeconds: Long) {
         val metadata = VideoMetadata(
             id = "local_${System.currentTimeMillis()}",
@@ -187,6 +337,9 @@ class StudioViewModel(
                             trimRange = firstClip?.let { TrimRange(it.startSeconds, it.endSeconds) }
                                 ?: TrimRange(0f, 30f),
                             hookText = firstClip?.captionOverlay ?: "WAIT TILL THE END... 🤯",
+                            overlayConfig = state.overlayConfig.copy(
+                                customText = firstClip?.captionOverlay ?: state.overlayConfig.customText
+                            ),
                             successMessage = "Loaded local video! ${clips.size} viral hooks suggested."
                         )
                     }
@@ -242,6 +395,9 @@ class StudioViewModel(
                                     trimRange = firstClip?.let { TrimRange(it.startSeconds, it.endSeconds) }
                                         ?: TrimRange(0f, 30f),
                                     hookText = firstClip?.captionOverlay ?: "WAIT TILL THE END... 🤯",
+                                    overlayConfig = state.overlayConfig.copy(
+                                        customText = firstClip?.captionOverlay ?: state.overlayConfig.customText
+                                    ),
                                     successMessage = "Analyzed with ${clips.size} viral clips ready!"
                                 )
                             }
@@ -274,6 +430,7 @@ class StudioViewModel(
                 selectedClip = clip,
                 trimRange = TrimRange(clip.startSeconds, clip.endSeconds),
                 hookText = clip.captionOverlay,
+                overlayConfig = it.overlayConfig.copy(customText = clip.captionOverlay),
                 successMessage = "Applied '${clip.title}'"
             )
         }
@@ -354,7 +511,6 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
                             }
                         },
                         onFailure = { err ->
-                            // Filter out generic warnings from stderr so only the core error is shown
                             val cleanError = err.message
                                 ?.lines()
                                 ?.firstOrNull { line ->
@@ -393,7 +549,8 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
                 renderVerticalShortUseCase(
                     inputUri = resolvedUri,
                     trimRange = state.trimRange,
-                    hookText = state.hookText
+                    hookText = state.hookText,
+                    overlayConfig = state.overlayConfig
                 ).collect { job ->
                     _uiState.update {
                         it.copy(
@@ -402,6 +559,19 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
                             successMessage = if (job.isComplete) "🎉 Saved directly to your Phone Gallery!" else it.successMessage,
                             errorMessage = job.error
                         )
+                    }
+
+                    if (job.isComplete && job.outputUri.isNotBlank()) {
+                        val item = GeneratedShortItem(
+                            id = job.id,
+                            title = state.selectedClip?.title ?: state.currentVideo?.title ?: "Viral Short",
+                            outputUri = job.outputUri,
+                            durationSeconds = state.trimRange.durationSeconds,
+                            timestamp = System.currentTimeMillis(),
+                            fileSizeFormatted = "",
+                            hookCaption = state.hookText
+                        )
+                        saveGeneratedShortUseCase(item)
                     }
                 }
             } catch (t: Throwable) {
@@ -415,32 +585,11 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
         }
     }
 
-    private suspend fun downloadDirectStream(
-        streamUrl: String,
-        cacheDir: File,
-        videoId: String
-    ): File? = withContext(Dispatchers.IO) {
-        return@withContext try {
-            val tempFile = File(cacheDir, "yt_${videoId}_source.mp4")
-            val request = Request.Builder()
-                .url(streamUrl)
-                .header("User-Agent", "Mozilla/5.0 (Linux; Android 14)")
-                .build()
-
-            val response = httpClient.newCall(request).execute()
-            if (response.isSuccessful) {
-                response.body?.byteStream()?.use { input ->
-                    FileOutputStream(tempFile).use { output ->
-                        input.copyTo(output)
-                    }
-                }
-                if (tempFile.exists() && tempFile.length() > 1024) tempFile else null
-            } else {
-                null
-            }
-        } catch (t: Throwable) {
-            null
-        }
+    private fun formatSeconds(sec: Float): String {
+        val totalSec = sec.toInt()
+        val m = totalSec / 60
+        val s = totalSec % 60
+        return String.format("%02d:%02d", m, s)
     }
 
     fun clearMessages() {

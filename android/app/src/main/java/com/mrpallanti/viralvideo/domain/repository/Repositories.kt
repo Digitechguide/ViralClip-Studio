@@ -1,5 +1,7 @@
 package com.mrpallanti.viralvideo.domain.repository
 
+import com.mrpallanti.viralvideo.domain.model.GeneratedShortItem
+import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
 import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
@@ -29,6 +31,13 @@ interface VideoRendererRepository {
     fun renderShort(
         inputUri: String,
         trimRange: TrimRange,
-        hookText: String
+        hookText: String,
+        overlayConfig: OverlayConfig = OverlayConfig()
     ): Flow<RenderJob>
+}
+
+interface GeneratedShortsRepository {
+    fun getRecentShorts(): Flow<List<GeneratedShortItem>>
+    suspend fun saveShort(item: GeneratedShortItem)
+    suspend fun deleteShort(id: String)
 }
