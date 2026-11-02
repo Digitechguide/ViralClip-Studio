@@ -64,19 +64,23 @@ jobs:
           git commit -m "ci: failure diagnostic logs" || true
           git push origin ci-error-log --force || true
 
+      - name: Locate and Prepare Release APK Assets
+        run: |
+          APK_FILE=$(find android/app/build/outputs -name "*.apk" | head -n 1)
+          echo "Discovered built APK: $APK_FILE"
+          mkdir -p android/app/build/outputs/apk/debug
+          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-debug.apk
+          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-release.apk
+          cp "$APK_FILE" "android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk"
+          cp "$APK_FILE" android/app/build/outputs/apk/debug/ViralClip-Studio.apk
+          ls -lh android/app/build/outputs/apk/debug/
+
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ViralClip-Studio-v${{ steps.app_version.outputs.version_code }}
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-
-      - name: Prepare Release APK Asset
-        if: github.ref == 'refs/heads/main'
-        run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/app-release.apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/ViralClip-Studio.apk
 
       - name: Publish GitHub Release
         if: github.ref == 'refs/heads/main'
@@ -89,10 +93,10 @@ jobs:
             - **Build Code:** `${{ steps.app_version.outputs.version_code }}`
             - **Commit:** `${{ steps.app_version.outputs.short_sha }}`
             - **Automated Dynamic Versioning:** Every commit increments the app version and package code automatically.
-            - **Creator Authentication Gate:** Mandatory login restricted to admin-approved accounts.
-            - **AndroidX Media3 Transformer Engine:** Crash-proof hardware video cropping (9:16) and trimming.
-            - **Auto Face-Centered Framing:** Smart subject tracking centers speakers automatically when converting 16:9 to 9:16 Shorts.
-            - **Local Gallery Picker & 1-Tap Blueprint Copy:** Pick downloaded video clips or copy viral timestamps directly to clipboard.
+            - **Custom Logo & Watermark Studio:** Add custom PNG channel logo, @handle watermark, dynamic opacity, and 4-corner positioning.
+            - **In-App Video Player & Precision Clipper:** Preview video directly inside the app, scrub start/end times with +/-1s precision micro-buttons and 15s/30s/45s/60s presets.
+            - **Recently Generated Shorts Library:** Instant playback modal, 1-tap native Android share sheet (Shorts, Reels, TikTok), and MediaStore sync.
+            - **Auto Face-Centered Framing:** Smart subject tracking centers primary speakers automatically when converting 16:9 to 9:16 Shorts.
           files: |
             android/app/build/outputs/apk/debug/app-release.apk
             android/app/build/outputs/apk/debug/app-debug.apk
