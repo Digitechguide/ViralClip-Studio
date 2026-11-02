@@ -49,7 +49,7 @@ files_to_upload = [
 ]
 
 def get_connection():
-    ftp = ftplib.FTP(timeout=60)
+    ftp = ftplib.FTP(timeout=300)
     ftp.connect(FTP_HOST, 21)
     ftp.login(FTP_USER, FTP_PASS)
     ftp.set_pasv(True)
@@ -92,7 +92,15 @@ def upload_all():
         for attempt in range(1, 4):
             try:
                 with open(local_path, 'rb') as f:
-                    ftp.storbinary(f'STOR {target_filename}', f)
+                    uploaded_bytes = 0
+                    def on_chunk(chunk):
+                        nonlocal uploaded_bytes
+                        uploaded_bytes += len(chunk)
+                        if size > 10 * 1024 * 1024 and (uploaded_bytes % (15 * 1024 * 1024) < 1024 * 1024 or uploaded_bytes >= size):
+                            pct = int((uploaded_bytes / size) * 100)
+                            print(f'    [{pct}%] {uploaded_bytes // (1024*1024)}MB / {size // (1024*1024)}MB')
+
+                    ftp.storbinary(f'STOR {target_filename}', f, blocksize=1024 * 1024, callback=on_chunk)
                 print(f'  [OK] Success: {remote_path}')
                 uploaded = True
                 break
