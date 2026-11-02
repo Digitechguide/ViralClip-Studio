@@ -10,6 +10,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
+import androidx.media3.effect.Crop
 import androidx.media3.effect.Presentation
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
@@ -59,6 +60,29 @@ class Media3TransformerVideoRendererImpl(
             val startMs = (trimRange.startSeconds * 1000).toLong().coerceAtLeast(0L)
             val endMs = (trimRange.endSeconds * 1000).toLong().coerceAtLeast(startMs + 1000L)
 
+            // Auto Face-Centered Framing (Option 1):
+            // Analyze the clip frames to identify the primary speaker's horizontal center
+            val speakerCenterX = FaceTrackingHelper.detectSpeakerHorizontalCenter(
+                videoPath = inputUri,
+                startMs = startMs,
+                endMs = endMs
+            )
+
+            // Compute exact 9:16 crop window in NDC (-1.0f to 1.0f) centered on the speaker's face.
+            // Horizontal fraction required to turn 16:9 into 9:16 is (9/16)/(16/9) = 81/256 ≈ 0.3164
+            val halfCropWidthNdc = 0.3164f
+            val speakerCenterNdc = (2.0f * speakerCenterX) - 1.0f
+            val maxLeftNdc = 1.0f - (2.0f * halfCropWidthNdc)
+            val leftNdc = (speakerCenterNdc - halfCropWidthNdc).coerceIn(-1.0f, maxLeftNdc)
+            val rightNdc = leftNdc + (2.0f * halfCropWidthNdc)
+
+            val cropEffect = Crop(leftNdc, rightNdc, -1.0f, 1.0f)
+            val presentationEffect = Presentation.createForWidthAndHeight(
+                1080,
+                1920,
+                Presentation.LAYOUT_SCALE_TO_FIT
+            )
+
             val clippingConfiguration = MediaItem.ClippingConfiguration.Builder()
                 .setStartPositionMs(startMs)
                 .setEndPositionMs(endMs)
@@ -69,16 +93,8 @@ class Media3TransformerVideoRendererImpl(
                 .setClippingConfiguration(clippingConfiguration)
                 .build()
 
-            // 9:16 vertical full HD (1080x1920) center-crop effect:
-            // Scales the 16:9 video and crops left & right edges evenly, centering the main characters
-            val presentationEffect = Presentation.createForWidthAndHeight(
-                1080,
-                1920,
-                Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP
-            )
-
             val editedMediaItem = EditedMediaItem.Builder(mediaItem)
-                .setEffects(Effects(emptyList(), listOf(presentationEffect)))
+                .setEffects(Effects(emptyList(), listOf(cropEffect, presentationEffect)))
                 .build()
 
             var isFinished = false
