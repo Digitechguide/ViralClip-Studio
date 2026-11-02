@@ -58,12 +58,17 @@ jobs:
 
       - name: Locate and Prepare Release APK Assets
         run: |
-          echo "=== Searching for APKs ==="
-          find . -name "*.apk"
-          APK_FILE=$(find . -name "*.apk" | head -n 1)
-          echo "Discovered built APK: $APK_FILE"
+          echo "=== Files in android/app/build/outputs ==="
+          ls -laR android/app/build/outputs/ || true
+          APK_FILE=$(find android/app/build -type f -name "*.apk" | head -n 1)
+          echo "Discovered built APK: '$APK_FILE'"
           if [ -z "$APK_FILE" ]; then
-            echo "❌ No APK was found in build tree! Exiting."
+            echo "Searching whole workspace:"
+            find . -type f -name "*.apk"
+            APK_FILE=$(find . -type f -name "*.apk" | head -n 1)
+          fi
+          if [ -z "$APK_FILE" ]; then
+            echo "❌ No APK found anywhere!"
             exit 1
           fi
           mkdir -p android/app/build/outputs/apk/debug
@@ -79,7 +84,8 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git checkout -B ci-error-log
-          git add compile_output.txt assemble_output.txt || true
+          ls -laR android/app/build > build_tree.txt 2>&1 || true
+          git add compile_output.txt assemble_output.txt build_tree.txt || true
           git commit -m "ci: failure diagnostic logs" || true
           git push origin ci-error-log --force || true
 
