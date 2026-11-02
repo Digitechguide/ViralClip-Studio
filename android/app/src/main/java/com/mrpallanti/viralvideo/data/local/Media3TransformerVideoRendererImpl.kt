@@ -14,6 +14,7 @@ import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.Crop
 import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.Presentation
+import androidx.media3.effect.TextureOverlay
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.Effects
@@ -111,7 +112,7 @@ class Media3TransformerVideoRendererImpl(
 
             if (overlayBitmap != null) {
                 try {
-                    val bitmapOverlay = BitmapOverlay.createStaticBitmapOverlay(overlayBitmap)
+                    val bitmapOverlay: TextureOverlay = BitmapOverlay.createStaticBitmapOverlay(overlayBitmap)
                     val overlayEffect = OverlayEffect(ImmutableList.of(bitmapOverlay))
                     videoEffects.add(overlayEffect)
                 } catch (t: Throwable) {

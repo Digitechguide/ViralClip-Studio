@@ -50,6 +50,15 @@ jobs:
         working-directory: ./android
         run: ./gradlew assembleDebug -PversionCode=${{ steps.app_version.outputs.version_code }} -PversionName=${{ steps.app_version.outputs.version_name }} --stacktrace
 
+      - name: Report Build Error to Step Summary
+        if: failure()
+        working-directory: ./android
+        run: |
+          echo "### Gradle Compiler Error" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          ./gradlew compileDebugKotlin >> $GITHUB_STEP_SUMMARY 2>&1 || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
