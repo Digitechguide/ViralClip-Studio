@@ -354,12 +354,21 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
                             }
                         },
                         onFailure = { err ->
-                            // If auto-download hits any restriction, fall back to gallery picker
+                            // Filter out generic warnings from stderr so only the core error is shown
+                            val cleanError = err.message
+                                ?.lines()
+                                ?.firstOrNull { line ->
+                                    val l = line.trim()
+                                    l.isNotBlank() && !l.startsWith("WARNING", ignoreCase = true)
+                                }
+                                ?: err.message
+                                ?: "Could not download stream"
+
                             _uiState.update {
                                 it.copy(
                                     isRendering = false,
                                     showVideoPickerPrompt = true,
-                                    errorMessage = "Auto-download notice: ${err.message}"
+                                    errorMessage = "Auto-download notice: $cleanError"
                                 )
                             }
                             return@launch

@@ -143,21 +143,47 @@ class YoutubeStreamExtractorImpl(
                 Log.d("YoutubeStreamExtractor", "Init status: ${t.message}")
             }
 
-            val request = YoutubeDLRequest(url).apply {
-                // Download up to 1080p and merge with best audio into single MP4
-                addOption("-f", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4]/best")
-                addOption("--merge-output-format", "mp4")
-                addOption("-o", File(outputDir, "${videoId}.%(ext)s").absolutePath)
-                addOption("--no-mtime")
-                addOption("--no-playlist")
-                addOption("--force-overwrites")
+            fun createYtDlpRequest(): YoutubeDLRequest {
+                return YoutubeDLRequest(url).apply {
+                    // Best video up to 1080p + best audio, automatically muxed into mp4
+                    addOption("-f", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best")
+                    addOption("--merge-output-format", "mp4")
+                    addOption("-o", File(outputDir, "${videoId}.%(ext)s").absolutePath)
+                    addOption("--no-mtime")
+                    addOption("--no-playlist")
+                    addOption("--force-overwrites")
+                    addOption("--no-warnings")
+                    addOption("--no-check-certificates")
+                    // Android client emulation bypasses YouTube Botguard / PO-token challenges on mobile IPs
+                    addOption("--extractor-args", "youtube:player_client=android,web")
+                }
             }
 
             onProgress(5f, "Connecting to YouTube stream via embedded engine...")
 
-            val response = YoutubeDL.getInstance().execute(request, "dl_$videoId") { progress, etaInSeconds, line ->
-                val statusText = line ?: "Downloading... ${progress.toInt()}%"
-                onProgress(progress.coerceIn(0f, 100f), statusText)
+            var executionOutput = ""
+            try {
+                val response = YoutubeDL.getInstance().execute(createYtDlpRequest(), "dl_$videoId") { progress, etaInSeconds, line ->
+                    val statusText = line ?: "Downloading... ${progress.toInt()}%"
+                    onProgress(progress.coerceIn(0f, 100f), statusText)
+                }
+                executionOutput = response.out ?: ""
+            } catch (initialErr: Throwable) {
+                Log.w("YoutubeStreamExtractor", "First attempt hit warning/error: ${initialErr.message}. Triggering yt-dlp update...")
+                onProgress(10f, "Updating on-device yt-dlp engine to latest version...")
+                try {
+                    val updateResult = YoutubeDL.getInstance().updateYoutubeDL(context, YoutubeDL.UpdateChannel.STABLE)
+                    Log.d("YoutubeStreamExtractor", "Dynamic update completed: $updateResult")
+                } catch (updateErr: Throwable) {
+                    Log.w("YoutubeStreamExtractor", "Update attempt note: ${updateErr.message}")
+                }
+
+                onProgress(15f, "Retrying direct download with latest engine...")
+                val retryResponse = YoutubeDL.getInstance().execute(createYtDlpRequest(), "dl_${videoId}_retry") { progress, etaInSeconds, line ->
+                    val statusText = line ?: "Downloading... ${progress.toInt()}%"
+                    onProgress(progress.coerceIn(0f, 100f), statusText)
+                }
+                executionOutput = retryResponse.out ?: ""
             }
 
             if (expectedOutputFile.exists() && expectedOutputFile.length() > 50_000) {
@@ -170,7 +196,7 @@ class YoutubeStreamExtractorImpl(
                     onProgress(100f, "Download complete!")
                     Result.success(matched)
                 } else {
-                    Result.failure(Exception("Download failed: output file not found. Response: ${response.out}"))
+                    Result.failure(Exception("Download failed: output file not found. Response: $executionOutput"))
                 }
             }
         } catch (t: Throwable) {

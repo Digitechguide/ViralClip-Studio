@@ -75,6 +75,14 @@ class ViralVideoApp : Application() {
                 YoutubeDL.getInstance().init(this@ViralVideoApp)
                 FFmpeg.getInstance().init(this@ViralVideoApp)
                 Log.d("ViralVideoApp", "Embedded yt-dlp & FFmpeg engines initialized.")
+
+                // Check and dynamically update yt-dlp to latest release to maintain YouTube cipher compatibility
+                try {
+                    val updateStatus = YoutubeDL.getInstance().updateYoutubeDL(this@ViralVideoApp, YoutubeDL.UpdateChannel.STABLE)
+                    Log.d("ViralVideoApp", "yt-dlp background update status: $updateStatus")
+                } catch (updateErr: Throwable) {
+                    Log.w("ViralVideoApp", "yt-dlp auto-update check skipped/failed: ${updateErr.message}")
+                }
             } catch (t: Throwable) {
                 Log.e("ViralVideoApp", "Error initializing embedded yt-dlp: ${t.message}", t)
             }
