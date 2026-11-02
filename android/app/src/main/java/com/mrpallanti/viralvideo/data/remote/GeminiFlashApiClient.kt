@@ -59,7 +59,7 @@ class GeminiFlashApiClient(
                     }
                 }
             }
-        } catch (serverErr) {
+        } catch (serverErr: Exception) {
             // Master server unreachable or offline, fallback to smart algorithmic retention curve
         }
 
