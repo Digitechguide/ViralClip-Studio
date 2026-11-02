@@ -368,7 +368,8 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
                 }
 
                 // If targetUri is still null, prompt creator to pick from gallery
-                if (targetUri.isNullOrBlank()) {
+                val resolvedUri = targetUri
+                if (resolvedUri.isNullOrBlank()) {
                     _uiState.update {
                         it.copy(
                             isRendering = false,
@@ -381,7 +382,7 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
                 _uiState.update { it.copy(isRendering = true, errorMessage = null) }
 
                 renderVerticalShortUseCase(
-                    inputUri = targetUri,
+                    inputUri = resolvedUri,
                     trimRange = state.trimRange,
                     hookText = state.hookText
                 ).collect { job ->

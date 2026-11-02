@@ -540,8 +540,9 @@ fun StudioScreen(
 
                             if (state.isRendering) {
                                 Spacer(modifier = Modifier.height(12.dp))
-                                val progressVal = if (state.renderJob != null) {
-                                    (state.renderJob.progressPercent) / 100f
+                                val currentJob = state.renderJob
+                                val progressVal = if (currentJob != null) {
+                                    currentJob.progressPercent / 100f
                                 } else {
                                     0.5f // Indeterminate or downloading pulse
                                 }
@@ -554,7 +555,7 @@ fun StudioScreen(
                                 val statusText = if (state.loadingMessage.isNotBlank()) {
                                     state.loadingMessage
                                 } else {
-                                    "Processing video with Android Hardware Acceleration: ${state.renderJob?.progressPercent ?: 0}%"
+                                    "Processing video with Android Hardware Acceleration: ${currentJob?.progressPercent ?: 0}%"
                                 }
                                 Text(
                                     text = statusText,
