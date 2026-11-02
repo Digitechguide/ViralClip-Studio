@@ -63,9 +63,16 @@ class YoutubeStreamExtractorImpl(
                     if (ytFiles != null) {
                         for (i in 0 until ytFiles.size()) {
                             val file = ytFiles.valueAt(i)
-                            if (file != null && file.ext == "mp4" && !file.url.isNullOrBlank()) {
-                                directStreamUrl = file.url
-                                break
+                            if (file != null) {
+                                val format = file.meta
+                                val ext = format?.ext
+                                val stream = file.url
+                                if (ext == "mp4" && !stream.isNullOrBlank()) {
+                                    directStreamUrl = stream
+                                    if (format?.isDashContainer == false) {
+                                        break
+                                    }
+                                }
                             }
                         }
                     }
