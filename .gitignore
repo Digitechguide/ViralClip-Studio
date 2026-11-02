@@ -19,6 +19,7 @@ venv/
 ENV/
 
 # Android & Gradle
+*.apk
 .gradle/
 build/
 */build/

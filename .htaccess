@@ -23,3 +23,11 @@ Options -Indexes
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
+
+# Ensure Android APK packages are served with correct MIME type and downloaded directly
+AddType application/vnd.android.package-archive .apk
+<FilesMatch "\.apk$">
+    <IfModule mod_headers.c>
+        Header set Content-Disposition "attachment; filename=\"ViralClip-Studio.apk\""
+    </IfModule>
+</FilesMatch>
