@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>ViralClip Studio - Turn Long Videos into Viral Shorts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css?v=5.0">
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <div class="brand-text">
+          <h1>ViralClip <span class="gradient-text">Studio</span></h1>
+          <span class="badge">AI Shorts Creator</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Admin Panel Link (Visible to Admin) -->
+        <a href="admin.html" id="adminPanelLink" class="btn btn-sm btn-outline" style="display:none; color:#fca5a5; border-color:rgba(239,68,68,0.4);">
+          <i class="fa-solid fa-shield-halved"></i> Admin Panel
+        </a>
+
+        <!-- Auth state buttons -->
+        <button id="openAuthBtn" class="btn btn-primary btn-sm" onclick="document.getElementById('authModal').style.display='flex';">
+          <i class="fa-solid fa-user-lock"></i> Sign In
+        </button>
+        <div class="user-badge" id="userBadge" style="display:none;">
+          <i class="fa-solid fa-circle-user"></i>
+          <span id="userNameDisplay">Creator</span>
+          <button id="logoutBtn" class="logout-btn" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
+        </div>
+        <button id="openSettingsBtn" class="btn btn-secondary btn-sm" title="Configure Gemini API Key & backend" onclick="document.getElementById('settingsModal').style.display='flex';">
+          <i class="fa-solid fa-gear"></i> Settings
+        </button>
+        <div class="status-indicator" id="systemStatus">
+          <span class="dot online"></span>
+          <span class="status-text">Ready</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="studio-layout">
+    <!-- Top Source Input Section -->
+    <section class="input-section glass-card">
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="yt-tab">
+          <i class="fa-brands fa-youtube"></i> YouTube / Shorts URL
+        </button>
+        <button class="tab-btn" data-tab="upload-tab">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload Local Video
+        </button>
+        <button class="tab-btn" data-tab="sample-tab">
+          <i class="fa-solid fa-film"></i> Try Demo Clip
+        </button>
+      </div>
+
+      <!-- Tab 1: YouTube URL -->
+      <div class="tab-content active" id="yt-tab">
+        <form id="ytForm" class="url-input-form" onsubmit="event.preventDefault(); return false;">
+          <div class="input-wrapper">
+            <i class="fa-brands fa-youtube input-icon"></i>
+            <input type="url" id="ytUrlInput" placeholder="Paste YouTube Video or Shorts URL (e.g., https://www.youtube.com/watch?v=... or /shorts/...)" required autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('fetchYtBtn').click();}">
+            <button type="button" id="clearUrlBtn" class="clear-btn" title="Clear">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <button type="button" id="fetchYtBtn" class="btn btn-primary glow-btn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Fetch & Analyze</span>
+          </button>
+        </form>
+        <p class="input-tip">
+          <i class="fa-solid fa-info-circle"></i> Works with regular YouTube videos, podcasts, talks, and Shorts URLs.
+        </p>
+      </div>
+
+      <!-- Tab 2: Upload Local File -->
+      <div class="tab-content" id="upload-tab">
+        <div class="dropzone" id="videoDropzone">
+          <input type="file" id="localFileInput" accept="video/mp4,video/webm,video/quicktime,video/x-matroska" hidden>
+          <div class="dropzone-content">
+            <i class="fa-solid fa-file-video dropzone-icon"></i>
+            <p class="dropzone-title">Drag & drop your long video here or <span class="browse-link">browse</span></p>
+            <p class="dropzone-sub">MP4, WebM, MOV supported (Instant 100% client-side privacy)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Demo Clip -->
+      <div class="tab-content" id="sample-tab">
+        <div class="demo-samples">
+          <p class="samples-title">Select a high-retention sample video to test right now:</p>
+          <div class="sample-cards">
+            <button class="sample-card" data-sample="nature">
+              <i class="fa-solid fa-mountain-sun"></i>
+              <span>Scenic 4K Drone</span>
+            </button>
+            <button class="sample-card" data-sample="tech">
+              <i class="fa-solid fa-microchip"></i>
+              <span>Tech Presentation</span>
+            </button>
+            <button class="sample-card" data-sample="podcast">
+              <i class="fa-solid fa-podcast"></i>
+              <span>Podcast Interview</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Studio Grid (Left: Preview & Trimmer | Right: AI Suggestions & Hooks) -->
+    <div class="studio-grid">
+      <!-- Left Column: Video Studio & Canvas Trimmer -->
+      <section class="player-panel glass-card">
+        <div class="panel-header">
+          <div class="video-meta" id="videoMetaDisplay">
+            <h2 id="currentVideoTitle">No video loaded</h2>
+            <span id="currentVideoDuration" class="meta-tag">00:00</span>
+          </div>
+          <div class="aspect-selector">
+            <label>Aspect Ratio:</label>
+            <div class="btn-group-sm">
+              <button class="aspect-btn active" data-aspect="9:16" title="YouTube Shorts, Reels, TikTok (9:16)">
+                <i class="fa-solid fa-mobile-screen"></i> 9:16
+              </button>
+              <button class="aspect-btn" data-aspect="1:1" title="Instagram Square (1:1)">
+                <i class="fa-regular fa-square"></i> 1:1
+              </button>
+              <button class="aspect-btn" data-aspect="16:9" title="Standard Landscape (16:9)">
+                <i class="fa-solid fa-tv"></i> 16:9
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Mockup Preview Area -->
+        <div class="video-viewport-wrapper">
+          <div class="smartphone-frame ratio-9-16" id="phoneFrame">
+            <!-- Canvas where local/streamed video + overlay text is rendered -->
+            <canvas id="renderCanvas" width="720" height="1280"></canvas>
+            
+            <!-- Hidden native video element used as source -->
+            <video id="sourceVideo" playsinline crossOrigin="anonymous" preload="auto" style="display:none;"></video>
+
+            <!-- YouTube Direct Embed Player for Real YouTube Videos -->
+            <div id="ytPlayerWrapper" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; z-index:4; overflow:hidden; background:#000;">
+              <iframe id="ytIframe" style="width:100%; height:100%; border:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <!-- Floating Live Hook Overlay (Z-INDEX 10 so it always sits above the video) -->
+            <div id="liveHookBanner" class="live-hook-overlay hook-style-yellow-black hook-pos-top" style="display:none; z-index:10;">
+              WAIT FOR THIS PART... 🤯
+            </div>
+
+            <!-- Video Overlay UI Elements (Simulating Shorts App) -->
+            <div class="shorts-ui-overlay">
+              <div class="shorts-side-actions">
+                <div class="side-action"><i class="fa-solid fa-heart"></i><span>124K</span></div>
+                <div class="side-action"><i class="fa-solid fa-comment-dots"></i><span>1.8K</span></div>
+                <div class="side-action"><i class="fa-solid fa-share"></i><span>Share</span></div>
+              </div>
+            </div>
+
+            <!-- Empty State Placeholder -->
+            <div class="empty-state" id="emptyState">
+              <i class="fa-solid fa-video empty-icon"></i>
+              <h3>Paste a YouTube link or upload a video</h3>
+              <p>AI will analyze viral segments and generate high-retention hooks</p>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loader-overlay" id="videoLoader" style="display:none;">
+              <div class="spinner"></div>
+              <p id="loaderMessage">Fetching & processing video...</p>
+            </div>
+          </div>
+
+          <!-- Video Framing Controls -->
+          <div class="framing-toolbar">
+            <span class="framing-label">Framing Crop:</span>
+            <button class="btn btn-tool" id="cropCenterBtn" title="Center Crop (Focus on Speaker)"><i class="fa-solid fa-align-center"></i> Center</button>
+            <button class="btn btn-tool" id="cropLeftBtn" title="Align Left"><i class="fa-solid fa-align-left"></i> Left</button>
+            <button class="btn btn-tool" id="cropRightBtn" title="Align Right"><i class="fa-solid fa-align-right"></i> Right</button>
+            <button class="btn btn-tool" id="cropFitBtn" title="Fit with blurred background"><i class="fa-solid fa-expand"></i> Fit</button>
+          </div>
+        </div>
+
+        <!-- Timeline Trimmer & Playback Controls -->
+        <div class="trimmer-card">
+          <!-- Playback controls -->
+          <div class="playback-controls">
+            <button id="playPauseBtn" class="btn-circle btn-primary" title="Play/Pause">
+              <i class="fa-solid fa-play"></i>
+            </button>
+            <button id="restartClipBtn" class="btn-circle btn-ghost" title="Replay current short clip">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+            <button id="muteBtn" class="btn-circle btn-ghost" title="Mute/Unmute">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <div class="time-display">
+              <span id="currentTimeDisplay" class="current-time">00:00</span>
+              <span class="divider">/</span>
+              <span id="totalDurationDisplay" class="total-time">00:00</span>
+            </div>
+            <div class="selected-clip-badge">
+              <span>Short Length: </span>
+              <strong id="selectedClipLength">0s</strong>
+            </div>
+          </div>
+
+          <!-- Interactive Range Timeline -->
+          <div class="timeline-container">
+            <div class="timeline-ruler" id="timelineRuler"></div>
+            <div class="timeline-track" id="timelineTrack">
+              <!-- Selected segment highlight -->
+              <div class="segment-highlight" id="segmentHighlight"></div>
+              <!-- Playhead scrubber -->
+              <div class="timeline-playhead" id="timelinePlayhead"></div>
+              <!-- Start handle -->
+              <div class="trim-handle handle-start" id="startHandle" title="Drag to adjust Start">
+                <span class="handle-bar"></span>
+                <span class="handle-label" id="startTimeLabel">0:00</span>
+              </div>
+              <!-- End handle -->
+              <div class="trim-handle handle-end" id="endHandle" title="Drag to adjust End">
+                <span class="handle-bar"></span>
+                <span class="handle-label" id="endTimeLabel">0:30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Duration Presets -->
+          <div class="duration-presets">
+            <span class="preset-label">Quick Duration:</span>
+            <button class="preset-btn" data-dur="15">15s</button>
+            <button class="preset-btn active" data-dur="30">30s</button>
+            <button class="preset-btn" data-dur="45">45s</button>
+            <button class="preset-btn" data-dur="60">60s</button>
+            <div class="custom-duration-input">
+              <label for="customSecInput">Custom:</label>
+              <input type="number" id="customSecInput" min="5" max="180" value="30">
+              <span>sec</span>
+              <button id="applyCustomDurBtn" class="btn btn-xs btn-secondary">Set</button>
+            </div>
+          </div>
+
+          <!-- Export & Download Actions -->
+          <div class="export-actions">
+            <button id="recordExportBtn" class="btn btn-success btn-lg glow-btn">
+              <i class="fa-solid fa-download"></i>
+              <span>Export & Download Short</span>
+            </button>
+            <div class="export-progress" id="exportProgressContainer" style="display:none;">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="exportProgressBar"></div>
+              </div>
+              <span class="progress-text" id="exportProgressText">Rendering Short: 0%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: AI Viral Suggestions & Hook Customizer -->
+      <aside class="sidebar-panel">
+        <!-- AI Hook Suggestion Box -->
+        <div class="glass-card ai-suggestions-card">
+          <div class="sidebar-header">
+            <div class="sidebar-title">
+              <i class="fa-solid fa-wand-magic-sparkles text-accent"></i>
+              <h3>AI Viral Suggestions</h3>
+            </div>
+            <button id="reanalyzeBtn" class="btn btn-xs btn-outline" title="Re-generate hooks with Gemini Flash">
+              <i class="fa-solid fa-arrows-rotate"></i> Re-Analyze
+            </button>
+          </div>
+
+          <p class="sidebar-desc" id="aiPremiseText">
+            AI segments the long video into high-retention viral clips optimized for the algorithm.
+          </p>
+
+          <!-- List of suggested viral clips -->
+          <div class="suggestions-list" id="suggestionsContainer">
+            <div class="empty-suggestions">
+              <i class="fa-solid fa-sparkles"></i>
+              <p>Load a video or paste a YouTube URL to view AI-generated viral clips and hooks.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- On-Screen Hook & Subtitle Overlay Customizer -->
+        <div class="glass-card hook-customizer-card">
+          <div class="sidebar-header">
+            <div class="sidebar-title">
+              <i class="fa-solid fa-heading text-accent"></i>
+              <h3>Viral Caption & Hook</h3>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="hookTextInput">Top Attention Hook Text:</label>
+            <input type="text" id="hookTextInput" placeholder="e.g. WAIT TILL THE END! 🤯" value="WAIT FOR THIS PART... 🤯">
+          </div>
+
+          <div class="form-group">
+            <label>Hook Style:</label>
+            <div class="style-presets">
+              <button class="style-pill active" data-style="yellow-black">⚡ MrBeast Yellow</button>
+              <button class="style-pill" data-style="red-white">🔥 Red Alert</button>
+              <button class="style-pill" data-style="neon-cyan">💎 Neon Cyan</button>
+              <button class="style-pill" data-style="clean-white">✨ Clean White</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Caption Position:</label>
+            <div class="btn-group-sm">
+              <button class="pos-btn active" data-pos="top"><i class="fa-solid fa-arrow-up"></i> Top</button>
+              <button class="pos-btn" data-pos="middle"><i class="fa-solid fa-arrows-up-down"></i> Center</button>
+              <button class="pos-btn" data-pos="bottom"><i class="fa-solid fa-arrow-down"></i> Bottom</button>
+            </div>
+          </div>
+
+          <div class="checkbox-row">
+            <label class="switch-label">
+              <input type="checkbox" id="enableHookOverlay" checked>
+              <span class="slider"></span>
+              Show Viral Hook Overlay on Video
+            </label>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal" style="display:none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-gear"></i> Studio Settings</h3>
+        <button class="modal-close-btn" id="closeSettingsBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label><strong>AI Virality Engine (Gemini)</strong></label>
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px; border-radius: 8px; font-size: 0.85rem; color: #34d399;">
+            <i class="fa-solid fa-circle-check"></i> Master Gemini AI Key Active (Managed by Administrator)
+          </div>
+          <small class="field-help" style="margin-top: 6px;">
+            Users do not need to provide an API key. All viral clips & hooks are powered automatically by the system.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="apiBaseUrlInput">
+            <strong>Backend API Endpoint</strong>
+          </label>
+          <input type="text" id="apiBaseUrlInput" value="api" placeholder="api or https://yourdomain.com/api">
+          <small class="field-help">
+            Leave as <code>api</code> when running on <code>serverbyt.in</code> or standard PHP server.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="colabWorkerUrlInput">
+            <strong><i class="fa-solid fa-bolt text-accent"></i> Google Colab 12GB Cloud Engine URL</strong>
+          </label>
+          <input type="url" id="colabWorkerUrlInput" placeholder="e.g. https://xxxx.trycloudflare.com">
+          <small class="field-help">
+            Enter your active Google Colab Cloudflare tunnel link to enable <strong>1-Click Direct 9:16 Cropped Downloads</strong>.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label><strong>Export Quality</strong></label>
+          <select id="exportQualitySelect">
+            <option value="1080">1080p Full HD (Recommended)</option>
+            <option value="720">720p HD (Faster render)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="saveSettingsBtn" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentication Modal (Login / Register) -->
+  <div class="modal" id="authModal" style="display:none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog glass-card auth-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-lock text-accent"></i> Creator Portal Login</h3>
+        <button class="modal-close-btn" id="closeAuthBtn" onclick="document.getElementById('authModal').style.display='none';"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="auth-modal-subtitle" style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 14px;">
+          <i class="fa-solid fa-lock" style="color: #38bdf8;"></i> <strong>Private Access Portal</strong>: Public signup is disabled. Only accounts created directly by the Administrator can access the AI virality engine and studio.
+        </p>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active" style="display:flex; flex-direction:column; gap:12px;">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" placeholder="you@domain.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+          <button type="submit" id="submitLoginBtn" class="btn btn-primary btn-block glow-btn">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Portal
+          </button>
+        </form>
+
+        <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:8px;">
+          <i class="fa-solid fa-shield-halved text-accent"></i> Need an account? Contact the Administrator (<a href="mailto:pallanti2020@gmail.com" style="color:#38bdf8;">pallanti2020@gmail.com</a>) to add your user profile.
+        </p>
+
+        <!-- Instant Test Credentials Helper -->
+        <div class="quick-demo-login">
+          <p class="demo-login-label">Quick 1-Click Login Shortcuts:</p>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button type="button" id="quickAdminLoginBtn" class="btn btn-secondary btn-xs btn-block" style="color:#fca5a5; border-color:rgba(239,68,68,0.4);">
+              <i class="fa-solid fa-shield-halved"></i> Login as Admin (pallanti2020@gmail.com)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube Export & Download Helper Modal -->
+  <div class="modal" id="ytExportModal" style="display:none;">
+    <div class="modal-backdrop" onclick="document.getElementById('ytExportModal').style.display='none';"></div>
+    <div class="modal-dialog glass-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-cloud-arrow-down text-accent"></i> Download YouTube Short</h3>
+        <button class="modal-close-btn" id="closeYtExportBtn" onclick="document.getElementById('ytExportModal').style.display='none';"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <!-- Video Preview Badge -->
+        <div class="yt-export-video-info" style="display: flex; gap: 12px; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 10px;">
+          <img id="ytExportThumb" src="" alt="Thumbnail" style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px;">
+          <div style="flex: 1; min-width: 0;">
+            <div id="ytExportTitle" style="font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">Video Title</div>
+            <div id="ytExportTimeRange" style="font-size: 0.8rem; color: #38bdf8; margin-top: 2px;">
+              <i class="fa-solid fa-scissors"></i> Clip: 00:00 - 00:30 (30s)
+            </div>
+          </div>
+        </div>
+
+        <!-- 0. 1-Click Automated Render via Google Colab 12GB Engine -->
+        <div id="colabRenderSection" class="export-box" style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 12px; padding: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color: #c084fc; font-size: 1.1rem;"></i>
+              <strong style="color: #fff; font-size: 0.95rem;">Automated Cloud 9:16 Render (Google Colab 12GB)</strong>
+            </div>
+            <span id="colabStatusBadge" style="font-size: 0.72rem; color: #c084fc; background: rgba(168, 85, 247, 0.18); padding: 2px 8px; border-radius: 10px; font-weight: 600;">Fast 1-Click</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">
+            Directly slices, crops to 9:16, burns your hook banner, and downloads the finished short in seconds:
+          </p>
+          <button type="button" id="startColabRenderBtn" class="btn btn-primary btn-block glow-btn" style="background: linear-gradient(135deg, #a855f7, #6366f1); border: none; padding: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fa-solid fa-bolt-lightning"></i>
+            <span id="colabBtnLabel">⚡ 1-Click Direct Render & Download (9:16 Short)</span>
+          </button>
+          <div id="colabRenderProgress" style="display: none; margin-top: 10px; font-size: 0.8rem; color: #e9d5ff; text-align: center;">
+            <i class="fa-solid fa-spinner fa-spin"></i> <span id="colabProgressText">Processing video on Google Colab 12GB worker...</span>
+          </div>
+          <div id="colabSetupHint" style="margin-top: 8px; font-size: 0.75rem; color: #d8b4fe; display: flex; justify-content: space-between; align-items: center;">
+            <span><i class="fa-solid fa-circle-info"></i> Powered by your free Google Colab notebook</span>
+            <button type="button" id="configColabBtn" style="background: none; border: none; color: #38bdf8; text-decoration: underline; cursor: pointer; padding: 0;">Configure Colab URL</button>
+          </div>
+        </div>
+
+        <!-- 1. 1-Click Fast MP4 Video Download -->
+        <div class="export-box" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 12px; padding: 16px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <i class="fa-solid fa-file-video text-accent" style="font-size: 1.1rem;"></i>
+            <strong style="color: #fff; font-size: 0.95rem;">1-Click Direct MP4 Video Download</strong>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+            Download the high-quality MP4 video file of this YouTube clip directly to your device:
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <a id="directMp4DownloadBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block glow-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; font-weight: 600;">
+              <i class="fa-solid fa-download"></i>
+              <span>1-Click Download MP4 Video</span>
+            </a>
+            <div style="display: flex; gap: 8px;">
+              <a id="backupDownloadBtn1" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs" style="flex: 1; text-decoration: none; text-align: center;">
+                <i class="fa-solid fa-link"></i> Server 2 (SSYouTube)
+              </a>
+              <a id="backupDownloadBtn2" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs" style="flex: 1; text-decoration: none; text-align: center;">
+                <i class="fa-solid fa-link"></i> Server 3 (Y2Mate)
+              </a>
+            </div>
+          </div>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: #a5b4fc; background: rgba(99, 102, 241, 0.1); padding: 8px; border-radius: 6px; line-height: 1.4;">
+            <i class="fa-solid fa-lightbulb"></i> <strong>Pro-Tip:</strong> Once downloaded, simply drop the MP4 into the <strong>"Upload Local Video"</strong> tab to burn in the 9:16 vertical crop, viral hook banner, and export your short!
+          </div>
+        </div>
+
+        <!-- 2. Copy Timestamps & Viral Hook -->
+        <div class="export-box" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-clipboard-check" style="color: #34d399; font-size: 1.1rem;"></i>
+              <strong style="color: #fff; font-size: 0.95rem;">Viral Hook & Timestamps</strong>
+            </div>
+            <span style="font-size: 0.75rem; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 12px; font-weight: 600;">Ready to Post</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+            Ready to paste into YouTube Shorts, Instagram Reels, or TikTok description:
+          </p>
+          <textarea id="viralHookTextarea" readonly rows="5" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e2e8f0; font-family: monospace; font-size: 0.82rem; padding: 10px; resize: none; margin-bottom: 10px; line-height: 1.5;"></textarea>
+          
+          <button type="button" id="copyViralHookBtn" class="btn btn-success btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-weight: 600;">
+            <i class="fa-solid fa-copy"></i>
+            <span id="copyViralHookBtnText">Copy Timestamps & Viral Hook</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast" style="display:none;">
+    <i class="toast-icon fa-solid fa-circle-check"></i>
+    <span class="toast-message">Action successful</span>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/youtube-helper.js?v=5.0"></script>
+  <script src="js/ai-analyzer.js?v=5.0"></script>
+  <script src="js/video-engine.js?v=5.0"></script>
+  <script src="js/app.js?v=5.0"></script>
+</body>
+</html>

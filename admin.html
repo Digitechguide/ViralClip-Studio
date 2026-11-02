@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Admin Portal - ViralClip Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <style>
+    .admin-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .stat-card {
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+    .stat-icon.purple { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+    .stat-icon.green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .stat-icon.yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .stat-icon.blue { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
+    .stat-info h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+    .stat-info .stat-value { font-size: 1.5rem; font-weight: 800; color: #fff; }
+
+    .table-card {
+      padding: 1.5rem;
+    }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .user-table th {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .user-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.875rem;
+    }
+    .user-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-badge.approved { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-badge.pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-badge.blocked { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .action-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .api-card {
+      padding: 1.5rem;
+    }
+    .admin-login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <!-- Admin Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #ef4444 0%, #8b5cf6 100%);">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="brand-text">
+          <h1>ViralClip <span class="gradient-text">Admin Panel</span></h1>
+          <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border-color: rgba(239, 68, 68, 0.3);">Access Control</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="user-badge" style="background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); color: #fca5a5;">
+          <i class="fa-solid fa-user-shield"></i>
+          <span id="adminEmailBadge">Administrator</span>
+        </div>
+        <a href="index.html" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-arrow-left"></i> Back to Home
+        </a>
+        <button id="adminLogoutBtn" class="btn btn-ghost btn-sm">
+          <i class="fa-solid fa-right-from-bracket"></i> Log Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Admin Login Overlay (Visible only when not authenticated) -->
+  <div class="admin-login-overlay" id="adminLoginOverlay" style="display:none;">
+    <div class="modal-dialog glass-card auth-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-shield-halved text-accent"></i> Administrator Login</h3>
+      </div>
+      <div class="modal-body">
+        <p class="auth-modal-subtitle">
+          Protected Portal. Enter your administrator credentials to access user management and system settings.
+        </p>
+        <form id="adminLoginForm" class="auth-form" autocomplete="off">
+          <div class="form-group">
+            <label for="adminLogEmail">Admin Email</label>
+            <input type="email" id="adminLogEmail" placeholder="Enter admin email" autocomplete="username" required>
+          </div>
+          <div class="form-group">
+            <label for="adminLogPass">Admin Password</label>
+            <input type="password" id="adminLogPass" placeholder="Enter admin password" autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block glow-btn">
+            <i class="fa-solid fa-unlock-keyhole"></i> Authenticate as Admin
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Admin Content Container -->
+  <main class="admin-container" id="adminMainContent">
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card glass-card">
+        <div class="stat-icon purple"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-info">
+          <h4>Total Users</h4>
+          <div class="stat-value" id="statTotalUsers">0</div>
+        </div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon green"><i class="fa-solid fa-user-check"></i></div>
+        <div class="stat-info">
+          <h4>Allowed / Approved</h4>
+          <div class="stat-value" id="statApprovedUsers">0</div>
+        </div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon yellow"><i class="fa-solid fa-user-clock"></i></div>
+        <div class="stat-info">
+          <h4>Pending Approval</h4>
+          <div class="stat-value" id="statPendingUsers">0</div>
+        </div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-key"></i></div>
+        <div class="stat-info">
+          <h4>Master AI Key</h4>
+          <div class="stat-value" style="font-size: 1.1rem; color: #34d399;">Active (Server)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Gemini AI Settings -->
+    <section class="glass-card api-card">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-microchip text-accent"></i>
+          <h3>Global Gemini AI Master Key</h3>
+        </div>
+      </div>
+      <p class="sidebar-desc">
+        All approved users automatically use this master API key securely through the server proxy. Users never see or manage their own keys.
+      </p>
+      <form id="geminiMasterKeyForm" style="display:flex; gap:0.75rem; align-items:flex-end; flex-wrap:wrap;">
+        <div class="form-group" style="flex:1; min-width:300px; margin-bottom:0;">
+          <label for="masterKeyInput">Admin Master Gemini API Key</label>
+          <input type="password" id="masterKeyInput" placeholder="Enter Gemini API key" autocomplete="off" required>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i> Save Master Key
+        </button>
+      </form>
+    </section>
+
+    <!-- User Access Management Table -->
+    <section class="glass-card table-card">
+      <div class="table-header">
+        <div>
+          <h3><i class="fa-solid fa-user-gear text-accent"></i> User Access & Approvals</h3>
+          <p class="sidebar-desc" style="margin-bottom:0;">Only <strong>Approved</strong> users can access the application and AI engine.</p>
+        </div>
+        <button id="openAddUserModalBtn" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-user-plus"></i> Add Allowed User
+        </button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Creator</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Loading users...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add Allowed User Modal -->
+  <div class="modal" id="addUserModal" style="display:none;">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog glass-card auth-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus text-accent"></i> Add Pre-Approved User</h3>
+        <button class="modal-close-btn" id="closeAddUserBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="addUserForm" class="auth-form" autocomplete="off">
+          <div class="form-group">
+            <label for="newUserName">Creator Name</label>
+            <input type="text" id="newUserName" placeholder="e.g. John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="newUserEmail">Email Address</label>
+            <input type="email" id="newUserEmail" placeholder="creator@domain.com" required>
+          </div>
+          <div class="form-group">
+            <label for="newUserPassword">Set Password</label>
+            <input type="password" id="newUserPassword" placeholder="Set temporary password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block glow-btn">
+            <i class="fa-solid fa-check"></i> Add as Approved User
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast" style="display:none;">
+    <i class="toast-icon fa-solid fa-circle-check"></i>
+    <span class="toast-message">Action successful</span>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const API_BASE = 'api';
+
+      let adminToken = localStorage.getItem('viralclip_admin_token') || '';
+      let currentAdminUser = JSON.parse(localStorage.getItem('viralclip_admin_user') || 'null');
+
+      const loginOverlay = document.getElementById('adminLoginOverlay');
+      const adminLoginForm = document.getElementById('adminLoginForm');
+      const userTableBody = document.getElementById('userTableBody');
+      const statTotalUsers = document.getElementById('statTotalUsers');
+      const statApprovedUsers = document.getElementById('statApprovedUsers');
+      const statPendingUsers = document.getElementById('statPendingUsers');
+      const masterKeyForm = document.getElementById('geminiMasterKeyForm');
+      const masterKeyInput = document.getElementById('masterKeyInput');
+      const addUserModal = document.getElementById('addUserModal');
+      const openAddUserModalBtn = document.getElementById('openAddUserModalBtn');
+      const closeAddUserBtn = document.getElementById('closeAddUserBtn');
+      const addUserForm = document.getElementById('addUserForm');
+      const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+      const adminEmailBadge = document.getElementById('adminEmailBadge');
+
+      function checkAdminAuth() {
+        if (!currentAdminUser || currentAdminUser.role !== 'admin' || !adminToken) {
+          loginOverlay.style.display = 'flex';
+          document.getElementById('adminLogEmail').value = '';
+          document.getElementById('adminLogPass').value = '';
+        } else {
+          loginOverlay.style.display = 'none';
+          if (adminEmailBadge && currentAdminUser.email) {
+            adminEmailBadge.textContent = currentAdminUser.email;
+          }
+          loadDashboardData();
+        }
+      }
+
+      adminLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('adminLogEmail').value.trim();
+        const password = document.getElementById('adminLogPass').value;
+
+        try {
+          const res = await fetch(`${API_BASE}/auth.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'login',
+              email: email,
+              password: password
+            })
+          });
+
+          const data = await res.json();
+          if (res.ok && data.status === 'success' && data.user && data.user.role === 'admin') {
+            currentAdminUser = data.user;
+            adminToken = data.token;
+            localStorage.setItem('viralclip_admin_user', JSON.stringify(currentAdminUser));
+            localStorage.setItem('viralclip_admin_token', adminToken);
+            localStorage.setItem('viralclip_user', JSON.stringify(currentAdminUser));
+            if (adminEmailBadge) adminEmailBadge.textContent = currentAdminUser.email;
+            loginOverlay.style.display = 'none';
+            showToast('Welcome, Administrator!', 'success');
+            loadDashboardData();
+          } else {
+            showToast(data.error || 'Access denied: Invalid credentials.', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to connect to authentication service.', 'error');
+        }
+      });
+
+      function logoutAdmin() {
+        localStorage.removeItem('viralclip_admin_user');
+        localStorage.removeItem('viralclip_admin_token');
+        currentAdminUser = null;
+        adminToken = '';
+        document.getElementById('adminLogEmail').value = '';
+        document.getElementById('adminLogPass').value = '';
+        loginOverlay.style.display = 'flex';
+      }
+
+      adminLogoutBtn.addEventListener('click', logoutAdmin);
+
+      async function loadDashboardData() {
+        if (!adminToken) return;
+
+        // Fetch User List
+        try {
+          const res = await fetch(`${API_BASE}/auth.php?action=admin_get_users&token=${encodeURIComponent(adminToken)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.users) {
+              renderUsers(data.users);
+            }
+          } else if (res.status === 403) {
+            logoutAdmin();
+            return;
+          }
+        } catch (e) {
+          console.warn('Backend call failed:', e);
+        }
+
+        // Fetch Master Settings
+        try {
+          const sRes = await fetch(`${API_BASE}/auth.php?action=admin_get_settings&token=${encodeURIComponent(adminToken)}`);
+          if (sRes.ok) {
+            const sData = await sRes.json();
+            if (sData && sData.settings && sData.settings.gemini_api_key) {
+              masterKeyInput.value = sData.settings.gemini_api_key;
+            }
+          }
+        } catch (e) {
+          console.warn('Settings load failed:', e);
+        }
+      }
+
+      function renderUsers(users) {
+        userTableBody.innerHTML = '';
+        let total = users.length;
+        let approved = 0;
+        let pending = 0;
+
+        users.forEach(u => {
+          if (u.status === 'approved') approved++;
+          else pending++;
+
+          const tr = document.createElement('tr');
+          const isSuperAdmin = u.role === 'admin';
+
+          tr.innerHTML = `
+            <td><strong>${escapeHtml(u.name)}</strong></td>
+            <td>${escapeHtml(u.email)}</td>
+            <td><span class="badge" style="text-transform:uppercase;">${u.role}</span></td>
+            <td><span class="status-badge ${u.status}">${u.status}</span></td>
+            <td>
+              <div class="action-btns">
+                ${!isSuperAdmin ? `
+                  ${u.status !== 'approved' ? `
+                    <button class="btn btn-xs btn-success approve-btn" data-email="${u.email}">
+                      <i class="fa-solid fa-check"></i> Approve
+                    </button>
+                  ` : `
+                    <button class="btn btn-xs btn-outline block-btn" data-email="${u.email}">
+                      <i class="fa-solid fa-ban"></i> Block
+                    </button>
+                  `}
+                  <button class="btn btn-xs btn-ghost delete-btn" data-email="${u.email}" style="color:var(--danger);">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                ` : '<span style="font-size:0.75rem; color:var(--text-muted);"><i class="fa-solid fa-lock"></i> Protected</span>'}
+              </div>
+            </td>
+          `;
+
+          // Action Listeners
+          const appBtn = tr.querySelector('.approve-btn');
+          if (appBtn) appBtn.addEventListener('click', () => setStatus(u.email, 'approved'));
+
+          const blkBtn = tr.querySelector('.block-btn');
+          if (blkBtn) blkBtn.addEventListener('click', () => setStatus(u.email, 'blocked'));
+
+          const delBtn = tr.querySelector('.delete-btn');
+          if (delBtn) delBtn.addEventListener('click', () => deleteUser(u.email));
+
+          userTableBody.appendChild(tr);
+        });
+
+        statTotalUsers.textContent = total;
+        statApprovedUsers.textContent = approved;
+        statPendingUsers.textContent = pending;
+      }
+
+      async function setStatus(email, status) {
+        try {
+          const res = await fetch(`${API_BASE}/auth.php?action=admin_set_status&email=${encodeURIComponent(email)}&status=${status}&token=${encodeURIComponent(adminToken)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'success') {
+            showToast(`User is now ${status}!`, 'success');
+            loadDashboardData();
+          } else {
+            showToast(data.error || 'Failed to update status', 'error');
+          }
+        } catch(e) {
+          showToast('Failed to update status', 'error');
+        }
+      }
+
+      async function deleteUser(email) {
+        if (!confirm(`Delete user ${email}?`)) return;
+        try {
+          const res = await fetch(`${API_BASE}/auth.php?action=admin_delete_user&email=${encodeURIComponent(email)}&token=${encodeURIComponent(adminToken)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'success') {
+            showToast('User removed.', 'info');
+            loadDashboardData();
+          } else {
+            showToast(data.error || 'Failed to delete user', 'error');
+          }
+        } catch(e) {
+          showToast('Failed to delete user', 'error');
+        }
+      }
+
+      // Add Pre-Approved User
+      openAddUserModalBtn.addEventListener('click', () => addUserModal.style.display = 'flex');
+      closeAddUserBtn.addEventListener('click', () => addUserModal.style.display = 'none');
+
+      addUserForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('newUserName').value.trim();
+        const email = document.getElementById('newUserEmail').value.trim();
+        const password = document.getElementById('newUserPassword').value;
+
+        try {
+          const res = await fetch(`${API_BASE}/auth.php?action=admin_add_user&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&status=approved&token=${encodeURIComponent(adminToken)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'success') {
+            showToast(`User ${email} created & approved!`, 'success');
+            addUserModal.style.display = 'none';
+            addUserForm.reset();
+            loadDashboardData();
+          } else {
+            showToast(data.error || 'Failed to add user', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to add user', 'error');
+        }
+      });
+
+      // Master Gemini API Key Update
+      masterKeyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const key = masterKeyInput.value.trim();
+        try {
+          const res = await fetch(`${API_BASE}/auth.php?action=admin_update_settings&gemini_api_key=${encodeURIComponent(key)}&token=${encodeURIComponent(adminToken)}`);
+          const data = await res.json();
+          if (res.ok && data.status === 'success') {
+            showToast('Master Gemini API Key updated globally!', 'success');
+          } else {
+            showToast(data.error || 'Failed to update key', 'error');
+          }
+        } catch(e) {
+          showToast('Failed to update key', 'error');
+        }
+      });
+
+      function escapeHtml(str) {
+        return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function showToast(msg, type = 'info') {
+        const toast = document.getElementById('toast');
+        toast.querySelector('.toast-message').textContent = msg;
+        toast.style.display = 'flex';
+        clearTimeout(toast._to);
+        toast._to = setTimeout(() => toast.style.display = 'none', 3500);
+      }
+
+      checkAdminAuth();
+    });
+  </script>
+</body>
+</html>

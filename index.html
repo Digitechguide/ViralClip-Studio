@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>ViralClip Studio - Native Android AI Shorts Creator</title>
+  
+  <!-- SEO & Open Graph -->
+  <meta name="description" content="Turn long YouTube videos into viral TikToks, YouTube Shorts, and Instagram Reels directly on your Android phone with Gemini AI and on-device FFmpeg.">
+  <meta property="og:title" content="ViralClip Studio - Turn Long Videos into Viral Shorts on Android">
+  <meta property="og:description" content="AI hook detection, on-device 9:16 vertical cropping, and direct YouTube Share Sheet integration.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://viral.mrpallanti.in/">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/landing.css?v=6.0">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <div>
+          <span class="brand-title">ViralClip Studio</span>
+          <span class="brand-badge"><i class="fa-brands fa-android"></i> Android Native</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#comparison" class="nav-link">Why Native?</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="studio.html" class="nav-link" title="Legacy Web Studio Backup"><i class="fa-solid fa-laptop-code"></i> Web Studio</a>
+        <a href="admin.html" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-shield-halved"></i> Admin Portal
+        </a>
+        <a href="#download" class="btn btn-primary btn-sm">
+          <i class="fa-brands fa-android"></i> Get APK
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        
+        <!-- Left Hero Content -->
+        <div class="hero-content">
+          <div class="hero-tag">
+            <i class="fa-solid fa-microchip"></i> 100% On-Device Processing • Zero Cloud Subscriptions
+          </div>
+          
+          <h1 class="hero-title">
+            Turn Long YouTube Videos into <span>Viral Shorts</span> on Android
+          </h1>
+          
+          <p class="hero-desc">
+            No expensive cloud subscriptions, no 10-minute server queues, and no browser CORS bottlenecks. 
+            ViralClip Studio utilizes your Android phone's hardware with on-device FFmpeg and Google Gemini AI 
+            to automatically extract viral hooks, crop 9:16 vertical video, and save to your camera roll in seconds.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#download" class="btn btn-primary btn-lg">
+              <i class="fa-brands fa-android"></i> Download Android APK
+            </a>
+            <a href="#how-it-works" class="btn btn-secondary btn-lg">
+              <i class="fa-solid fa-circle-play"></i> Watch Demo
+            </a>
+          </div>
+
+          <div class="hero-stats">
+            <div>
+              <div class="stat-num">0s</div>
+              <div class="stat-label">Cloud Queue Latency</div>
+            </div>
+            <div>
+              <div class="stat-num">1080x1920</div>
+              <div class="stat-label">Crisp 60fps Vertical</div>
+            </div>
+            <div>
+              <div class="stat-num">100%</div>
+              <div class="stat-label">On-Device Privacy</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Mockup (Interactive Mobile UI Preview) -->
+        <div class="mockup-wrapper">
+          
+          <!-- Floating Badge Top Left -->
+          <div class="floating-badge badge-top-left">
+            <div class="badge-icon" style="background:#10b981;">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div>
+              <div style="font-size:0.75rem; color:#94a3b8;">Processing Speed</div>
+              <div style="color:#fff;">Hardware Accelerated</div>
+            </div>
+          </div>
+
+          <!-- Phone Mockup Frame -->
+          <div class="phone-mockup">
+            <div class="phone-notch"></div>
+            
+            <div class="phone-screen">
+              <!-- Mock App Header -->
+              <div class="app-mock-header">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <i class="fa-solid fa-bolt-lightning" style="color:#a855f7; font-size:0.9rem;"></i>
+                  <span style="font-weight:700; font-size:0.8rem; color:#fff;">ViralClip Studio</span>
+                </div>
+                <span style="background:rgba(16,185,129,0.2); color:#10b981; font-size:0.65rem; padding:2px 6px; border-radius:10px; font-weight:700;">PRO</span>
+              </div>
+
+              <!-- Mock YouTube Input -->
+              <div class="app-mock-input">
+                <i class="fa-brands fa-youtube" style="color:#ef4444;"></i>
+                <span style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">youtu.be/dQw4w9WgXcQ (Podcasts, Talks...)</span>
+              </div>
+
+              <!-- Mock Video Preview Frame -->
+              <div class="app-mock-preview">
+                <div style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at center, #1e1b4b 0%, #030712 100%);">
+                  <i class="fa-solid fa-play" style="font-size:1.8rem; color:rgba(255,255,255,0.7);"></i>
+                  
+                  <!-- Detected Viral Hook Tag -->
+                  <div class="app-mock-hook">
+                    <div style="color:#f59e0b; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.5px;">
+                      <i class="fa-solid fa-fire"></i> Viral Hook Detected (96/100)
+                    </div>
+                    <div style="color:#fff; font-size:0.72rem; margin-top:2px;">
+                      "The 1 Habit That Changed Everything..."
+                    </div>
+                  </div>
+
+                  <!-- 9:16 Crop Guides -->
+                  <div style="position:absolute; inset:8px; border:1px dashed rgba(168,85,247,0.4); border-radius:8px; pointer-events:none;"></div>
+                </div>
+              </div>
+
+              <!-- Mock AI Analysis Card -->
+              <div class="app-mock-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.7rem;">
+                  <span style="color:#c084fc; font-weight:700;"><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 1.5 Flash</span>
+                  <span style="color:#10b981; font-weight:700;">00:45 - 01:25</span>
+                </div>
+                <div style="color:#94a3b8; font-size:0.68rem; line-height:1.3;">
+                  High emotional tension in opening 5s, optimal retention curve for Shorts & Reels.
+                </div>
+              </div>
+
+              <!-- Mock Render Button -->
+              <div class="app-mock-btn">
+                <i class="fa-solid fa-film"></i> Export 9:16 Vertical Short
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating Badge Bottom Right -->
+          <div class="floating-badge badge-bottom-right">
+            <div class="badge-icon" style="background:#a855f7;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <div style="font-size:0.75rem; color:#94a3b8;">Gemini AI Engine</div>
+              <div style="color:#fff;">Auto-Hook Detection</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Section: Web SaaS vs Android Native -->
+  <section id="comparison" class="section" style="background: rgba(15, 23, 42, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Direct Comparison</div>
+        <h2 class="section-title">Why Native Mobile Trumps Web Video SaaS</h2>
+        <p class="section-subtitle">Web-based video editors suffer from browser CORS blocks, heavy server bandwidth costs, and sluggish upload/download loops. Here is why the native app wins.</p>
+      </div>
+
+      <div class="comparison-card">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Feature / Metric</th>
+              <th>Traditional Web SaaS (Opus/Kling/Veed)</th>
+              <th class="highlight"><i class="fa-brands fa-android"></i> ViralClip Native Android App</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Monthly Cost</strong></td>
+              <td>$29 – $60 / month per creator</td>
+              <td class="highlight"><strong style="color:#10b981;">100% Free</strong> (Runs on your hardware)</td>
+            </tr>
+            <tr>
+              <td><strong>Processing Queue</strong></td>
+              <td>Cloud queue: 5 – 15 mins wait time</td>
+              <td class="highlight"><strong>0 seconds</strong> (Instant local rendering)</td>
+            </tr>
+            <tr>
+              <td><strong>Workflow from YouTube</strong></td>
+              <td>Copy link -> Open laptop -> Download -> Upload</td>
+              <td class="highlight"><strong>1-Tap Share Sheet</strong> directly in YouTube mobile app</td>
+            </tr>
+            <tr>
+              <td><strong>Video Export Quality</strong></td>
+              <td>Compressed, restricted 720p on free tiers</td>
+              <td class="highlight"><strong>Full 1080p 60fps</strong> uncompressed direct to Gallery</td>
+            </tr>
+            <tr>
+              <td><strong>Privacy & Security</strong></td>
+              <td>Your media is stored on 3rd party cloud servers</td>
+              <td class="highlight"><strong>100% Private</strong> (On-device MediaStore)</td>
+            </tr>
+            <tr>
+              <td><strong>AI Hook Engine</strong></td>
+              <td>Generic black-box models with credit limits</td>
+              <td class="highlight"><strong>Google Gemini 1.5 Flash</strong> with custom viral prompt engineering</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Engineered for Creators</div>
+        <h2 class="section-title">Everything Needed to Dominate Vertical Video</h2>
+        <p class="section-subtitle">Built with Android Clean Architecture, Jetpack Compose, Kotlin Coroutines, and hardware-accelerated FFmpegKit.</p>
+      </div>
+
+      <div class="features-grid">
+        
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fa-solid fa-microchip"></i>
+          </div>
+          <h3>On-Device FFmpeg Engine</h3>
+          <p>Renders 9:16 aspect ratio vertical clips using native ARM NEON vector instructions and Android MediaCodec hardware encoders. Zero remote server dependency.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(99,102,241,0.15); color:#818cf8;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <h3>Gemini AI Hook Detection</h3>
+          <p>Leverages Google Gemini 1.5 Flash to automatically detect emotional peaks, curiosity loops, and high-CTR punchlines, guaranteeing high audience retention.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(239,68,68,0.15); color:#ef4444;">
+            <i class="fa-brands fa-youtube"></i>
+          </div>
+          <h3>Native Share Sheet Receiver</h3>
+          <p>Never copy-paste URLs again. While watching any long video on YouTube, simply tap <em>Share &rarr; ViralClip Studio</em> to auto-import the stream instantly.</p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(16,185,129,0.15); color:#10b981;">
+            <i class="fa-solid fa-photo-film"></i>
+          </div>
+          <h3>1-Tap Gallery Export</h3>
+          <p>Exported clips are instantly indexed into the Android MediaStore. Ready to be published to TikTok, Instagram Reels, and YouTube Shorts without file management hassles.</p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(56,189,248,0.15); color:#38bdf8;">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3>Zero Server Bandwidth</h3>
+          <p>Web applications crash or run up massive cloud bills streaming gigabytes of video. ViralClip performs all cropping on your device, using zero cloud bandwidth.</p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="feature-card">
+          <div class="feature-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">
+            <i class="fa-solid fa-user-lock"></i>
+          </div>
+          <h3>Centralized Admin Governance</h3>
+          <p>The Master Gemini AI key is guarded securely on the server. Unauthorized access and public signups are locked down—only admin-approved accounts can run AI suggestions.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="section" style="background: rgba(15, 23, 42, 0.4);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Simple 3-Step Flow</div>
+        <h2 class="section-title">From 2-Hour Video to Viral Short in 60 Seconds</h2>
+        <p class="section-subtitle">Streamlined workflow designed specifically for high-volume content creators and social media agencies.</p>
+      </div>
+
+      <div class="steps-grid">
+        
+        <!-- Step 1 -->
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:10px;">Share or Paste Video</h3>
+          <p style="color:var(--text-muted); font-size:0.92rem;">
+            Watch any podcast, interview, or talk in the YouTube app. Tap <strong>Share</strong> and choose <strong>ViralClip Studio</strong>, or paste any video link directly.
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:10px;">AI Finds the Best Hooks</h3>
+          <p style="color:var(--text-muted); font-size:0.92rem;">
+            Gemini 1.5 Flash scans the video transcript and audio patterns, ranking the top 30-60 second clips with virality scores, punchlines, and titles.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:10px;">1-Click Local Crop & Save</h3>
+          <p style="color:var(--text-muted); font-size:0.92rem;">
+            Select your preferred hook. The app auto-crops to 9:16 vertical (1080x1920) and encodes directly into your Android Camera Roll ready to post!
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Authorized Access & Download CTA Banner -->
+  <section id="download" class="section">
+    <div class="container">
+      <div class="cta-banner">
+        <h2>Ready to Supercharge Your Shorts Production?</h2>
+        <p>
+          Download the latest <strong>ViralClip Studio Native Android APK</strong>. 
+          To protect AI engine quota, public signups are closed. Access is granted exclusively to creators authorized by the administrator.
+        </p>
+
+        <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin-bottom:32px;">
+          <a href="https://github.com/Digitechguide/ViralClip-Studio/releases/download/v1.0.0/app-release.apk" class="btn btn-primary btn-lg" onclick="handleApkDownload(event)">
+            <i class="fa-brands fa-android"></i> Download APK (v1.0.0)
+          </a>
+          <a href="admin.html" class="btn btn-secondary btn-lg">
+            <i class="fa-solid fa-shield-halved"></i> Admin Login & User Approval
+          </a>
+        </div>
+
+        <!-- Installation Instructions Badge -->
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:10px 20px; font-size:0.85rem; color:#cbd5e1;">
+          <i class="fa-solid fa-circle-info" style="color:#38bdf8;"></i>
+          Requires Android 8.0 (Oreo) or higher • ARM64-v8a / armeabi-v7a compatible
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#comparison">Why Native?</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="studio.html">Legacy Web Studio</a>
+        <a href="admin.html">Admin Portal</a>
+      </div>
+      <p style="margin-bottom:8px;">
+        &copy; 2026 ViralClip Studio by <strong>MrPallanti</strong>. All Rights Reserved.
+      </p>
+      <p style="font-size:0.75rem; color:#64748b;">
+        Powered by Google Gemini 1.5 Flash • Hardware Accelerated FFmpegKit • Android Clean Architecture
+      </p>
+    </div>
+  </footer>
+
+  <!-- Simple APK Download Notification Modal -->
+  <div id="downloadModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#0f172a; border:1px solid rgba(168,85,247,0.4); border-radius:20px; max-width:480px; width:100%; padding:32px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+      <div style="width:60px; height:60px; border-radius:16px; background:rgba(168,85,247,0.15); color:#c084fc; font-size:1.8rem; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <i class="fa-brands fa-android"></i>
+      </div>
+      <h3 style="font-family:var(--font-heading); font-size:1.5rem; margin-bottom:12px; color:#fff;">ViralClip Studio for Android</h3>
+      <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:24px; line-height:1.5;">
+        The source repository includes the full Android Studio project ready to compile and run.
+        You can also build the APK using GitHub Actions with our preconfigured CI/CD workflow in <code>.github/workflows/build-apk.yml</code>.
+      </p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <a href="admin.html" class="btn btn-primary" style="width:100%;">
+          <i class="fa-solid fa-user-shield"></i> Open Admin Portal to Manage Users
+        </a>
+        <button onclick="document.getElementById('downloadModal').style.display='none';" class="btn btn-secondary" style="width:100%;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleApkDownload(e) {
+      e.preventDefault();
+      document.getElementById('downloadModal').style.display = 'flex';
+    }
+  </script>
+
+</body>
+</html>

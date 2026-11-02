@@ -1,0 +1,42 @@
+# Environment and Credentials
+.env
+.env.*
+*.env
+deploy_secrets.*
+
+# Server runtime data & users database
+api/data/*.json
+!api/data/.htaccess
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Android & Gradle
+.gradle/
+build/
+*/build/
+*/*/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Node / JS
+node_modules/
+npm-debug.log*
+
+# OS / Editor files
+Thumbs.db
+Desktop.ini
+*.swp
+*.bak
