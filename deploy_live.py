@@ -30,7 +30,6 @@ if not FTP_PASS:
 files_to_upload = [
     ('.htaccess', '.htaccess'),
     ('index.html', 'index.html'),
-    ('ViralClip-Studio.apk', 'ViralClip-Studio.apk'),
     ('studio.html', 'studio.html'),
     ('admin.html', 'admin.html'),
     ('css/landing.css', 'css/landing.css'),
@@ -44,6 +43,7 @@ files_to_upload = [
     ('api/suggest.php', 'api/suggest.php'),
     ('api/download.php', 'api/download.php'),
     ('api/info.php', 'api/info.php'),
+    ('api/sync_apk.php', 'api/sync_apk.php'),
     ('api/data/.htaccess', 'api/data/.htaccess'),
     ('Viral_Video_Renderer_Colab.ipynb', 'Viral_Video_Renderer_Colab.ipynb')
 ]

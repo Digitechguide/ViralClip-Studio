@@ -61,6 +61,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/app-release.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/ViralClip-Studio.apk
 
       - name: Publish GitHub Release
         if: github.ref == 'refs/heads/main'
@@ -75,7 +77,10 @@ jobs:
             - **Automated Dynamic Versioning:** Every commit increments the app version and package code automatically.
             - **Creator Authentication Gate:** Mandatory login restricted to admin-approved accounts.
             - **AndroidX Media3 Transformer Engine:** Crash-proof hardware video cropping (9:16) and trimming.
+            - **Auto Face-Centered Framing:** Smart subject tracking centers speakers automatically when converting 16:9 to 9:16 Shorts.
             - **Local Gallery Picker & 1-Tap Blueprint Copy:** Pick downloaded video clips or copy viral timestamps directly to clipboard.
           files: |
             android/app/build/outputs/apk/debug/app-release.apk
             android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk
+            android/app/build/outputs/apk/debug/ViralClip-Studio.apk

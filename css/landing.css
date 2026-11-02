@@ -550,6 +550,30 @@ body {
   margin: 0 auto 32px;
 }
 
+.cta-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.cta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.table-scroll-hint {
+  display: none;
+}
+
 /* Footer */
 .footer {
   border-top: 1px solid var(--border);
@@ -595,5 +619,271 @@ body {
   }
   .floating-badge {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 0;
+  }
+
+  .nav-container {
+    gap: 10px;
+  }
+
+  /* Hide regular nav text links on mobile to prevent navbar vertical overflow */
+  .nav-links .nav-link {
+    display: none;
+  }
+
+  .nav-links {
+    gap: 8px;
+  }
+
+  .nav-links .btn-sm {
+    padding: 8px 12px;
+    font-size: 0.82rem;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+  }
+
+  .brand-title {
+    font-size: 1.1rem;
+  }
+
+  .brand-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    margin-left: 2px;
+  }
+
+  .hero {
+    padding: 36px 0 20px;
+  }
+
+  .hero-tag {
+    font-size: 0.76rem;
+    padding: 6px 12px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 7.5vw, 2.5rem);
+    letter-spacing: -0.8px;
+    line-height: 1.18;
+    margin-bottom: 16px;
+  }
+
+  .hero-desc {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 32px;
+    padding-top: 20px;
+  }
+
+  .stat-num {
+    font-size: 1.4rem;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+
+  .mockup-wrapper {
+    margin: 32px auto 0;
+    max-width: 100%;
+  }
+
+  .phone-mockup {
+    width: 280px;
+    height: 550px;
+    border-width: 6px;
+    border-radius: 36px;
+  }
+
+  .section {
+    padding: 55px 0;
+  }
+
+  .section-title {
+    font-size: clamp(1.7rem, 6vw, 2.1rem);
+    line-height: 1.25;
+  }
+
+  .section-subtitle {
+    font-size: 0.92rem;
+    margin-bottom: 30px;
+  }
+
+  /* Comparison Mobile Card & Smooth Scroll */
+  .comparison-card {
+    padding: 20px 14px;
+    border-radius: 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-scroll-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--accent-cyan);
+    margin-bottom: 14px;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 20px;
+    padding: 6px 12px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .comp-table {
+    min-width: 520px;
+  }
+
+  .comp-table th, .comp-table td {
+    padding: 12px 10px;
+    font-size: 0.84rem;
+  }
+
+  .feature-card, .step-card {
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .step-num {
+    font-size: 2.2rem;
+    margin-bottom: 6px;
+  }
+
+  /* CTA Banner Mobile */
+  .cta-banner {
+    padding: 36px 18px;
+    border-radius: 22px;
+  }
+
+  .cta-banner h2 {
+    font-size: clamp(1.55rem, 5.5vw, 2rem);
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+
+  .cta-banner p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+
+  .cta-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .cta-actions .btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+  }
+
+  .cta-badge {
+    width: 100%;
+    font-size: 0.76rem;
+    padding: 10px 12px;
+    text-align: center;
+    justify-content: center;
+    line-height: 1.4;
+  }
+
+  .footer {
+    padding: 32px 0;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  /* On extra-small phones, hide brand-badge to keep header single-line */
+  .brand-badge {
+    display: none;
+  }
+
+  .brand-title {
+    font-size: 1.02rem;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
+
+  .nav-links {
+    gap: 6px;
+  }
+
+  .nav-links .btn {
+    padding: 7px 10px;
+    font-size: 0.78rem;
+    border-radius: 8px;
+  }
+
+  .phone-mockup {
+    width: 260px;
+    height: 510px;
+    border-radius: 30px;
+  }
+
+  .app-mock-preview {
+    height: 180px;
+  }
+
+  .stat-num {
+    font-size: 1.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
   }
 }

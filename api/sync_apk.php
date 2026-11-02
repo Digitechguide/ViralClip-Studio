@@ -11,10 +11,28 @@ if ($key !== 'sync_salicylates_2026') {
     exit;
 }
 
-$tag = $_GET['tag'] ?? 'v1.0.21';
+$tag = $_GET['tag'] ?? 'v1.0.28';
+$action = $_GET['action'] ?? 'download';
 $remoteUrl = "https://github.com/Digitechguide/ViralClip-Studio/releases/download/{$tag}/app-release.apk";
 $destPath = dirname(__DIR__) . "/ViralClip-Studio.apk";
+$versionedDestPath = dirname(__DIR__) . "/ViralClip-Studio-{$tag}.apk";
 $tempPath = dirname(__DIR__) . "/ViralClip-Studio.apk.tmp";
+
+// If action is copy/version_only and unversioned file already exists
+if ($action === 'version_only' || $action === 'copy') {
+    if (file_exists($destPath) && filesize($destPath) > 1000000) {
+        copy($destPath, $versionedDestPath);
+        echo json_encode([
+            'status' => 'success',
+            'action' => 'version_copied',
+            'tag' => $tag,
+            'versioned_file' => basename($versionedDestPath),
+            'bytes' => filesize($versionedDestPath),
+            'md5' => md5_file($versionedDestPath)
+        ]);
+        exit;
+    }
+}
 
 // Use streaming cURL with redirect follow to download directly from GitHub CDN
 $fp = fopen($tempPath, 'w+');
@@ -39,10 +57,15 @@ if ($success && $httpCode >= 200 && $httpCode < 300 && filesize($tempPath) > 100
         unlink($destPath);
     }
     rename($tempPath, $destPath);
+    // Also save versioned APK for explicit version downloads
+    copy($destPath, $versionedDestPath);
+
     echo json_encode([
         'status' => 'success',
         'tag' => $tag,
         'bytes' => filesize($destPath),
+        'versioned_file' => basename($versionedDestPath),
+        'versioned_bytes' => filesize($versionedDestPath),
         'md5' => md5_file($destPath)
     ]);
 } else {
