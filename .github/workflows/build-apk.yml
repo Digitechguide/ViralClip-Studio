@@ -52,9 +52,28 @@ jobs:
 
       - name: Build Debug APK with Gradle
         working-directory: ./android
-        run: ./gradlew assembleDebug -PversionCode=${{ steps.app_version.outputs.version_code }} -PversionName=${{ steps.app_version.outputs.version_name }} --stacktrace 2>&1 | tee ../assemble_output.txt
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug -PversionCode=${{ steps.app_version.outputs.version_code }} -PversionName=${{ steps.app_version.outputs.version_name }} --stacktrace 2>&1 | tee ../assemble_output.txt
 
-      - name: Save Error Log on Failure
+      - name: Locate and Prepare Release APK Assets
+        run: |
+          echo "=== Searching for APKs ==="
+          find . -name "*.apk"
+          APK_FILE=$(find . -name "*.apk" | head -n 1)
+          echo "Discovered built APK: $APK_FILE"
+          if [ -z "$APK_FILE" ]; then
+            echo "❌ No APK was found in build tree! Exiting."
+            exit 1
+          fi
+          mkdir -p android/app/build/outputs/apk/debug
+          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-debug.apk
+          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-release.apk
+          cp "$APK_FILE" "android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk"
+          cp "$APK_FILE" android/app/build/outputs/apk/debug/ViralClip-Studio.apk
+          ls -lh android/app/build/outputs/apk/debug/
+
+      - name: Save Diagnostic Logs on Failure
         if: failure()
         run: |
           git config user.name "github-actions"
@@ -63,17 +82,6 @@ jobs:
           git add compile_output.txt assemble_output.txt || true
           git commit -m "ci: failure diagnostic logs" || true
           git push origin ci-error-log --force || true
-
-      - name: Locate and Prepare Release APK Assets
-        run: |
-          APK_FILE=$(find android/app/build/outputs -name "*.apk" | head -n 1)
-          echo "Discovered built APK: $APK_FILE"
-          mkdir -p android/app/build/outputs/apk/debug
-          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-debug.apk
-          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-release.apk
-          cp "$APK_FILE" "android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk"
-          cp "$APK_FILE" android/app/build/outputs/apk/debug/ViralClip-Studio.apk
-          ls -lh android/app/build/outputs/apk/debug/
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
