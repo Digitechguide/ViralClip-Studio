@@ -4,6 +4,24 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// Compute dynamic version code and version name from git history or project properties
+val gitVersionCode: Int by lazy {
+    project.findProperty("versionCode")?.toString()?.toIntOrNull()
+        ?: runCatching {
+            val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start()
+            process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)
+            process.inputStream.bufferedReader().readText().trim().toInt()
+        }.getOrElse { 13 }
+}
+
+val gitVersionName: String by lazy {
+    project.findProperty("versionName")?.toString()
+        ?: "1.0.$gitVersionCode"
+}
+
 android {
     namespace = "com.mrpallanti.viralvideo"
     compileSdk = 34
@@ -12,8 +30,11 @@ android {
         applicationId = "com.mrpallanti.viralvideo"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = gitVersionCode
+        versionName = gitVersionName
+
+        buildConfigField("String", "APP_VERSION_NAME", "\"$gitVersionName\"")
+        buildConfigField("int", "APP_VERSION_CODE", "$gitVersionCode")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -43,6 +64,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.11"

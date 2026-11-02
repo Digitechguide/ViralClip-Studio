@@ -15,8 +15,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Repository with Full History
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute Dynamic App Version
+        id: app_version
+        run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          VERSION_CODE=$COMMIT_COUNT
+          VERSION_NAME="1.0.${COMMIT_COUNT}"
+          TAG_NAME="v1.0.${COMMIT_COUNT}"
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "Building ViralClip Studio $VERSION_NAME (Code: $VERSION_CODE, Commit: $SHORT_SHA)"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -32,12 +48,12 @@ jobs:
 
       - name: Build Debug APK with Gradle
         working-directory: ./android
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug -PversionCode=${{ steps.app_version.outputs.version_code }} -PversionName=${{ steps.app_version.outputs.version_name }} --stacktrace
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ViralClip-Studio-Debug-APK
+          name: ViralClip-Studio-v${{ steps.app_version.outputs.version_code }}
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
@@ -50,15 +66,16 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.1
-          name: ViralClip Studio v1.0.1 (Android)
+          tag_name: ${{ steps.app_version.outputs.tag_name }}
+          name: ViralClip Studio ${{ steps.app_version.outputs.version_name }} (Android)
           body: |
-            ### ViralClip Studio Native Android App (v1.0.1)
-            - **Creator Authentication Gate:** Enforced login requiring authorized accounts managed by the admin portal.
-            - **Crash-Proof Hardware Video Rendering:** Replaced external native binaries with official AndroidX Media3 Transformer for 100% stable 9:16 vertical video processing.
-            - **Local Gallery Picker & 1-Tap Blueprint Copy:** Select videos directly from phone storage or 1-tap copy viral blueprints for CapCut/Shorts.
-            - **Google Gemini 1.5 Flash:** Viral hook detection, punchline extraction, and audience retention analysis.
-            - **YouTube Share Sheet Receiver:** Direct import from the YouTube Android app via Share.
+            ### ViralClip Studio Native Android App (${{ steps.app_version.outputs.version_name }})
+            - **Build Code:** `${{ steps.app_version.outputs.version_code }}`
+            - **Commit:** `${{ steps.app_version.outputs.short_sha }}`
+            - **Automated Dynamic Versioning:** Every commit increments the app version and package code automatically.
+            - **Creator Authentication Gate:** Mandatory login restricted to admin-approved accounts.
+            - **AndroidX Media3 Transformer Engine:** Crash-proof hardware video cropping (9:16) and trimming.
+            - **Local Gallery Picker & 1-Tap Blueprint Copy:** Pick downloaded video clips or copy viral timestamps directly to clipboard.
           files: |
             android/app/build/outputs/apk/debug/app-release.apk
             android/app/build/outputs/apk/debug/app-debug.apk

@@ -125,12 +125,27 @@ fun StudioScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Column {
-                            Text(
-                                text = "ViralClip Studio",
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary,
-                                fontSize = 18.sp
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "ViralClip Studio",
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary,
+                                    fontSize = 17.sp
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Surface(
+                                    color = PrimaryPurple.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(4.dp)
+                                ) {
+                                    Text(
+                                        text = "v${com.mrpallanti.viralvideo.BuildConfig.APP_VERSION_NAME}",
+                                        color = PrimaryPurple,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
                             state.currentUser?.let { user ->
                                 Text(
                                     text = user.email,

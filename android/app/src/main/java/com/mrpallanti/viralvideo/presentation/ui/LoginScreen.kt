@@ -283,6 +283,15 @@ fun LoginScreen(
                     textAlign = TextAlign.Center
                 )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "v${com.mrpallanti.viralvideo.BuildConfig.APP_VERSION_NAME}",
+                fontSize = 11.sp,
+                color = TextSecondary.copy(alpha = 0.6f),
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
