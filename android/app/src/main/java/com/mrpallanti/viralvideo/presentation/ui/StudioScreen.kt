@@ -3,13 +3,18 @@ package com.mrpallanti.viralvideo.presentation.ui
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -28,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import com.mrpallanti.viralvideo.presentation.ui.theme.*
-import com.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +42,35 @@ fun StudioScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    // Video Picker Launcher for Local Gallery Videos
+    val videoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(context, uri)
+                val durStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                val durationSec = (durStr?.toLongOrNull() ?: 30000L) / 1000L
+                retriever.release()
+
+                val fileName = uri.lastPathSegment?.substringAfterLast('/') ?: "Selected Video"
+                viewModel.onLocalVideoSelected(
+                    uriString = uri.toString(),
+                    title = fileName,
+                    durationSeconds = durationSec
+                )
+            } catch (e: Exception) {
+                viewModel.onLocalVideoSelected(
+                    uriString = uri.toString(),
+                    title = "Gallery Video",
+                    durationSeconds = 60
+                )
+            }
+        }
+    }
 
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let {
@@ -53,6 +86,32 @@ fun StudioScreen(
         }
     }
 
+    // Logout Confirmation Dialog
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Sign Out", fontWeight = FontWeight.Bold, color = TextPrimary) },
+            text = { Text("Are you sure you want to sign out of ViralClip Studio?", color = TextSecondary) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        viewModel.logout()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                ) {
+                    Text("Sign Out", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel", color = TextSecondary)
+                }
+            },
+            containerColor = CardDark
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,10 +124,32 @@ fun StudioScreen(
                             modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "ViralClip Studio",
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
+                        Column {
+                            Text(
+                                text = "ViralClip Studio",
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary,
+                                fontSize = 18.sp
+                            )
+                            state.currentUser?.let { user ->
+                                Text(
+                                    text = user.email,
+                                    color = TextSecondary,
+                                    fontSize = 11.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                },
+                actions = {
+                    // Sign Out Button
+                    IconButton(onClick = { showLogoutDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Logout,
+                            contentDescription = "Sign Out",
+                            tint = TextSecondary
                         )
                     }
                 },
@@ -86,7 +167,7 @@ fun StudioScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // 1. YouTube Link Input Section
+            // 1. YouTube Link & Gallery Picker Input Section
             item {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = CardDark),
@@ -94,13 +175,48 @@ fun StudioScreen(
                     modifier = Modifier.border(1.dp, BorderDark, RoundedCornerShape(16.dp))
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "YouTube / Shorts Link",
-                            fontWeight = FontWeight.SemiBold,
-                            color = TextPrimary,
-                            fontSize = 15.sp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Source Video Input",
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary,
+                                fontSize = 15.sp
+                            )
+
+                            // Pick from gallery pill button
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = PrimaryPurple.copy(alpha = 0.15f),
+                                modifier = Modifier.clickable {
+                                    videoPickerLauncher.launch("video/*")
+                                }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        Icons.Default.VideoFile,
+                                        contentDescription = null,
+                                        tint = PrimaryPurple,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Pick Local Video",
+                                        color = PrimaryPurple,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         OutlinedTextField(
                             value = state.urlInput,
@@ -179,7 +295,12 @@ fun StudioScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Icon(Icons.Default.PlayCircle, contentDescription = null, tint = PrimaryPurple, modifier = Modifier.size(48.dp))
+                                Icon(
+                                    Icons.Default.PlayCircle,
+                                    contentDescription = null,
+                                    tint = PrimaryPurple,
+                                    modifier = Modifier.size(48.dp)
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = state.currentVideo?.title ?: "",
@@ -188,6 +309,12 @@ fun StudioScreen(
                                     textAlign = TextAlign.Center,
                                     fontSize = 12.sp,
                                     color = TextPrimary
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if (state.currentVideo?.localUri != null) "📱 Local File Ready" else "🌐 YouTube Source",
+                                    fontSize = 10.sp,
+                                    color = SuccessGreen
                                 )
                             }
                         } else {
@@ -236,7 +363,7 @@ fun StudioScreen(
                 }
             }
 
-            // 3. Trimmer & Hook Customizer
+            // 3. Trimmer, Hook Customizer & 1-Click Hardware Render
             if (state.currentVideo != null) {
                 item {
                     Card(
@@ -269,11 +396,9 @@ fun StudioScreen(
 
                             // 1-Click Hardware Render Button
                             Button(
-                                onClick = { viewModel.startRenderShort() },
+                                onClick = { viewModel.startRenderShort(context.cacheDir) },
                                 enabled = !state.isRendering,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Transparent
-                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -291,6 +416,26 @@ fun StudioScreen(
                                 )
                             }
 
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // 1-Tap Copy Blueprint Button
+                            OutlinedButton(
+                                onClick = {
+                                    val blueprint = viewModel.getViralBlueprintText()
+                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    clipboard.setPrimaryClip(ClipData.newPlainText("Viral Blueprint", blueprint))
+                                    Toast.makeText(context, "📋 Copied Viral Blueprint! Ready to paste into CapCut or Shorts.", Toast.LENGTH_LONG).show()
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
+                                border = ButtonDefaults.outlinedButtonBorder.copy(brush = Brush.horizontalGradient(listOf(BorderDark, PrimaryPurple))),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Default.ContentCopy, contentDescription = null, tint = PrimaryPurple)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("📋 Copy Viral Blueprint & Hook Script")
+                            }
+
                             if (state.isRendering) {
                                 Spacer(modifier = Modifier.height(12.dp))
                                 LinearProgressIndicator(
@@ -300,7 +445,7 @@ fun StudioScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Rendering on-device with FFmpeg: ${state.renderJob?.progressPercent ?: 0}%",
+                                    text = "Processing video with Android Hardware Acceleration: ${state.renderJob?.progressPercent ?: 0}%",
                                     fontSize = 11.sp,
                                     color = SuccessGreen,
                                     textAlign = TextAlign.Center,
@@ -345,8 +490,6 @@ fun ViralClipCard(
     isSelected: Boolean,
     onApply: () -> Unit
 ) {
-    val context = LocalContext.current
-
     Card(
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) CardDark.copy(alpha = 0.9f) else CardDark
@@ -381,61 +524,64 @@ fun ViralClipCard(
                     )
                 }
 
-                Text(
-                    text = "${clip.startSeconds.toInt()}s - ${clip.endSeconds.toInt()}s (${clip.duration.toInt()}s)",
-                    color = AccentIndigo,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                // Duration Pill
+                Surface(
+                    color = Color.Black.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text(
+                        text = "${clip.startSeconds.toInt()}s - ${clip.endSeconds.toInt()}s (${(clip.endSeconds - clip.startSeconds).toInt()}s)",
+                        color = TextSecondary,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
+
             Text(
                 text = clip.title,
                 fontWeight = FontWeight.Bold,
-                color = TextPrimary,
-                fontSize = 14.sp
+                fontSize = 14.sp,
+                color = TextPrimary
             )
 
             Spacer(modifier = Modifier.height(4.dp))
+
             Text(
-                text = clip.hookReason,
-                color = TextSecondary,
+                text = clip.rationale,
                 fontSize = 12.sp,
+                color = TextSecondary,
                 lineHeight = 16.sp
             )
 
             Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = onApply,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(vertical = 6.dp)
-                ) {
-                    Icon(Icons.Default.ContentCut, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Apply Clip & Hook", fontSize = 12.sp)
-                }
 
-                OutlinedButton(
-                    onClick = {
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val copyText = "🔥 ${clip.title}\n⏱️ ${clip.startSeconds.toInt()}s - ${clip.endSeconds.toInt()}s\n💬 ${clip.captionOverlay}\n${clip.hashtags.joinToString(" ")}"
-                        clipboard.setPrimaryClip(ClipData.newPlainText("Viral Clip", copyText))
-                        Toast.makeText(context, "Copied post details to clipboard!", Toast.LENGTH_SHORT).show()
-                    },
-                    shape = RoundedCornerShape(8.dp),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = Brush.linearGradient(listOf(BorderDark, BorderDark))),
-                    contentPadding = PaddingValues(vertical = 6.dp)
+            // Caption Hook Box
+            Surface(
+                color = BgDark,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.ContentCopy, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Copy", color = TextSecondary, fontSize = 12.sp)
+                    Text(
+                        text = "Hook:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp,
+                        color = PrimaryPurple
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = clip.captionOverlay,
+                        fontSize = 11.sp,
+                        color = TextPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
         }

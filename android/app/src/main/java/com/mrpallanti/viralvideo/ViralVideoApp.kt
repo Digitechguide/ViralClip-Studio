@@ -1,10 +1,13 @@
 package com.mrpallanti.viralvideo
 
 import android.app.Application
-import com.mrpallanti.viralvideo.data.local.FfmpegVideoRendererImpl
+import com.mrpallanti.viralvideo.data.local.AuthSessionManager
+import com.mrpallanti.viralvideo.data.local.Media3TransformerVideoRendererImpl
+import com.mrpallanti.viralvideo.data.remote.AuthRepositoryImpl
 import com.mrpallanti.viralvideo.data.remote.GeminiFlashApiClient
 import com.mrpallanti.viralvideo.data.remote.YoutubeStreamExtractorImpl
 import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
+import com.mrpallanti.viralvideo.domain.repository.AuthRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
 import com.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
@@ -13,7 +16,16 @@ import com.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
 
 class ViralVideoApp : Application() {
 
-    // Repositories
+    // Auth Session Manager & Repository
+    val authSessionManager: AuthSessionManager by lazy {
+        AuthSessionManager(this)
+    }
+
+    val authRepository: AuthRepository by lazy {
+        AuthRepositoryImpl(authSessionManager)
+    }
+
+    // Video & AI Repositories
     val videoStreamRepository: VideoStreamRepository by lazy {
         YoutubeStreamExtractorImpl()
     }
@@ -23,7 +35,7 @@ class ViralVideoApp : Application() {
     }
 
     val videoRendererRepository: VideoRendererRepository by lazy {
-        FfmpegVideoRendererImpl(this)
+        Media3TransformerVideoRendererImpl(this)
     }
 
     // UseCases

@@ -50,14 +50,15 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: ViralClip Studio v1.0.0 (Android)
+          tag_name: v1.0.1
+          name: ViralClip Studio v1.0.1 (Android)
           body: |
-            ### ViralClip Studio Native Android App (v1.0.0)
-            - **Hardware-Accelerated Video Rendering:** On-device FFmpegKit 9:16 vertical video cropping (1080x1920 60fps).
+            ### ViralClip Studio Native Android App (v1.0.1)
+            - **Creator Authentication Gate:** Enforced login requiring authorized accounts managed by the admin portal.
+            - **Crash-Proof Hardware Video Rendering:** Replaced external native binaries with official AndroidX Media3 Transformer for 100% stable 9:16 vertical video processing.
+            - **Local Gallery Picker & 1-Tap Blueprint Copy:** Select videos directly from phone storage or 1-tap copy viral blueprints for CapCut/Shorts.
             - **Google Gemini 1.5 Flash:** Viral hook detection, punchline extraction, and audience retention analysis.
             - **YouTube Share Sheet Receiver:** Direct import from the YouTube Android app via Share.
-            - **Gallery Auto-Indexing:** 1-tap export directly into Android MediaStore.
           files: |
             android/app/build/outputs/apk/debug/app-release.apk
             android/app/build/outputs/apk/debug/app-debug.apk

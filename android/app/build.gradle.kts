@@ -12,8 +12,8 @@ android {
         applicationId = "com.mrpallanti.viralvideo"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -68,10 +68,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons)
 
-    // Video Engine (ExoPlayer playback & on-device FFmpeg rendering)
+    // Video Engine (ExoPlayer playback & Android Hardware Media3 Transformer rendering)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
-    implementation(libs.ffmpeg.kit)
+    implementation(libs.androidx.media3.transformer)
+    implementation(libs.androidx.media3.effect)
+    implementation(libs.androidx.media3.common)
 
     // Network & Serialization
     implementation(libs.okhttp)
