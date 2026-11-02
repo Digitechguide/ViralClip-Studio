@@ -48,15 +48,17 @@ jobs:
 
       - name: Compile Kotlin Code
         working-directory: ./android
+        run: ./gradlew compileDebugKotlin --stacktrace 2>&1 | tee ../compile_output.txt
+
+      - name: Save Error Log on Failure
+        if: failure()
         run: |
-          set -o pipefail
-          ./gradlew compileDebugKotlin --stacktrace 2>&1 | tee ../compile_output.txt || {
-            echo "## ❌ Kotlin Compilation Failed" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -n 120 ../compile_output.txt >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            exit 1
-          }
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -B ci-error-log
+          git add compile_output.txt
+          git commit -m "ci: compiler failure log" || true
+          git push origin ci-error-log --force || true
 
       - name: Build Debug APK with Gradle
         working-directory: ./android
