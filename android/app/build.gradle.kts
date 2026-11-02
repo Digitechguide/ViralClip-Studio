@@ -90,7 +90,6 @@ dependencies {
     implementation(libs.androidx.media3.transformer)
     implementation(libs.androidx.media3.effect)
     implementation(libs.androidx.media3.common)
-    implementation("com.google.guava:guava:33.0.0-android")
 
     // Network & Serialization & YouTube Stream Extractor
     implementation(libs.okhttp)

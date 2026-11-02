@@ -50,19 +50,19 @@ jobs:
         working-directory: ./android
         run: ./gradlew compileDebugKotlin --stacktrace 2>&1 | tee ../compile_output.txt
 
+      - name: Build Debug APK with Gradle
+        working-directory: ./android
+        run: ./gradlew assembleDebug -PversionCode=${{ steps.app_version.outputs.version_code }} -PversionName=${{ steps.app_version.outputs.version_name }} --stacktrace 2>&1 | tee ../assemble_output.txt
+
       - name: Save Error Log on Failure
         if: failure()
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git checkout -B ci-error-log
-          git add compile_output.txt
-          git commit -m "ci: compiler failure log" || true
+          git add compile_output.txt assemble_output.txt || true
+          git commit -m "ci: failure diagnostic logs" || true
           git push origin ci-error-log --force || true
-
-      - name: Build Debug APK with Gradle
-        working-directory: ./android
-        run: ./gradlew assembleDebug -PversionCode=${{ steps.app_version.outputs.version_code }} -PversionName=${{ steps.app_version.outputs.version_name }} --stacktrace
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
