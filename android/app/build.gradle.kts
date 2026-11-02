@@ -83,11 +83,12 @@ dependencies {
     implementation(libs.androidx.media3.effect)
     implementation(libs.androidx.media3.common)
 
-    // Network & Serialization
+    // Network & Serialization & YouTube Stream Extractor
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
+    implementation("com.github.maxrave-dev:kotlin-youtubeExtractor:0.0.7")
 
     debugImplementation(libs.androidx.ui.tooling)
 }

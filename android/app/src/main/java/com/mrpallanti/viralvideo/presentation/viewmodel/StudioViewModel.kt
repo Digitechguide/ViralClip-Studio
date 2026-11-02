@@ -11,11 +11,13 @@ import com.mrpallanti.viralvideo.domain.repository.AuthRepository
 import com.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
 import com.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
 import com.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
@@ -41,7 +43,8 @@ data class StudioUiState(
     val isRendering: Boolean = false,
     val renderJob: RenderJob? = null,
     val errorMessage: String? = null,
-    val successMessage: String? = null
+    val successMessage: String? = null,
+    val showVideoPickerPrompt: Boolean = false
 )
 
 class StudioViewModel(
@@ -87,7 +90,6 @@ class StudioViewModel(
                             successMessage = "Welcome, ${user.name}!"
                         )
                     }
-                    // If user had shared a URL before logging in, process it now!
                     if (!pendingUrl.isNullOrBlank()) {
                         onUrlChanged(pendingUrl)
                         fetchAndAnalyze(pendingUrl)
@@ -125,7 +127,6 @@ class StudioViewModel(
             onUrlChanged(sharedUrl)
             fetchAndAnalyze(sharedUrl)
         } else {
-            // Store pending until login completes
             _uiState.update { it.copy(pendingSharedUrl = sharedUrl) }
         }
     }
@@ -145,6 +146,10 @@ class StudioViewModel(
         _uiState.update { it.copy(trimRange = TrimRange(start, end)) }
     }
 
+    fun dismissVideoPickerPrompt() {
+        _uiState.update { it.copy(showVideoPickerPrompt = false) }
+    }
+
     fun onLocalVideoSelected(uriString: String, title: String, durationSeconds: Long) {
         val metadata = VideoMetadata(
             id = "local_${System.currentTimeMillis()}",
@@ -159,7 +164,7 @@ class StudioViewModel(
         _uiState.update {
             it.copy(
                 currentVideo = metadata,
-                urlInput = title,
+                showVideoPickerPrompt = false,
                 isLoading = true,
                 loadingMessage = "Analyzing virality hooks for local video..."
             )
@@ -206,7 +211,7 @@ class StudioViewModel(
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    loadingMessage = "Extracting video details...",
+                    loadingMessage = "Extracting video details & streams...",
                     errorMessage = null
                 )
             }
@@ -310,35 +315,26 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
             try {
                 var targetUri = video.localUri
 
-                // If local file is missing and it's a YouTube link, check if we can stream/download
-                if (targetUri.isNullOrBlank()) {
-                    if (cacheDir != null && state.currentUser != null && video.id.isNotBlank()) {
-                        _uiState.update {
-                            it.copy(
-                                isRendering = true,
-                                errorMessage = null,
-                                loadingMessage = "Preparing video stream..."
-                            )
-                        }
-
-                        val downloadedFile = downloadSourceVideoIfPossible(
-                            youtubeUrl = state.urlInput,
-                            userEmail = state.currentUser.email,
-                            userToken = state.currentUser.token,
-                            cacheDir = cacheDir
+                // If local file is missing, try downloading direct YouTube stream if available
+                if (targetUri.isNullOrBlank() && !video.streamUrl.isNullOrBlank() && cacheDir != null) {
+                    _uiState.update {
+                        it.copy(
+                            isRendering = true,
+                            loadingMessage = "Downloading video stream directly..."
                         )
-
-                        if (downloadedFile != null && downloadedFile.exists() && downloadedFile.length() > 1024) {
-                            targetUri = downloadedFile.absolutePath
-                        }
+                    }
+                    val downloadedFile = downloadDirectStream(video.streamUrl, cacheDir, video.id)
+                    if (downloadedFile != null && downloadedFile.exists() && downloadedFile.length() > 50000) {
+                        targetUri = downloadedFile.absolutePath
                     }
                 }
 
+                // If stream is protected by YouTube bot detection, prompt creator to pick the local video
                 if (targetUri.isNullOrBlank()) {
                     _uiState.update {
                         it.copy(
                             isRendering = false,
-                            errorMessage = "To render on-device, please select the source video from your device Gallery using '📁 Select Video', or tap '📋 Copy Blueprint'."
+                            showVideoPickerPrompt = true
                         )
                     }
                     return@launch
@@ -371,29 +367,26 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
         }
     }
 
-    private suspend fun downloadSourceVideoIfPossible(
-        youtubeUrl: String,
-        userEmail: String,
-        userToken: String,
-        cacheDir: File
-    ): File? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+    private suspend fun downloadDirectStream(
+        streamUrl: String,
+        cacheDir: File,
+        videoId: String
+    ): File? = withContext(Dispatchers.IO) {
         return@withContext try {
-            val downloadUrl = "https://viral.mrpallanti.in/api/download.php?url=${java.net.URLEncoder.encode(youtubeUrl, "UTF-8")}&user_email=${java.net.URLEncoder.encode(userEmail, "UTF-8")}&user_token=${java.net.URLEncoder.encode(userToken, "UTF-8")}"
+            val tempFile = File(cacheDir, "yt_${videoId}_source.mp4")
             val request = Request.Builder()
-                .url(downloadUrl)
+                .url(streamUrl)
+                .header("User-Agent", "Mozilla/5.0 (Linux; Android 14)")
                 .build()
 
             val response = httpClient.newCall(request).execute()
-            val contentType = response.header("Content-Type", "") ?: ""
-
-            if (response.isSuccessful && contentType.contains("video")) {
-                val tempFile = File(cacheDir, "source_stream_${System.currentTimeMillis()}.mp4")
+            if (response.isSuccessful) {
                 response.body?.byteStream()?.use { input ->
                     FileOutputStream(tempFile).use { output ->
                         input.copyTo(output)
                     }
                 }
-                tempFile
+                if (tempFile.exists() && tempFile.length() > 1024) tempFile else null
             } else {
                 null
             }

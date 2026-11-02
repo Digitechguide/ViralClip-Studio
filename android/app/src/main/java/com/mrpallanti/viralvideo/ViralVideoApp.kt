@@ -27,7 +27,7 @@ class ViralVideoApp : Application() {
 
     // Video & AI Repositories
     val videoStreamRepository: VideoStreamRepository by lazy {
-        YoutubeStreamExtractorImpl()
+        YoutubeStreamExtractorImpl(this)
     }
 
     val aiViralityRepository: AiViralityRepository by lazy {

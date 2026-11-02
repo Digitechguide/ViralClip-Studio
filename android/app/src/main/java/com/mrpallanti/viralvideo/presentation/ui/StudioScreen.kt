@@ -14,7 +14,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -84,6 +83,72 @@ fun StudioScreen(
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             viewModel.clearMessages()
         }
+    }
+
+    // Source Video Required Dialog (When YouTube protected stream needs local video selection)
+    if (state.showVideoPickerPrompt) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissVideoPickerPrompt() },
+            icon = {
+                Icon(
+                    Icons.Default.VideoLibrary,
+                    contentDescription = null,
+                    tint = PrimaryPurple,
+                    modifier = Modifier.size(36.dp)
+                )
+            },
+            title = {
+                Text(
+                    "Select Source Video",
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        "YouTube stream protection prevented direct in-app downloading for this clip.",
+                        color = TextPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        "Tap below to select the downloaded video or screen recording from your phone's Gallery to render the 9:16 short directly!",
+                        color = TextSecondary,
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.dismissVideoPickerPrompt()
+                        videoPickerLauncher.launch("video/*")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple)
+                ) {
+                    Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Select from Gallery")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        val blueprint = viewModel.getViralBlueprintText()
+                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        clipboard.setPrimaryClip(ClipData.newPlainText("Viral Blueprint", blueprint))
+                        Toast.makeText(context, "📋 Copied Viral Blueprint! Ready for CapCut.", Toast.LENGTH_SHORT).show()
+                        viewModel.dismissVideoPickerPrompt()
+                    }
+                ) {
+                    Text("Copy Blueprint", color = TextSecondary)
+                }
+            },
+            containerColor = CardDark
+        )
     }
 
     // Logout Confirmation Dialog
@@ -159,7 +224,6 @@ fun StudioScreen(
                     }
                 },
                 actions = {
-                    // Sign Out Button
                     IconButton(onClick = { showLogoutDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Logout,
@@ -300,7 +364,6 @@ fun StudioScreen(
                             .border(3.dp, BorderDark, RoundedCornerShape(28.dp)),
                         contentAlignment = Alignment.Center
                     ) {
-                        // Background / Video info
                         if (state.currentVideo != null) {
                             Column(
                                 modifier = Modifier
@@ -325,12 +388,19 @@ fun StudioScreen(
                                     fontSize = 12.sp,
                                     color = TextPrimary
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = if (state.currentVideo?.localUri != null) "📱 Local File Ready" else "🌐 YouTube Source",
-                                    fontSize = 10.sp,
-                                    color = SuccessGreen
-                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Surface(
+                                    color = if (state.currentVideo?.localUri != null) SuccessGreen.copy(alpha = 0.2f) else PrimaryPurple.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(6.dp)
+                                ) {
+                                    Text(
+                                        text = if (state.currentVideo?.localUri != null) "📱 Local File Ready" else "🌐 YouTube Hook Ready",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (state.currentVideo?.localUri != null) SuccessGreen else PrimaryPurple,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
                             }
                         } else {
                             Text(
@@ -425,13 +495,31 @@ fun StudioScreen(
                                 Icon(Icons.Default.Download, contentDescription = null, tint = Color.White)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "⚡ 1-Click Render & Save 9:16 to Gallery",
+                                    text = if (state.currentVideo?.localUri != null) "⚡ Render & Save 9:16 to Gallery" else "⚡ 1-Click Render Video to Gallery",
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                            // If only YouTube link is loaded, offer 1-tap gallery video picker
+                            if (state.currentVideo?.localUri == null) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedButton(
+                                    onClick = { videoPickerLauncher.launch("video/*") },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
+                                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                                        brush = Brush.horizontalGradient(listOf(BorderDark, PrimaryPurple))
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Icon(Icons.Default.FolderOpen, contentDescription = null, tint = PrimaryPurple)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("📁 Select Video File from Gallery")
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             // 1-Tap Copy Blueprint Button
                             OutlinedButton(
@@ -443,7 +531,6 @@ fun StudioScreen(
                                 },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
-                                border = ButtonDefaults.outlinedButtonBorder.copy(brush = Brush.horizontalGradient(listOf(BorderDark, PrimaryPurple))),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Icon(Icons.Default.ContentCopy, contentDescription = null, tint = PrimaryPurple)

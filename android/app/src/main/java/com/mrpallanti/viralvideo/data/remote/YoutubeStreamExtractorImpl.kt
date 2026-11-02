@@ -1,5 +1,8 @@
 package com.mrpallanti.viralvideo.data.remote
 
+import android.content.Context
+import com.maxrave.kotlinyoutubeextractor.State
+import com.maxrave.kotlinyoutubeextractor.YTExtractor
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
 import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +13,7 @@ import org.json.JSONObject
 import java.util.regex.Pattern
 
 class YoutubeStreamExtractorImpl(
+    private val context: Context,
     private val client: OkHttpClient = OkHttpClient()
 ) : VideoStreamRepository {
 
@@ -18,38 +22,91 @@ class YoutubeStreamExtractorImpl(
             val videoId = extractVideoId(url)
                 ?: return@withContext Result.failure(IllegalArgumentException("Invalid YouTube URL: $url"))
 
-            // Query YouTube oEmbed API for title and author
-            val oembedUrl = "https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=$videoId&format=json"
-            val request = Request.Builder()
-                .url(oembedUrl)
-                .header("User-Agent", "Mozilla/5.0 (Linux; Android 14)")
-                .build()
-
-            val response = client.newCall(request).execute()
-            val body = response.body?.string() ?: ""
-
             var title = "YouTube Video ($videoId)"
             var author = "YouTube Creator"
+            var durationSeconds = 180L
+            val thumbnailUrl = "https://img.youtube.com/vi/$videoId/maxresdefault.jpg"
+            var directStreamUrl: String? = null
 
-            if (response.isSuccessful && body.isNotBlank()) {
-                val json = JSONObject(body)
-                title = json.optString("title", title)
-                author = json.optString("author_name", author)
+            // 1. First attempt: Query YouTube oEmbed API for fast title and author
+            try {
+                val oembedUrl = "https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=$videoId&format=json"
+                val request = Request.Builder()
+                    .url(oembedUrl)
+                    .header("User-Agent", "Mozilla/5.0 (Linux; Android 14)")
+                    .build()
+
+                val response = client.newCall(request).execute()
+                val body = response.body?.string() ?: ""
+
+                if (response.isSuccessful && body.isNotBlank()) {
+                    val json = JSONObject(body)
+                    title = json.optString("title", title)
+                    author = json.optString("author_name", author)
+                }
+            } catch (t: Throwable) {
+                // Continue to on-device stream extractor
             }
 
-            val thumbnailUrl = "https://img.youtube.com/vi/$videoId/maxresdefault.jpg"
+            // 2. Second attempt: On-Device YTExtractor for direct playable MP4 stream & exact duration
+            try {
+                val yt = YTExtractor(
+                    con = context,
+                    CACHING = false,
+                    LOGGING = false,
+                    retryCount = 2
+                )
+                yt.extract(videoId)
 
-            // Direct playable stream URL or embed URL
-            val streamUrl = "https://www.youtube-nocookie.com/embed/$videoId?autoplay=1"
+                if (yt.state == State.SUCCESS) {
+                    val ytFiles = yt.getYTFiles()
+                    if (ytFiles != null) {
+                        // Find progressive MP4 stream (audio + video muxed together, e.g. 720p/360p itag 22 or 18)
+                        for (i in 0 until ytFiles.size()) {
+                            val file = ytFiles.valueAt(i)
+                            if (file != null && file.format.ext == "mp4" && !file.format.isDash && !file.url.isNullOrBlank()) {
+                                directStreamUrl = file.url
+                                break
+                            }
+                        }
+
+                        // Fallback: any MP4 URL
+                        if (directStreamUrl.isNullOrBlank()) {
+                            for (i in 0 until ytFiles.size()) {
+                                val file = ytFiles.valueAt(i)
+                                if (file != null && file.format.ext == "mp4" && !file.url.isNullOrBlank()) {
+                                    directStreamUrl = file.url
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                    val meta = yt.getVideoMeta()
+                    if (meta != null) {
+                        if (meta.videoLength > 0) {
+                            durationSeconds = meta.videoLength
+                        }
+                        if (!meta.title.isNullOrBlank()) {
+                            title = meta.title
+                        }
+                        if (!meta.author.isNullOrBlank()) {
+                            author = meta.author
+                        }
+                    }
+                }
+            } catch (t: Throwable) {
+                // Ignore extraction failures, oEmbed metadata is already loaded
+            }
 
             Result.success(
                 VideoMetadata(
                     id = videoId,
                     title = title,
                     author = author,
-                    durationSeconds = 180, // Default baseline if not probed
+                    durationSeconds = durationSeconds,
                     thumbnailUrl = thumbnailUrl,
-                    streamUrl = streamUrl
+                    streamUrl = directStreamUrl
                 )
             )
         } catch (e: Exception) {
