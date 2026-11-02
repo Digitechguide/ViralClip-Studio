@@ -550,7 +550,7 @@ fun ViralClipCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = clip.rationale,
+                text = clip.hookReason,
                 fontSize = 12.sp,
                 color = TextSecondary,
                 lineHeight = 16.sp
