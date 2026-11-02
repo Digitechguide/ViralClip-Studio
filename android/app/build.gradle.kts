@@ -1,28 +1,12 @@
-import java.util.concurrent.TimeUnit
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Compute dynamic version code and version name from git history or project properties
-val gitVersionCode: Int by lazy {
-    project.findProperty("versionCode")?.toString()?.toIntOrNull()
-        ?: runCatching {
-            val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start()
-            process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)
-            process.inputStream.bufferedReader().readText().trim().toInt()
-        }.getOrElse { 13 }
-}
-
-val gitVersionName: String by lazy {
-    project.findProperty("versionName")?.toString()
-        ?: "1.0.$gitVersionCode"
-}
+// Version passed from CI / build environment (-PversionCode=... -PversionName=...)
+val gitVersionCode: Int = (project.findProperty("versionCode") as? String)?.toIntOrNull() ?: 1
+val gitVersionName: String = (project.findProperty("versionName") as? String) ?: "1.0.$gitVersionCode"
 
 android {
     namespace = "com.mrpallanti.viralvideo"
