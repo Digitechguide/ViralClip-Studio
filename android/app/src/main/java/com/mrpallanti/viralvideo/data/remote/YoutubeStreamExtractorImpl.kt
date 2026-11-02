@@ -1,7 +1,7 @@
-package in.mrpallanti.viralvideo.data.remote
+package com.mrpallanti.viralvideo.data.remote
 
-import in.mrpallanti.viralvideo.domain.model.VideoMetadata
-import in.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
+import com.mrpallanti.viralvideo.domain.model.VideoMetadata
+import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient

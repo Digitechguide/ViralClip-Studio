@@ -1,7 +1,7 @@
-package in.mrpallanti.viralvideo.data.remote
+package com.mrpallanti.viralvideo.data.remote
 
-import in.mrpallanti.viralvideo.domain.model.ViralClip
-import in.mrpallanti.viralvideo.domain.repository.AiViralityRepository
+import com.mrpallanti.viralvideo.domain.model.ViralClip
+import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType

@@ -1,4 +1,4 @@
-package in.mrpallanti.viralvideo.presentation
+package com.mrpallanti.viralvideo.presentation
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,10 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import in.mrpallanti.viralvideo.ViralVideoApp
-import in.mrpallanti.viralvideo.presentation.ui.StudioScreen
-import in.mrpallanti.viralvideo.presentation.ui.theme.ViralVideoTheme
-import in.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
+import com.mrpallanti.viralvideo.ViralVideoApp
+import com.mrpallanti.viralvideo.presentation.ui.StudioScreen
+import com.mrpallanti.viralvideo.presentation.ui.theme.ViralVideoTheme
+import com.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
 
 class MainActivity : ComponentActivity() {
 

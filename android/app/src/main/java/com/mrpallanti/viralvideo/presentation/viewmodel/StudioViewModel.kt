@@ -1,14 +1,14 @@
-package in.mrpallanti.viralvideo.presentation.viewmodel
+package com.mrpallanti.viralvideo.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import in.mrpallanti.viralvideo.domain.model.RenderJob
-import in.mrpallanti.viralvideo.domain.model.TrimRange
-import in.mrpallanti.viralvideo.domain.model.VideoMetadata
-import in.mrpallanti.viralvideo.domain.model.ViralClip
-import in.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
-import in.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
-import in.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
+import com.mrpallanti.viralvideo.domain.model.RenderJob
+import com.mrpallanti.viralvideo.domain.model.TrimRange
+import com.mrpallanti.viralvideo.domain.model.VideoMetadata
+import com.mrpallanti.viralvideo.domain.model.ViralClip
+import com.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
+import com.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
+import com.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

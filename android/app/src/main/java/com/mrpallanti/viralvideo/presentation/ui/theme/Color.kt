@@ -1,4 +1,4 @@
-package in.mrpallanti.viralvideo.presentation.ui.theme
+package com.mrpallanti.viralvideo.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

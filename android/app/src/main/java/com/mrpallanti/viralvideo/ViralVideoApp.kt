@@ -1,15 +1,15 @@
-package in.mrpallanti.viralvideo
+package com.mrpallanti.viralvideo
 
 import android.app.Application
-import in.mrpallanti.viralvideo.data.local.FfmpegVideoRendererImpl
-import in.mrpallanti.viralvideo.data.remote.GeminiFlashApiClient
-import in.mrpallanti.viralvideo.data.remote.YoutubeStreamExtractorImpl
-import in.mrpallanti.viralvideo.domain.repository.AiViralityRepository
-import in.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
-import in.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
-import in.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
-import in.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
-import in.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
+import com.mrpallanti.viralvideo.data.local.FfmpegVideoRendererImpl
+import com.mrpallanti.viralvideo.data.remote.GeminiFlashApiClient
+import com.mrpallanti.viralvideo.data.remote.YoutubeStreamExtractorImpl
+import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
+import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
+import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
+import com.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
+import com.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
+import com.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
 
 class ViralVideoApp : Application() {
 

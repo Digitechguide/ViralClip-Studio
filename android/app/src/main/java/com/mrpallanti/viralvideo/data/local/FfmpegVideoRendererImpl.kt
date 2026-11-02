@@ -1,4 +1,4 @@
-package in.mrpallanti.viralvideo.data.local
+package com.mrpallanti.viralvideo.data.local
 
 import android.content.ContentValues
 import android.content.Context
@@ -8,9 +8,9 @@ import android.os.Environment
 import android.provider.MediaStore
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.ReturnCode
-import in.mrpallanti.viralvideo.domain.model.RenderJob
-import in.mrpallanti.viralvideo.domain.model.TrimRange
-import in.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
+import com.mrpallanti.viralvideo.domain.model.RenderJob
+import com.mrpallanti.viralvideo.domain.model.TrimRange
+import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

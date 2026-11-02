@@ -1,4 +1,4 @@
-package in.mrpallanti.viralvideo.domain.model
+package com.mrpallanti.viralvideo.domain.model
 
 data class VideoMetadata(
     val id: String,

@@ -1,9 +1,9 @@
-package in.mrpallanti.viralvideo.domain.repository
+package com.mrpallanti.viralvideo.domain.repository
 
-import in.mrpallanti.viralvideo.domain.model.RenderJob
-import in.mrpallanti.viralvideo.domain.model.TrimRange
-import in.mrpallanti.viralvideo.domain.model.VideoMetadata
-import in.mrpallanti.viralvideo.domain.model.ViralClip
+import com.mrpallanti.viralvideo.domain.model.RenderJob
+import com.mrpallanti.viralvideo.domain.model.TrimRange
+import com.mrpallanti.viralvideo.domain.model.VideoMetadata
+import com.mrpallanti.viralvideo.domain.model.ViralClip
 import kotlinx.coroutines.flow.Flow
 
 interface VideoStreamRepository {

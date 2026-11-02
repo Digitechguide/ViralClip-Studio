@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "in.mrpallanti.viralvideo"
+    namespace = "com.mrpallanti.viralvideo"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "in.mrpallanti.viralvideo"
+        applicationId = "com.mrpallanti.viralvideo"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

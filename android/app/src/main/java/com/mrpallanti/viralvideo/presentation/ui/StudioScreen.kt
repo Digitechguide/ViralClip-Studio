@@ -1,4 +1,4 @@
-package in.mrpallanti.viralvideo.presentation.ui
+package com.mrpallanti.viralvideo.presentation.ui
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -26,10 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import in.mrpallanti.viralvideo.domain.model.ViralClip
-import in.mrpallanti.viralvideo.presentation.ui.theme.*
-import in.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
-import in.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
+import com.mrpallanti.viralvideo.domain.model.ViralClip
+import com.mrpallanti.viralvideo.presentation.ui.theme.*
+import com.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
+import com.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

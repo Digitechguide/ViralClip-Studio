@@ -1,12 +1,12 @@
-package in.mrpallanti.viralvideo.domain.usecase
+package com.mrpallanti.viralvideo.domain.usecase
 
-import in.mrpallanti.viralvideo.domain.model.RenderJob
-import in.mrpallanti.viralvideo.domain.model.TrimRange
-import in.mrpallanti.viralvideo.domain.model.VideoMetadata
-import in.mrpallanti.viralvideo.domain.model.ViralClip
-import in.mrpallanti.viralvideo.domain.repository.AiViralityRepository
-import in.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
-import in.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
+import com.mrpallanti.viralvideo.domain.model.RenderJob
+import com.mrpallanti.viralvideo.domain.model.TrimRange
+import com.mrpallanti.viralvideo.domain.model.VideoMetadata
+import com.mrpallanti.viralvideo.domain.model.ViralClip
+import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
+import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
+import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
 import kotlinx.coroutines.flow.Flow
 
 class ExtractYoutubeStreamUseCase(
