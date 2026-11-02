@@ -8,8 +8,10 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.Crop
 import androidx.media3.effect.OverlayEffect
@@ -36,6 +38,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.UUID
 
+@OptIn(UnstableApi::class)
 class Media3TransformerVideoRendererImpl(
     private val context: Context
 ) : VideoRendererRepository {
@@ -113,7 +116,7 @@ class Media3TransformerVideoRendererImpl(
             if (overlayBitmap != null) {
                 try {
                     val bitmapOverlay: TextureOverlay = BitmapOverlay.createStaticBitmapOverlay(overlayBitmap)
-                    val overlayEffect = OverlayEffect(ImmutableList.of(bitmapOverlay))
+                    val overlayEffect = OverlayEffect(ImmutableList.of<TextureOverlay>(bitmapOverlay))
                     videoEffects.add(overlayEffect)
                 } catch (t: Throwable) {
                     // Safe fallback if overlay effect cannot be attached

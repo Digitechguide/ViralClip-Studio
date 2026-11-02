@@ -48,7 +48,15 @@ jobs:
 
       - name: Compile Kotlin Code
         working-directory: ./android
-        run: ./gradlew compileDebugKotlin --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew compileDebugKotlin --stacktrace 2>&1 | tee ../compile_output.txt || {
+            echo "## ❌ Kotlin Compilation Failed" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            tail -n 120 ../compile_output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          }
 
       - name: Build Debug APK with Gradle
         working-directory: ./android
