@@ -58,24 +58,18 @@ jobs:
 
       - name: Locate and Prepare Release APK Assets
         run: |
-          echo "=== Files in android/app/build/outputs ==="
-          ls -laR android/app/build/outputs/ || true
-          APK_FILE=$(find android/app/build -type f -name "*.apk" | head -n 1)
+          echo "=== Locating built APK ==="
+          APK_FILE=$(find android/app/build/outputs/apk -type f -name "*.apk" | head -n 1)
           echo "Discovered built APK: '$APK_FILE'"
           if [ -z "$APK_FILE" ]; then
-            echo "Searching whole workspace:"
-            find . -type f -name "*.apk"
-            APK_FILE=$(find . -type f -name "*.apk" | head -n 1)
-          fi
-          if [ -z "$APK_FILE" ]; then
-            echo "❌ No APK found anywhere!"
+            echo "❌ No APK found in outputs! Exiting."
             exit 1
           fi
           mkdir -p android/app/build/outputs/apk/debug
-          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-debug.apk
-          cp "$APK_FILE" android/app/build/outputs/apk/debug/app-release.apk
-          cp "$APK_FILE" "android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk"
-          cp "$APK_FILE" android/app/build/outputs/apk/debug/ViralClip-Studio.apk
+          [ "$APK_FILE" = "android/app/build/outputs/apk/debug/app-debug.apk" ] || cp -f "$APK_FILE" android/app/build/outputs/apk/debug/app-debug.apk
+          cp -f "$APK_FILE" android/app/build/outputs/apk/debug/app-release.apk
+          cp -f "$APK_FILE" "android/app/build/outputs/apk/debug/ViralClip-Studio-${{ steps.app_version.outputs.tag_name }}.apk"
+          cp -f "$APK_FILE" android/app/build/outputs/apk/debug/ViralClip-Studio.apk
           ls -lh android/app/build/outputs/apk/debug/
 
       - name: Save Diagnostic Logs on Failure
