@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,10 +23,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant Execute Permission for Gradlew
-        run: chmod +x android/gradlew || true
+        run: chmod +x android/gradlew
 
       - name: Build Debug APK with Gradle
         working-directory: ./android
@@ -35,3 +40,24 @@ jobs:
           name: ViralClip-Studio-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Prepare Release APK Asset
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/app-release.apk
+
+      - name: Publish GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: ViralClip Studio v1.0.0 (Android)
+          body: |
+            ### ViralClip Studio Native Android App (v1.0.0)
+            - **Hardware-Accelerated Video Rendering:** On-device FFmpegKit 9:16 vertical video cropping (1080x1920 60fps).
+            - **Google Gemini 1.5 Flash:** Viral hook detection, punchline extraction, and audience retention analysis.
+            - **YouTube Share Sheet Receiver:** Direct import from the YouTube Android app via Share.
+            - **Gallery Auto-Indexing:** 1-tap export directly into Android MediaStore.
+          files: |
+            android/app/build/outputs/apk/debug/app-release.apk
+            android/app/build/outputs/apk/debug/app-debug.apk
