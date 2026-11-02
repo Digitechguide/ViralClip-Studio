@@ -19,7 +19,8 @@
         android:roundIcon="@drawable/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.ViralVideoStudio"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="false"
+        android:extractNativeLibs="true">
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"

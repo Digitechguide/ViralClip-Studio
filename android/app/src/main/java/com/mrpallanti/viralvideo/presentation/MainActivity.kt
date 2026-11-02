@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
                 return StudioViewModel(
                     authRepository = app.authRepository,
                     extractYoutubeStreamUseCase = app.extractYoutubeStreamUseCase,
+                    downloadYoutubeVideoUseCase = app.downloadYoutubeVideoUseCase,
                     analyzeViralHooksUseCase = app.analyzeViralHooksUseCase,
                     renderVerticalShortUseCase = app.renderVerticalShortUseCase
                 ) as T

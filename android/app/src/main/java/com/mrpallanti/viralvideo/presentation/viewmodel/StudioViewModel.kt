@@ -9,6 +9,7 @@ import com.mrpallanti.viralvideo.domain.model.VideoMetadata
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import com.mrpallanti.viralvideo.domain.repository.AuthRepository
 import com.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
+import com.mrpallanti.viralvideo.domain.usecase.DownloadYoutubeVideoUseCase
 import com.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
 import com.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
 import kotlinx.coroutines.Dispatchers
@@ -50,6 +51,7 @@ data class StudioUiState(
 class StudioViewModel(
     private val authRepository: AuthRepository,
     private val extractYoutubeStreamUseCase: ExtractYoutubeStreamUseCase,
+    private val downloadYoutubeVideoUseCase: DownloadYoutubeVideoUseCase,
     private val analyzeViralHooksUseCase: AnalyzeViralHooksUseCase,
     private val renderVerticalShortUseCase: RenderVerticalShortUseCase
 ) : ViewModel() {
@@ -315,21 +317,57 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
             try {
                 var targetUri = video.localUri
 
-                // If local file is missing, try downloading direct YouTube stream if available
-                if (targetUri.isNullOrBlank() && !video.streamUrl.isNullOrBlank() && cacheDir != null) {
+                // If local file is missing, automatically download full video using on-device yt-dlp engine!
+                if (targetUri.isNullOrBlank() && cacheDir != null) {
                     _uiState.update {
                         it.copy(
                             isRendering = true,
-                            loadingMessage = "Downloading video stream directly..."
+                            loadingMessage = "Initializing on-device engine for YouTube download..."
                         )
                     }
-                    val downloadedFile = downloadDirectStream(video.streamUrl, cacheDir, video.id)
-                    if (downloadedFile != null && downloadedFile.exists() && downloadedFile.length() > 50000) {
-                        targetUri = downloadedFile.absolutePath
-                    }
+
+                    val dlUrl = state.urlInput.ifBlank { "https://www.youtube.com/watch?v=${video.id}" }
+                    val dlResult = downloadYoutubeVideoUseCase(
+                        url = dlUrl,
+                        outputDir = cacheDir,
+                        onProgress = { progress, status ->
+                            _uiState.update {
+                                it.copy(
+                                    loadingMessage = if (progress in 1f..99f) {
+                                        "Downloading from YouTube: ${progress.toInt()}% (On-device engine)..."
+                                    } else {
+                                        status
+                                    }
+                                )
+                            }
+                        }
+                    )
+
+                    dlResult.fold(
+                        onSuccess = { file ->
+                            targetUri = file.absolutePath
+                            _uiState.update {
+                                it.copy(
+                                    currentVideo = it.currentVideo?.copy(localUri = targetUri),
+                                    loadingMessage = "Download complete! Now rendering 9:16 vertical Short..."
+                                )
+                            }
+                        },
+                        onFailure = { err ->
+                            // If auto-download hits any restriction, fall back to gallery picker
+                            _uiState.update {
+                                it.copy(
+                                    isRendering = false,
+                                    showVideoPickerPrompt = true,
+                                    errorMessage = "Auto-download notice: ${err.message}"
+                                )
+                            }
+                            return@launch
+                        }
+                    )
                 }
 
-                // If stream is protected by YouTube bot detection, prompt creator to pick the local video
+                // If targetUri is still null, prompt creator to pick from gallery
                 if (targetUri.isNullOrBlank()) {
                     _uiState.update {
                         it.copy(

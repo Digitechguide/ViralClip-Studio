@@ -5,9 +5,15 @@ import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 interface VideoStreamRepository {
     suspend fun extractMetadata(url: String): Result<VideoMetadata>
+    suspend fun downloadDirectVideo(
+        url: String,
+        outputDir: File,
+        onProgress: (Float, String) -> Unit
+    ): Result<File>
 }
 
 interface AiViralityRepository {

@@ -540,15 +540,26 @@ fun StudioScreen(
 
                             if (state.isRendering) {
                                 Spacer(modifier = Modifier.height(12.dp))
+                                val progressVal = if (state.renderJob != null) {
+                                    (state.renderJob.progressPercent) / 100f
+                                } else {
+                                    0.5f // Indeterminate or downloading pulse
+                                }
                                 LinearProgressIndicator(
-                                    progress = (state.renderJob?.progressPercent ?: 0) / 100f,
+                                    progress = progressVal,
                                     modifier = Modifier.fillMaxWidth(),
                                     color = SuccessGreen
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
+                                val statusText = if (state.loadingMessage.isNotBlank()) {
+                                    state.loadingMessage
+                                } else {
+                                    "Processing video with Android Hardware Acceleration: ${state.renderJob?.progressPercent ?: 0}%"
+                                }
                                 Text(
-                                    text = "Processing video with Android Hardware Acceleration: ${state.renderJob?.progressPercent ?: 0}%",
-                                    fontSize = 11.sp,
+                                    text = statusText,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
                                     color = SuccessGreen,
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.fillMaxWidth()

@@ -1,6 +1,7 @@
 package com.mrpallanti.viralvideo
 
 import android.app.Application
+import android.util.Log
 import com.mrpallanti.viralvideo.data.local.AuthSessionManager
 import com.mrpallanti.viralvideo.data.local.Media3TransformerVideoRendererImpl
 import com.mrpallanti.viralvideo.data.remote.AuthRepositoryImpl
@@ -11,8 +12,14 @@ import com.mrpallanti.viralvideo.domain.repository.AuthRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
 import com.mrpallanti.viralvideo.domain.usecase.AnalyzeViralHooksUseCase
+import com.mrpallanti.viralvideo.domain.usecase.DownloadYoutubeVideoUseCase
 import com.mrpallanti.viralvideo.domain.usecase.ExtractYoutubeStreamUseCase
 import com.mrpallanti.viralvideo.domain.usecase.RenderVerticalShortUseCase
+import com.yausername.ffmpeg.FFmpeg
+import com.yausername.youtubedl_android.YoutubeDL
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ViralVideoApp : Application() {
 
@@ -43,6 +50,10 @@ class ViralVideoApp : Application() {
         ExtractYoutubeStreamUseCase(videoStreamRepository)
     }
 
+    val downloadYoutubeVideoUseCase: DownloadYoutubeVideoUseCase by lazy {
+        DownloadYoutubeVideoUseCase(videoStreamRepository)
+    }
+
     val analyzeViralHooksUseCase: AnalyzeViralHooksUseCase by lazy {
         AnalyzeViralHooksUseCase(aiViralityRepository)
     }
@@ -54,6 +65,20 @@ class ViralVideoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        initEmbeddedEngine()
+    }
+
+    private fun initEmbeddedEngine() {
+        // Asynchronously initialize embedded yt-dlp & FFmpeg binaries to prevent main thread ANR
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                YoutubeDL.getInstance().init(this@ViralVideoApp)
+                FFmpeg.getInstance().init(this@ViralVideoApp)
+                Log.d("ViralVideoApp", "Embedded yt-dlp & FFmpeg engines initialized.")
+            } catch (t: Throwable) {
+                Log.e("ViralVideoApp", "Error initializing embedded yt-dlp: ${t.message}", t)
+            }
+        }
     }
 
     companion object {

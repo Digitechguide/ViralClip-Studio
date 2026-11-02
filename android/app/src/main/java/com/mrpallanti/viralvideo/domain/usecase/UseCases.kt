@@ -8,6 +8,7 @@ import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoRendererRepository
 import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 class ExtractYoutubeStreamUseCase(
     private val repository: VideoStreamRepository
@@ -17,6 +18,21 @@ class ExtractYoutubeStreamUseCase(
             return Result.failure(IllegalArgumentException("URL cannot be empty"))
         }
         return repository.extractMetadata(url.trim())
+    }
+}
+
+class DownloadYoutubeVideoUseCase(
+    private val repository: VideoStreamRepository
+) {
+    suspend operator fun invoke(
+        url: String,
+        outputDir: File,
+        onProgress: (Float, String) -> Unit = { _, _ -> }
+    ): Result<File> {
+        if (url.isBlank()) {
+            return Result.failure(IllegalArgumentException("URL cannot be empty"))
+        }
+        return repository.downloadDirectVideo(url.trim(), outputDir, onProgress)
     }
 }
 

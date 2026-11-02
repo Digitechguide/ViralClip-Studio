@@ -1,15 +1,20 @@
 package com.mrpallanti.viralvideo.data.remote
 
 import android.content.Context
+import android.util.Log
 import com.maxrave.kotlinyoutubeextractor.State
 import com.maxrave.kotlinyoutubeextractor.YTExtractor
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
 import com.mrpallanti.viralvideo.domain.repository.VideoStreamRepository
+import com.yausername.ffmpeg.FFmpeg
+import com.yausername.youtubedl_android.YoutubeDL
+import com.yausername.youtubedl_android.YoutubeDLRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
+import java.io.File
 import java.util.regex.Pattern
 
 class YoutubeStreamExtractorImpl(
@@ -28,7 +33,7 @@ class YoutubeStreamExtractorImpl(
             val thumbnailUrl = "https://img.youtube.com/vi/$videoId/maxresdefault.jpg"
             var directStreamUrl: String? = null
 
-            // 1. First attempt: Query YouTube oEmbed API for fast title and author
+            // 1. Fast attempt: Query YouTube oEmbed API for instant title and creator name
             try {
                 val oembedUrl = "https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=$videoId&format=json"
                 val request = Request.Builder()
@@ -45,16 +50,16 @@ class YoutubeStreamExtractorImpl(
                     author = json.optString("author_name", author)
                 }
             } catch (t: Throwable) {
-                // Continue to on-device stream extractor
+                // Continue to extractors
             }
 
-            // 2. Second attempt: On-Device YTExtractor for direct playable MP4 stream & exact duration
+            // 2. Client-side stream check via YTExtractor
             try {
                 val yt = YTExtractor(
                     con = context,
                     CACHING = false,
                     LOGGING = false,
-                    retryCount = 2
+                    retryCount = 1
                 )
                 yt.extract(videoId)
 
@@ -108,6 +113,69 @@ class YoutubeStreamExtractorImpl(
             )
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override suspend fun downloadDirectVideo(
+        url: String,
+        outputDir: File,
+        onProgress: (Float, String) -> Unit
+    ): Result<File> = withContext(Dispatchers.IO) {
+        try {
+            if (!outputDir.exists()) {
+                outputDir.mkdirs()
+            }
+
+            val videoId = extractVideoId(url) ?: "video_${System.currentTimeMillis()}"
+            val expectedOutputFile = File(outputDir, "${videoId}.mp4")
+
+            // Check if already downloaded and valid
+            if (expectedOutputFile.exists() && expectedOutputFile.length() > 500_000) {
+                onProgress(100f, "Cached video ready!")
+                return@withContext Result.success(expectedOutputFile)
+            }
+
+            // Ensure embedded engines are ready
+            try {
+                YoutubeDL.getInstance().init(context)
+                FFmpeg.getInstance().init(context)
+            } catch (t: Throwable) {
+                Log.d("YoutubeStreamExtractor", "Init status: ${t.message}")
+            }
+
+            val request = YoutubeDLRequest(url).apply {
+                // Download up to 1080p and merge with best audio into single MP4
+                addOption("-f", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4]/best")
+                addOption("--merge-output-format", "mp4")
+                addOption("-o", File(outputDir, "${videoId}.%(ext)s").absolutePath)
+                addOption("--no-mtime")
+                addOption("--no-playlist")
+                addOption("--force-overwrites")
+            }
+
+            onProgress(5f, "Connecting to YouTube stream via embedded engine...")
+
+            val response = YoutubeDL.getInstance().execute(request, "dl_$videoId") { progress, etaInSeconds, line ->
+                val statusText = line ?: "Downloading... ${progress.toInt()}%"
+                onProgress(progress.coerceIn(0f, 100f), statusText)
+            }
+
+            if (expectedOutputFile.exists() && expectedOutputFile.length() > 50_000) {
+                onProgress(100f, "Download complete!")
+                Result.success(expectedOutputFile)
+            } else {
+                // Find any matching file in directory starting with videoId
+                val matched = outputDir.listFiles()?.firstOrNull { it.name.startsWith(videoId) && it.length() > 50_000 }
+                if (matched != null) {
+                    onProgress(100f, "Download complete!")
+                    Result.success(matched)
+                } else {
+                    Result.failure(Exception("Download failed: output file not found. Response: ${response.out}"))
+                }
+            }
+        } catch (t: Throwable) {
+            Log.e("YoutubeStreamExtractor", "Embedded yt-dlp error: ${t.message}", t)
+            Result.failure(t)
         }
     }
 

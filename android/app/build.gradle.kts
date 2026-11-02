@@ -56,8 +56,16 @@ android {
         kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += listOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "META-INF/LICENSE*",
+                "META-INF/NOTICE*",
+                "META-INF/DEPENDENCIES"
+            )
         }
     }
 }
@@ -89,6 +97,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
     implementation("com.github.maxrave-dev:kotlin-youtubeExtractor:0.0.7")
+
+    // Embedded On-Device yt-dlp & FFmpeg engine (Direct YouTube Downloads on Phone)
+    val youtubedlAndroid = "0.18.1"
+    implementation("io.github.junkfood02.youtubedl-android:library:$youtubedlAndroid")
+    implementation("io.github.junkfood02.youtubedl-android:ffmpeg:$youtubedlAndroid")
 
     debugImplementation(libs.androidx.ui.tooling)
 }
