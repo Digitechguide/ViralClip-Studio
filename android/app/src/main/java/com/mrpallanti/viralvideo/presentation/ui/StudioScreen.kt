@@ -457,7 +457,6 @@ fun StudioScreen(
                                         fontSize = 10.sp
                                     )
                                 }
-                                }
                             }
                         }
                     }
