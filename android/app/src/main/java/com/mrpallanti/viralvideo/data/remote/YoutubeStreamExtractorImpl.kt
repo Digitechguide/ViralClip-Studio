@@ -61,23 +61,11 @@ class YoutubeStreamExtractorImpl(
                 if (yt.state == State.SUCCESS) {
                     val ytFiles = yt.getYTFiles()
                     if (ytFiles != null) {
-                        // Find progressive MP4 stream (audio + video muxed together, e.g. 720p/360p itag 22 or 18)
                         for (i in 0 until ytFiles.size()) {
                             val file = ytFiles.valueAt(i)
-                            if (file != null && file.format.ext == "mp4" && !file.format.isDash && !file.url.isNullOrBlank()) {
+                            if (file != null && file.ext == "mp4" && !file.url.isNullOrBlank()) {
                                 directStreamUrl = file.url
                                 break
-                            }
-                        }
-
-                        // Fallback: any MP4 URL
-                        if (directStreamUrl.isNullOrBlank()) {
-                            for (i in 0 until ytFiles.size()) {
-                                val file = ytFiles.valueAt(i)
-                                if (file != null && file.format.ext == "mp4" && !file.url.isNullOrBlank()) {
-                                    directStreamUrl = file.url
-                                    break
-                                }
                             }
                         }
                     }
@@ -87,11 +75,13 @@ class YoutubeStreamExtractorImpl(
                         if (meta.videoLength > 0) {
                             durationSeconds = meta.videoLength
                         }
-                        if (!meta.title.isNullOrBlank()) {
-                            title = meta.title
+                        val metaTitle = meta.title
+                        if (!metaTitle.isNullOrBlank()) {
+                            title = metaTitle
                         }
-                        if (!meta.author.isNullOrBlank()) {
-                            author = meta.author
+                        val metaAuthor = meta.author
+                        if (!metaAuthor.isNullOrBlank()) {
+                            author = metaAuthor
                         }
                     }
                 }
