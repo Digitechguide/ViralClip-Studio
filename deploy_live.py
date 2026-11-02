@@ -30,6 +30,7 @@ if not FTP_PASS:
 files_to_upload = [
     ('.htaccess', '.htaccess'),
     ('index.html', 'index.html'),
+    ('ViralClip-Studio.apk', 'ViralClip-Studio.apk'),
     ('studio.html', 'studio.html'),
     ('admin.html', 'admin.html'),
     ('css/landing.css', 'css/landing.css'),
@@ -48,7 +49,7 @@ files_to_upload = [
 ]
 
 def get_connection():
-    ftp = ftplib.FTP(timeout=20)
+    ftp = ftplib.FTP(timeout=60)
     ftp.connect(FTP_HOST, 21)
     ftp.login(FTP_USER, FTP_PASS)
     ftp.set_pasv(True)
