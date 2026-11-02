@@ -31,6 +31,7 @@ data class TrimRange(
     val durationSeconds: Float get() = (endSeconds - startSeconds).coerceAtLeast(1f)
 }
 
+@Serializable
 enum class WatermarkPosition {
     TOP_LEFT,
     TOP_RIGHT,
@@ -38,6 +39,7 @@ enum class WatermarkPosition {
     BOTTOM_RIGHT
 }
 
+@Serializable
 enum class TextOverlayPosition {
     TOP,
     CENTER,
