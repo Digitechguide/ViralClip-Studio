@@ -246,7 +246,7 @@ fun StudioScreen(
             StudioBottomNavigationBar(
                 currentTab = state.currentTab,
                 onTabSelected = { tab ->
-                    if (tab == StudioTab.CLIPPER && state.currentVideo != null && state.currentVideo.localUri.isNullOrBlank()) {
+                    if (tab == StudioTab.CLIPPER && state.currentVideo != null && state.currentVideo?.localUri.isNullOrBlank()) {
                         viewModel.cacheVideoForPlayback(context.cacheDir)
                     }
                     viewModel.setTab(tab)

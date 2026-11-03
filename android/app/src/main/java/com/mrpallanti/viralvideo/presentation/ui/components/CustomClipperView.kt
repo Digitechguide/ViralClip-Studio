@@ -26,6 +26,7 @@ import com.mrpallanti.viralvideo.presentation.ui.theme.*
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
 
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun CustomClipperView(
     state: StudioUiState,
