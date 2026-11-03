@@ -1,7 +1,11 @@
 # ViralClip Studio ⚡
 > Turn Long Videos into High-Retention Viral Shorts & Reels with Gemini AI.
 
-ViralClip Studio is a complete web application designed to run smoothly on shared hosting (**serverbyt.in**) with PHP support, or directly in the browser with zero heavy server requirements.
+[![Architecture & Flow](https://img.shields.io/badge/Architecture-PROJECT__ARCHITECTURE__AND__FLOW.md-blueviolet?style=for-the-badge)](PROJECT_ARCHITECTURE_AND_FLOW.md)
+[![Latest Release](https://img.shields.io/badge/Release-v1.0.50-success?style=for-the-badge)](https://viral.mrpallanti.in/ViralClip-Studio-v1.0.50.apk)
+[![Live Production](https://img.shields.io/badge/Live-viral.mrpallanti.in-cyan?style=for-the-badge)](https://viral.mrpallanti.in/)
+
+> 📖 **Developer / AI Memory & System Flow:** See [PROJECT_ARCHITECTURE_AND_FLOW.md](PROJECT_ARCHITECTURE_AND_FLOW.md) for full architectural blueprints, data flow diagrams, clean architecture specifications, CI/CD pipeline, and deployment instructions.
 
 ---
 
