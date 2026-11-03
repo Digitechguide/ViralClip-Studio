@@ -32,17 +32,53 @@ import com.mrpallanti.viralvideo.presentation.ui.theme.PrimaryPurple
 import com.mrpallanti.viralvideo.presentation.ui.theme.TextPrimary
 import com.mrpallanti.viralvideo.presentation.ui.theme.TextSecondary
 
+interface YouTubePlayerController {
+    fun pause()
+    fun play()
+    fun seekTo(seconds: Float)
+}
+
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun InAppYouTubePlayer(
     videoId: String,
     modifier: Modifier = Modifier,
     onPositionUpdate: (Float) -> Unit = {},
+    onPlayerReady: (YouTubePlayerController) -> Unit = {},
     onCacheVideo: () -> Unit = {},
     onPickFromGallery: () -> Unit = {}
 ) {
     val handler = Handler(Looper.getMainLooper())
     var playerError by remember(videoId) { mutableStateOf<Int?>(null) }
+    var webViewRef by remember { mutableStateOf<WebView?>(null) }
+
+    val controller = remember {
+        object : YouTubePlayerController {
+            override fun pause() {
+                handler.post {
+                    webViewRef?.evaluateJavascript("if (player && typeof player.pauseVideo === 'function') { player.pauseVideo(); }", null)
+                }
+            }
+
+            override fun play() {
+                handler.post {
+                    webViewRef?.evaluateJavascript("if (player && typeof player.playVideo === 'function') { player.playVideo(); }", null)
+                }
+            }
+
+            override fun seekTo(seconds: Float) {
+                handler.post {
+                    webViewRef?.evaluateJavascript("if (player && typeof player.seekTo === 'function') { player.seekTo($seconds, true); }", null)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(webViewRef) {
+        if (webViewRef != null) {
+            onPlayerReady(controller)
+        }
+    }
 
     val htmlContent = remember(videoId) {
         """
@@ -116,6 +152,7 @@ fun InAppYouTubePlayer(
         AndroidView(
             factory = { ctx ->
                 WebView(ctx).apply {
+                    webViewRef = this
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT

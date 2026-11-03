@@ -452,9 +452,15 @@ class StudioViewModel(
         }
     }
 
-    fun loadVideoForManualCropping(url: String = _uiState.value.urlInput) {
-        // If a video is already loaded, switch directly to CLIPPER tab
-        if (_uiState.value.currentVideo != null && url.isBlank()) {
+    fun loadVideoForManualCropping(url: String = _uiState.value.urlInput, cacheDir: File? = null) {
+        val effectiveUrl = url.ifBlank { _uiState.value.urlInput }
+
+        // Case 1: Video is already loaded
+        if (_uiState.value.currentVideo != null && effectiveUrl.isBlank()) {
+            val current = _uiState.value.currentVideo!!
+            if (current.localUri.isNullOrBlank() && cacheDir != null) {
+                cacheVideoForPlayback(cacheDir)
+            }
             _uiState.update {
                 it.copy(
                     currentTab = StudioTab.CLIPPER,
@@ -464,37 +470,93 @@ class StudioViewModel(
             return
         }
 
-        if (url.isBlank()) {
+        // Case 2: No URL provided and no video loaded
+        if (effectiveUrl.isBlank()) {
             _uiState.update {
                 it.copy(
                     currentTab = StudioTab.CLIPPER,
-                    errorMessage = "Please paste a YouTube URL or pick a video from Gallery"
+                    errorMessage = "Please paste a YouTube URL or select a video from Gallery"
                 )
             }
             return
         }
 
+        // Case 3: Load YouTube video and AUTO-CACHE OFFLINE immediately
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
                     isLoading = true,
-                    loadingMessage = "Loading video for custom cropping...",
+                    loadingMessage = "Extracting video details...",
                     errorMessage = null
                 )
             }
 
-            extractYoutubeStreamUseCase(url).fold(
+            extractYoutubeStreamUseCase(effectiveUrl).fold(
                 onSuccess = { metadata ->
                     val defaultEnd = minOf(30f, metadata.durationSeconds.toFloat().coerceAtLeast(10f))
-                    _uiState.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            currentVideo = metadata,
-                            currentTab = StudioTab.CLIPPER,
-                            trimRange = TrimRange(0f, defaultEnd),
-                            hookText = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" },
-                            successMessage = "Loaded '${metadata.title}'! Choose length & place below."
+
+                    // If cacheDir is provided, automatically download with on-device engine now!
+                    if (cacheDir != null && metadata.localUri.isNullOrBlank()) {
+                        _uiState.update {
+                            it.copy(
+                                currentVideo = metadata,
+                                loadingMessage = "Auto-caching video for smooth offline cropping: 0%..."
+                            )
+                        }
+
+                        val dlResult = downloadYoutubeVideoUseCase(
+                            url = effectiveUrl,
+                            outputDir = cacheDir,
+                            onProgress = { progress, status ->
+                                _uiState.update {
+                                    it.copy(
+                                        loadingMessage = if (progress in 1f..99f) {
+                                            "Auto-caching video: ${progress.toInt()}% (On-device engine)..."
+                                        } else {
+                                            status
+                                        }
+                                    )
+                                }
+                            }
                         )
+
+                        dlResult.fold(
+                            onSuccess = { localFile ->
+                                _uiState.update { state ->
+                                    state.copy(
+                                        isLoading = false,
+                                        currentVideo = metadata.copy(localUri = localFile.absolutePath, streamUrl = localFile.absolutePath),
+                                        currentTab = StudioTab.CLIPPER,
+                                        trimRange = TrimRange(0f, defaultEnd),
+                                        hookText = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" },
+                                        successMessage = "Auto-cached offline! Frame-accurate scrubbing ready."
+                                    )
+                                }
+                            },
+                            onFailure = { err ->
+                                _uiState.update { state ->
+                                    state.copy(
+                                        isLoading = false,
+                                        currentVideo = metadata,
+                                        currentTab = StudioTab.CLIPPER,
+                                        trimRange = TrimRange(0f, defaultEnd),
+                                        hookText = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" },
+                                        errorMessage = "Auto-cache note: ${err.message?.lines()?.firstOrNull() ?: "Using stream playback"}"
+                                    )
+                                }
+                            }
+                        )
+                    } else {
+                        _uiState.update { state ->
+                            state.copy(
+                                isLoading = false,
+                                currentVideo = metadata,
+                                currentTab = StudioTab.CLIPPER,
+                                trimRange = TrimRange(0f, defaultEnd),
+                                hookText = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" },
+                                successMessage = "Loaded '${metadata.title}'! Choose length & place below."
+                            )
+                        }
                     }
                 },
                 onFailure = { err ->

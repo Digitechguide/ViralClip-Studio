@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.exoplayer.ExoPlayer
 import com.mrpallanti.viralvideo.domain.model.CropPlacement
 import com.mrpallanti.viralvideo.presentation.ui.theme.*
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
@@ -34,6 +35,10 @@ fun CustomClipperView(
     val context = LocalContext.current
     val video = state.currentVideo
     var playerPositionSec by remember { mutableFloatStateOf(0f) }
+
+    var exoPlayerInstance by remember { mutableStateOf<ExoPlayer?>(null) }
+    var ytControllerInstance by remember { mutableStateOf<YouTubePlayerController?>(null) }
+    var isPlaybackPaused by remember { mutableStateOf(false) }
 
     if (video == null) {
         // Empty State: No video loaded yet
@@ -97,6 +102,15 @@ fun CustomClipperView(
     val currentPlacement = state.overlayConfig.cropPlacement
     val currentOffset = state.overlayConfig.cropHorizontalOffset
 
+    // Auto-stop preview when playhead reaches endSec
+    LaunchedEffect(playerPositionSec, endSec) {
+        if (!isPlaybackPaused && playerPositionSec >= endSec && endSec > startSec) {
+            exoPlayerInstance?.pause()
+            ytControllerInstance?.pause()
+            isPlaybackPaused = true
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -127,7 +141,7 @@ fun CustomClipperView(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (hasLocalFile) "Local Video Player" else "In-App YouTube Player",
+                            text = if (hasLocalFile) "Offline Local Player" else "In-App Stream Player",
                             color = TextPrimary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
@@ -148,7 +162,7 @@ fun CustomClipperView(
                 }
 
                 if (hasLocalFile) {
-                    // Local Gallery / Pre-downloaded video player
+                    // Local Gallery / Pre-downloaded video player (ExoPlayer)
                     InAppVideoPlayer(
                         uriString = video.localUri!!,
                         modifier = Modifier
@@ -157,6 +171,9 @@ fun CustomClipperView(
                         onPositionUpdate = { pos ->
                             playerPositionSec = pos
                             viewModel.updatePlayerPosition(pos)
+                        },
+                        onPlayerReady = { player ->
+                            exoPlayerInstance = player
                         }
                     )
                 } else if (isYouTubeVideo) {
@@ -169,6 +186,9 @@ fun CustomClipperView(
                         onPositionUpdate = { pos ->
                             playerPositionSec = pos
                             viewModel.updatePlayerPosition(pos)
+                        },
+                        onPlayerReady = { controller ->
+                            ytControllerInstance = controller
                         },
                         onCacheVideo = {
                             viewModel.cacheVideoForPlayback(context.cacheDir)
@@ -184,6 +204,9 @@ fun CustomClipperView(
                         onPositionUpdate = { pos ->
                             playerPositionSec = pos
                             viewModel.updatePlayerPosition(pos)
+                        },
+                        onPlayerReady = { player ->
+                            exoPlayerInstance = player
                         }
                     )
                 } else {
@@ -200,65 +223,162 @@ fun CustomClipperView(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Playback Position Row + Offline Cache Action
+                // Playback Position Row + Pause/Play toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Playhead: ${formatSec(playerPositionSec)} / ${formatSec(totalDurationSec)}",
-                        color = AccentCyan,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Playhead: ${formatSec(playerPositionSec)} / ${formatSec(totalDurationSec)}",
+                            color = AccentCyan,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (isPlaybackPaused) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Surface(
+                                color = Color(0xFFF59E0B).copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = "PAUSED",
+                                    color = Color(0xFFF59E0B),
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                )
+                            }
+                        }
+                    }
 
-                    if (!hasLocalFile) {
-                        FilledTonalButton(
-                            onClick = { viewModel.cacheVideoForPlayback(context.cacheDir) },
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(containerColor = PrimaryPurple.copy(alpha = 0.25f))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        FilledTonalIconButton(
+                            onClick = {
+                                if (isPlaybackPaused) {
+                                    exoPlayerInstance?.play()
+                                    ytControllerInstance?.play()
+                                    isPlaybackPaused = false
+                                } else {
+                                    exoPlayerInstance?.pause()
+                                    ytControllerInstance?.pause()
+                                    isPlaybackPaused = true
+                                }
+                            },
+                            modifier = Modifier.size(34.dp)
                         ) {
-                            Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(14.dp), tint = PrimaryPurple)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Cache Offline", fontSize = 11.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            Icon(
+                                imageVector = if (isPlaybackPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
+                                contentDescription = if (isPlaybackPaused) "Play" else "Pause",
+                                tint = TextPrimary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        if (!hasLocalFile) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            FilledTonalButton(
+                                onClick = { viewModel.cacheVideoForPlayback(context.cacheDir) },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.filledTonalButtonColors(containerColor = PrimaryPurple.copy(alpha = 0.25f))
+                            ) {
+                                Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(12.dp), tint = PrimaryPurple)
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text("Cache", fontSize = 11.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Set Start & Set End Big Action Buttons (PAUSES PLAYBACK IMMEDIATELY)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            // 1. Immediately pause playback so timer stops!
+                            exoPlayerInstance?.pause()
+                            ytControllerInstance?.pause()
+                            isPlaybackPaused = true
+
+                            // 2. Lock start timestamp and seek
+                            val currentPos = playerPositionSec
+                            viewModel.setStartToCurrentPlayback(currentPos)
+                            exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
+                            ytControllerInstance?.seekTo(currentPos)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(46.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple)
+                    ) {
+                        Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Set Start & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text("Start: ${formatSec(startSec)}", fontSize = 10.sp, color = AccentCyan)
+                        }
+                    }
+
+                    Button(
+                        onClick = {
+                            // 1. Immediately pause playback so timer stops!
+                            exoPlayerInstance?.pause()
+                            ytControllerInstance?.pause()
+                            isPlaybackPaused = true
+
+                            // 2. Lock end timestamp and seek
+                            val currentPos = playerPositionSec
+                            viewModel.setEndToCurrentPlayback(currentPos)
+                            exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
+                            ytControllerInstance?.seekTo(currentPos)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(46.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentCyan)
+                    ) {
+                        Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Black)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Set End & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                            Text("End: ${formatSec(endSec)}", fontSize = 10.sp, color = Color.Black.copy(alpha = 0.8f))
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Set Start & Set End Big Action Buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                // Preview Range Button (Start -> End with auto-pause at End)
+                OutlinedButton(
+                    onClick = {
+                        exoPlayerInstance?.seekTo((startSec * 1000).toLong())
+                        exoPlayerInstance?.play()
+                        ytControllerInstance?.seekTo(startSec)
+                        ytControllerInstance?.play()
+                        isPlaybackPaused = false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.6f))
                 ) {
-                    FilledTonalButton(
-                        onClick = { viewModel.setStartToCurrentPlayback(playerPositionSec) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(40.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = PrimaryPurple.copy(alpha = 0.25f))
-                    ) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryPurple)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Set Start [${formatSec(playerPositionSec)}]", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    }
-
-                    FilledTonalButton(
-                        onClick = { viewModel.setEndToCurrentPlayback(playerPositionSec) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(40.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = AccentCyan.copy(alpha = 0.2f))
-                    ) {
-                        Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp), tint = AccentCyan)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Set End [${formatSec(playerPositionSec)}]", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    }
+                    Icon(Icons.Default.FastForward, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryPurple)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "▶ Preview Range (${formatSec(startSec)} ➔ ${formatSec(endSec)})",
+                        fontSize = 12.sp,
+                        color = TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -530,7 +650,11 @@ fun CustomClipperView(
                     Text("Start: ${formatSec(startSec)}", color = TextSecondary, fontSize = 13.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         OutlinedButton(
-                            onClick = { viewModel.updateTrimRange(startSec - 1f, endSec) },
+                            onClick = {
+                                viewModel.updateTrimRange(startSec - 1f, endSec)
+                                exoPlayerInstance?.seekTo(((startSec - 1f).coerceAtLeast(0f) * 1000).toLong())
+                                ytControllerInstance?.seekTo((startSec - 1f).coerceAtLeast(0f))
+                            },
                             contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
                             shape = RoundedCornerShape(6.dp),
                             modifier = Modifier.height(28.dp)
@@ -538,7 +662,11 @@ fun CustomClipperView(
                             Text("-1s", fontSize = 11.sp, color = TextPrimary)
                         }
                         OutlinedButton(
-                            onClick = { viewModel.updateTrimRange(startSec + 1f, endSec) },
+                            onClick = {
+                                viewModel.updateTrimRange(startSec + 1f, endSec)
+                                exoPlayerInstance?.seekTo(((startSec + 1f) * 1000).toLong())
+                                ytControllerInstance?.seekTo(startSec + 1f)
+                            },
                             contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
                             shape = RoundedCornerShape(6.dp),
                             modifier = Modifier.height(28.dp)
@@ -549,7 +677,11 @@ fun CustomClipperView(
                 }
                 Slider(
                     value = startSec,
-                    onValueChange = { newStart -> viewModel.updateTrimRange(newStart, endSec) },
+                    onValueChange = { newStart ->
+                        viewModel.updateTrimRange(newStart, endSec)
+                        exoPlayerInstance?.seekTo((newStart * 1000).toLong())
+                        ytControllerInstance?.seekTo(newStart)
+                    },
                     valueRange = 0f..totalDurationSec,
                     colors = SliderDefaults.colors(
                         thumbColor = PrimaryPurple,
@@ -568,7 +700,11 @@ fun CustomClipperView(
                     Text("End: ${formatSec(endSec)}", color = TextSecondary, fontSize = 13.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         OutlinedButton(
-                            onClick = { viewModel.updateTrimRange(startSec, endSec - 1f) },
+                            onClick = {
+                                viewModel.updateTrimRange(startSec, endSec - 1f)
+                                exoPlayerInstance?.seekTo(((endSec - 1f).coerceAtLeast(0f) * 1000).toLong())
+                                ytControllerInstance?.seekTo((endSec - 1f).coerceAtLeast(0f))
+                            },
                             contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
                             shape = RoundedCornerShape(6.dp),
                             modifier = Modifier.height(28.dp)
@@ -576,7 +712,11 @@ fun CustomClipperView(
                             Text("-1s", fontSize = 11.sp, color = TextPrimary)
                         }
                         OutlinedButton(
-                            onClick = { viewModel.updateTrimRange(startSec, endSec + 1f) },
+                            onClick = {
+                                viewModel.updateTrimRange(startSec, endSec + 1f)
+                                exoPlayerInstance?.seekTo(((endSec + 1f) * 1000).toLong())
+                                ytControllerInstance?.seekTo(endSec + 1f)
+                            },
                             contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
                             shape = RoundedCornerShape(6.dp),
                             modifier = Modifier.height(28.dp)
@@ -587,7 +727,11 @@ fun CustomClipperView(
                 }
                 Slider(
                     value = endSec,
-                    onValueChange = { newEnd -> viewModel.updateTrimRange(startSec, newEnd) },
+                    onValueChange = { newEnd ->
+                        viewModel.updateTrimRange(startSec, newEnd)
+                        exoPlayerInstance?.seekTo((newEnd * 1000).toLong())
+                        ytControllerInstance?.seekTo(newEnd)
+                    },
                     valueRange = 0f..totalDurationSec,
                     colors = SliderDefaults.colors(
                         thumbColor = AccentCyan,

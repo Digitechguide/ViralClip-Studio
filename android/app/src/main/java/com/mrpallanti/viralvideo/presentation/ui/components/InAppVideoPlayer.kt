@@ -31,7 +31,8 @@ import kotlinx.coroutines.isActive
 fun InAppVideoPlayer(
     uriString: String,
     modifier: Modifier = Modifier,
-    onPositionUpdate: (Float) -> Unit = {}
+    onPositionUpdate: (Float) -> Unit = {},
+    onPlayerReady: (ExoPlayer) -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -47,6 +48,7 @@ fun InAppVideoPlayer(
     }
 
     LaunchedEffect(exoPlayer) {
+        onPlayerReady(exoPlayer)
         while (isActive) {
             try {
                 if (exoPlayer.isPlaying) {

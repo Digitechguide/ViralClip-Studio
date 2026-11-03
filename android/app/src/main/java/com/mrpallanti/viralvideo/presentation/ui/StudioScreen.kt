@@ -245,7 +245,12 @@ fun StudioScreen(
         bottomBar = {
             StudioBottomNavigationBar(
                 currentTab = state.currentTab,
-                onTabSelected = { viewModel.setTab(it) },
+                onTabSelected = { tab ->
+                    if (tab == StudioTab.CLIPPER && state.currentVideo != null && state.currentVideo.localUri.isNullOrBlank()) {
+                        viewModel.cacheVideoForPlayback(context.cacheDir)
+                    }
+                    viewModel.setTab(tab)
+                },
                 recentCount = state.recentShorts.size
             )
         },
@@ -362,7 +367,7 @@ fun StudioScreen(
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 OutlinedButton(
-                                    onClick = { viewModel.loadVideoForManualCropping() },
+                                    onClick = { viewModel.loadVideoForManualCropping(cacheDir = context.cacheDir) },
                                     enabled = !state.isLoading,
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.fillMaxWidth(),
