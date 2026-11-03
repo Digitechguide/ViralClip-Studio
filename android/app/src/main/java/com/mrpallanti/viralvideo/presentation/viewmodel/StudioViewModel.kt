@@ -3,6 +3,7 @@ package com.mrpallanti.viralvideo.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrpallanti.viralvideo.domain.model.AuthUser
+import com.mrpallanti.viralvideo.domain.model.CropPlacement
 import com.mrpallanti.viralvideo.domain.model.GeneratedShortItem
 import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
@@ -240,6 +241,33 @@ class StudioViewModel(
         _uiState.update { it.copy(overlayConfig = config) }
     }
 
+    fun setCropPlacement(placement: CropPlacement) {
+        _uiState.update {
+            it.copy(
+                overlayConfig = it.overlayConfig.copy(cropPlacement = placement),
+                successMessage = when (placement) {
+                    CropPlacement.AUTO_FACE -> "Auto Face Tracking activated"
+                    CropPlacement.LEFT -> "Framed to Left side (0.16)"
+                    CropPlacement.CENTER -> "Framed to Center (0.50)"
+                    CropPlacement.RIGHT -> "Framed to Right side (0.84)"
+                    CropPlacement.CUSTOM -> "Custom placement enabled"
+                }
+            )
+        }
+    }
+
+    fun setCropHorizontalOffset(offset: Float) {
+        val cleanOffset = offset.coerceIn(0.0f, 1.0f)
+        _uiState.update {
+            it.copy(
+                overlayConfig = it.overlayConfig.copy(
+                    cropPlacement = CropPlacement.CUSTOM,
+                    cropHorizontalOffset = cleanOffset
+                )
+            )
+        }
+    }
+
     fun setCustomLogoUri(uriString: String?) {
         _uiState.update {
             it.copy(
@@ -417,6 +445,63 @@ class StudioViewModel(
                         it.copy(
                             isLoading = false,
                             errorMessage = err.message ?: "Failed to load video"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun loadVideoForManualCropping(url: String = _uiState.value.urlInput) {
+        // If a video is already loaded, switch directly to CLIPPER tab
+        if (_uiState.value.currentVideo != null && url.isBlank()) {
+            _uiState.update {
+                it.copy(
+                    currentTab = StudioTab.CLIPPER,
+                    successMessage = "Switched to Custom Clipper: Select length & place"
+                )
+            }
+            return
+        }
+
+        if (url.isBlank()) {
+            _uiState.update {
+                it.copy(
+                    currentTab = StudioTab.CLIPPER,
+                    errorMessage = "Please paste a YouTube URL or pick a video from Gallery"
+                )
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    loadingMessage = "Loading video for custom cropping...",
+                    errorMessage = null
+                )
+            }
+
+            extractYoutubeStreamUseCase(url).fold(
+                onSuccess = { metadata ->
+                    val defaultEnd = minOf(30f, metadata.durationSeconds.toFloat().coerceAtLeast(10f))
+                    _uiState.update { state ->
+                        state.copy(
+                            isLoading = false,
+                            currentVideo = metadata,
+                            currentTab = StudioTab.CLIPPER,
+                            trimRange = TrimRange(0f, defaultEnd),
+                            hookText = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" },
+                            successMessage = "Loaded '${metadata.title}'! Choose length & place below."
+                        )
+                    }
+                },
+                onFailure = { err ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = err.message ?: "Failed to load YouTube video"
                         )
                     }
                 }

@@ -47,6 +47,15 @@ enum class TextOverlayPosition {
 }
 
 @Serializable
+enum class CropPlacement {
+    AUTO_FACE, // AI Face-Centered Auto Framing
+    LEFT,      // Left side of 16:9 frame (0.16)
+    CENTER,    // Center of 16:9 frame (0.50)
+    RIGHT,     // Right side of 16:9 frame (0.84)
+    CUSTOM     // Custom user-defined horizontal offset (0.0 to 1.0)
+}
+
+@Serializable
 data class OverlayConfig(
     val customText: String = "",
     val textPosition: TextOverlayPosition = TextOverlayPosition.TOP,
@@ -55,7 +64,9 @@ data class OverlayConfig(
     val logoUri: String? = null,
     val watermarkText: String = "",
     val watermarkPosition: WatermarkPosition = WatermarkPosition.TOP_RIGHT,
-    val watermarkOpacity: Float = 0.85f
+    val watermarkOpacity: Float = 0.85f,
+    val cropPlacement: CropPlacement = CropPlacement.AUTO_FACE,
+    val cropHorizontalOffset: Float = 0.50f
 )
 
 @Serializable

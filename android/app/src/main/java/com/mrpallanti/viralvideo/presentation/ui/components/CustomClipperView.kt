@@ -16,8 +16,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mrpallanti.viralvideo.domain.model.CropPlacement
 import com.mrpallanti.viralvideo.presentation.ui.theme.*
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
@@ -61,11 +63,11 @@ fun CustomClipperView(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Load a YouTube link in the Studio tab or pick a video from your gallery to play and manually scrub custom short ranges.",
+                    text = "Enter a YouTube link or pick a video from your gallery to play, scrub custom length, and choose your 9:16 crop framing place.",
                     color = TextSecondary,
                     fontSize = 13.sp,
                     lineHeight = 18.sp,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
@@ -87,93 +89,138 @@ fun CustomClipperView(
     val endSec = state.trimRange.endSeconds.coerceIn(startSec + 1f, totalDurationSec)
     val durationSec = endSec - startSec
 
+    val isYouTubeVideo = !video.id.startsWith("local_") && video.id.isNotBlank()
+    val hasLocalFile = !video.localUri.isNullOrBlank()
     val playableUri = video.localUri ?: video.streamUrl
+
+    val currentPlacement = state.overlayConfig.cropPlacement
+    val currentOffset = state.overlayConfig.cropHorizontalOffset
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // 1. In-App Video Player or Download Banner
-        if (!playableUri.isNullOrBlank()) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = CardDark),
-                shape = RoundedCornerShape(20.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
-            ) {
-                Column(modifier = Modifier.padding(14.dp)) {
+        // ----------------------------------------------------
+        // 1. IN-APP VIDEO PLAYER (Dual Engine: Local ExoPlayer / In-App YouTube)
+        // ----------------------------------------------------
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = CardDark),
+            shape = RoundedCornerShape(20.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
+        ) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (hasLocalFile) "📱 Local Video Player" else "▶️ In-App YouTube Player",
+                        color = TextPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Surface(
+                        color = if (hasLocalFile) SuccessGreen.copy(alpha = 0.15f) else PrimaryPurple.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = if (hasLocalFile) "Offline Ready" else "Live Stream",
+                            color = if (hasLocalFile) SuccessGreen else PrimaryPurple,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+
+                if (hasLocalFile) {
+                    // Local Gallery / Pre-downloaded video player
                     InAppVideoPlayer(
-                        uriString = playableUri,
+                        uriString = video.localUri!!,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(220.dp),
+                            .height(210.dp),
                         onPositionUpdate = { pos ->
                             playerPositionSec = pos
                             viewModel.updatePlayerPosition(pos)
                         }
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Playback: ${formatSec(playerPositionSec)} / ${formatSec(totalDurationSec)}",
-                            color = AccentCyan,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            FilledTonalButton(
-                                onClick = { viewModel.setStartToCurrentPlayback(playerPositionSec) },
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Set Start [${formatSec(playerPositionSec)}]", fontSize = 11.sp)
-                            }
-                            FilledTonalButton(
-                                onClick = { viewModel.setEndToCurrentPlayback(playerPositionSec) },
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Text("Set End [${formatSec(playerPositionSec)}]", fontSize = 11.sp)
-                            }
+                } else if (isYouTubeVideo) {
+                    // Embedded YouTube WebView player with live JS bridge
+                    InAppYouTubePlayer(
+                        videoId = video.id,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(210.dp),
+                        onPositionUpdate = { pos ->
+                            playerPositionSec = pos
+                            viewModel.updatePlayerPosition(pos)
                         }
+                    )
+                } else if (!playableUri.isNullOrBlank()) {
+                    InAppVideoPlayer(
+                        uriString = playableUri,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(210.dp),
+                        onPositionUpdate = { pos ->
+                            playerPositionSec = pos
+                            viewModel.updatePlayerPosition(pos)
+                        }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .background(Color.Black, RoundedCornerShape(12.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No playable stream available", color = TextSecondary, fontSize = 13.sp)
                     }
                 }
-            }
-        } else {
-            // Need source file
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = CardDark),
-                shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.4f))
-            ) {
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Playback Position Bar & Set Start/End Quick Buttons
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("Stream Playback Needs Local Source", fontWeight = FontWeight.Bold, color = TextPrimary, fontSize = 14.sp)
-                        Text("Pick video from gallery for frame-accurate scrubbing", color = TextSecondary, fontSize = 12.sp)
-                    }
-                    Button(
-                        onClick = onPickFromGallery,
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Text("Pick", fontSize = 12.sp)
+                    Text(
+                        text = "Playhead: ${formatSec(playerPositionSec)} / ${formatSec(totalDurationSec)}",
+                        color = AccentCyan,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        FilledTonalButton(
+                            onClick = { viewModel.setStartToCurrentPlayback(playerPositionSec) },
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Set Start [${formatSec(playerPositionSec)}]", fontSize = 11.sp)
+                        }
+                        FilledTonalButton(
+                            onClick = { viewModel.setEndToCurrentPlayback(playerPositionSec) },
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Set End [${formatSec(playerPositionSec)}]", fontSize = 11.sp)
+                        }
                     }
                 }
             }
         }
 
-        // 2. Interactive Scrubber & Duration Control Card
+        // ----------------------------------------------------
+        // 2. CROP PLACEMENT ("PLACE" SELECTOR & 16:9 VISUAL PREVIEW)
+        // ----------------------------------------------------
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardDark),
@@ -186,12 +233,222 @@ fun CustomClipperView(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Custom Range Selector",
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                        fontSize = 15.sp
+                    Column {
+                        Text(
+                            text = "Crop Place & Framing",
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary,
+                            fontSize = 15.sp
+                        )
+                        Text(
+                            text = "Position of the 9:16 vertical Short in 16:9 video",
+                            color = TextSecondary,
+                            fontSize = 11.sp
+                        )
+                    }
+                    Surface(
+                        color = PrimaryPurple.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text = when (currentPlacement) {
+                                CropPlacement.AUTO_FACE -> "🤖 Auto Face"
+                                CropPlacement.LEFT -> "👈 Left (16%)"
+                                CropPlacement.CENTER -> "🎯 Center (50%)"
+                                CropPlacement.RIGHT -> "👉 Right (84%)"
+                                CropPlacement.CUSTOM -> "🎚️ Custom (${(currentOffset * 100).toInt()}%)"
+                            },
+                            color = PrimaryPurple,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Interactive 16:9 Widescreen Mockup with sliding 9:16 Crop Window
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(110.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFF070B14))
+                        .border(1.dp, BorderSubtle, RoundedCornerShape(12.dp))
+                ) {
+                    val fullWidth = maxWidth
+                    // 9:16 short takes ~31.64% width of a 16:9 widescreen frame
+                    val cropBoxWidth = fullWidth * 0.3164f
+                    val maxTravel = fullWidth - cropBoxWidth
+
+                    val resolvedFraction = when (currentPlacement) {
+                        CropPlacement.AUTO_FACE -> 0.50f
+                        CropPlacement.LEFT -> 0.0f
+                        CropPlacement.CENTER -> 0.50f
+                        CropPlacement.RIGHT -> 1.0f
+                        CropPlacement.CUSTOM -> currentOffset.coerceIn(0.0f, 1.0f)
+                    }
+
+                    val boxOffsetX = maxTravel * resolvedFraction
+
+                    // Background 16:9 Guide lines
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(BorderSubtle.copy(alpha = 0.4f)))
+                        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(BorderSubtle.copy(alpha = 0.4f)))
+                    }
+
+                    // Sliding 9:16 Framing Window
+                    Box(
+                        modifier = Modifier
+                            .offset(x = boxOffsetX)
+                            .width(cropBoxWidth)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(PrimaryPurple.copy(alpha = 0.30f))
+                            .border(2.dp, PrimaryPurple, RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = if (currentPlacement == CropPlacement.AUTO_FACE) Icons.Default.Face else Icons.Default.CropPortrait,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "9:16 CROP",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    if (currentPlacement == CropPlacement.AUTO_FACE) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .padding(6.dp)
+                                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(6.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text("🤖 Auto Tracking Speaker Face", color = AccentCyan, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Placement Selection Chips
+                Text("Select Framing Place:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    FilterChip(
+                        selected = currentPlacement == CropPlacement.AUTO_FACE,
+                        onClick = { viewModel.setCropPlacement(CropPlacement.AUTO_FACE) },
+                        label = { Text("🤖 Auto Face", fontSize = 11.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
+                            selectedLabelColor = TextPrimary
+                        )
                     )
+                    FilterChip(
+                        selected = currentPlacement == CropPlacement.LEFT,
+                        onClick = { viewModel.setCropPlacement(CropPlacement.LEFT) },
+                        label = { Text("👈 Left", fontSize = 11.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
+                            selectedLabelColor = TextPrimary
+                        )
+                    )
+                    FilterChip(
+                        selected = currentPlacement == CropPlacement.CENTER,
+                        onClick = { viewModel.setCropPlacement(CropPlacement.CENTER) },
+                        label = { Text("🎯 Center", fontSize = 11.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
+                            selectedLabelColor = TextPrimary
+                        )
+                    )
+                    FilterChip(
+                        selected = currentPlacement == CropPlacement.RIGHT,
+                        onClick = { viewModel.setCropPlacement(CropPlacement.RIGHT) },
+                        label = { Text("👉 Right", fontSize = 11.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
+                            selectedLabelColor = TextPrimary
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Custom Slider option
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Fine Horizontal Placement Slider:", color = TextSecondary, fontSize = 11.sp)
+                    Text("${(currentOffset * 100).toInt()}%", color = AccentCyan, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                }
+                Slider(
+                    value = currentOffset,
+                    onValueChange = { viewModel.setCropHorizontalOffset(it) },
+                    valueRange = 0.0f..1.0f,
+                    colors = SliderDefaults.colors(
+                        thumbColor = PrimaryPurple,
+                        activeTrackColor = PrimaryPurple
+                    )
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("0% (Left Edge)", fontSize = 10.sp, color = TextSecondary)
+                    Text("50% (Center)", fontSize = 10.sp, color = TextSecondary)
+                    Text("100% (Right Edge)", fontSize = 10.sp, color = TextSecondary)
+                }
+            }
+        }
+
+        // ----------------------------------------------------
+        // 3. CUSTOM LENGTH SELECTOR & SCRUBBER
+        // ----------------------------------------------------
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = CardDark),
+            shape = RoundedCornerShape(20.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
+        ) {
+            Column(modifier = Modifier.padding(18.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Custom Length Selector",
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary,
+                            fontSize = 15.sp
+                        )
+                        Text(
+                            text = "Trim precise start & end timestamps",
+                            color = TextSecondary,
+                            fontSize = 11.sp
+                        )
+                    }
                     Surface(
                         color = if (durationSec in 15f..60f) SuccessGreen.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.1f),
                         shape = RoundedCornerShape(12.dp)
@@ -306,7 +563,9 @@ fun CustomClipperView(
             }
         }
 
-        // 3. Custom Hook Text for this Clip
+        // ----------------------------------------------------
+        // 4. CLIP CAPTION OVERLAY
+        // ----------------------------------------------------
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardDark),
@@ -337,7 +596,9 @@ fun CustomClipperView(
             }
         }
 
-        // 4. Render CTA Button
+        // ----------------------------------------------------
+        // 5. RENDER CTA BUTTON
+        // ----------------------------------------------------
         Button(
             onClick = { viewModel.startRenderShort(context.cacheDir) },
             enabled = !state.isRendering,

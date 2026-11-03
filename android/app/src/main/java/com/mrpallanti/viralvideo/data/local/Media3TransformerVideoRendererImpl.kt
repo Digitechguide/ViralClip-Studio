@@ -25,6 +25,7 @@ import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
 import com.google.common.collect.ImmutableList
+import com.mrpallanti.viralvideo.domain.model.CropPlacement
 import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
 import com.mrpallanti.viralvideo.domain.model.TrimRange
@@ -70,20 +71,28 @@ class Media3TransformerVideoRendererImpl(
             val startMs = (trimRange.startSeconds * 1000).toLong().coerceAtLeast(0L)
             val endMs = (trimRange.endSeconds * 1000).toLong().coerceAtLeast(startMs + 1000L)
 
-            // Auto Face-Centered Framing (Option 1):
-            // Analyze the clip frames to identify the primary speaker's horizontal center
-            val speakerCenterX = FaceTrackingHelper.detectSpeakerHorizontalCenter(
-                videoPath = inputUri,
-                startMs = startMs,
-                endMs = endMs
-            )
+            // Custom Crop Placement ("Place"):
+            // Compute horizontal crop center based on user selection or Auto Face Tracking
+            val horizontalCenterX = when (overlayConfig.cropPlacement) {
+                CropPlacement.AUTO_FACE -> {
+                    FaceTrackingHelper.detectSpeakerHorizontalCenter(
+                        videoPath = inputUri,
+                        startMs = startMs,
+                        endMs = endMs
+                    )
+                }
+                CropPlacement.LEFT -> 0.16f
+                CropPlacement.CENTER -> 0.50f
+                CropPlacement.RIGHT -> 0.84f
+                CropPlacement.CUSTOM -> overlayConfig.cropHorizontalOffset.coerceIn(0.0f, 1.0f)
+            }
 
-            // Compute exact 9:16 crop window in NDC (-1.0f to 1.0f) centered on the speaker's face.
+            // Compute exact 9:16 crop window in NDC (-1.0f to 1.0f) centered on the chosen place.
             // Horizontal fraction required to turn 16:9 into 9:16 is (9/16)/(16/9) = 81/256 ≈ 0.3164
             val halfCropWidthNdc = 0.3164f
-            val speakerCenterNdc = (2.0f * speakerCenterX) - 1.0f
+            val centerNdc = (2.0f * horizontalCenterX) - 1.0f
             val maxLeftNdc = 1.0f - (2.0f * halfCropWidthNdc)
-            val leftNdc = (speakerCenterNdc - halfCropWidthNdc).coerceIn(-1.0f, maxLeftNdc)
+            val leftNdc = (centerNdc - halfCropWidthNdc).coerceIn(-1.0f, maxLeftNdc)
             val rightNdc = leftNdc + (2.0f * halfCropWidthNdc)
 
             val cropEffect = Crop(leftNdc, rightNdc, -1.0f, 1.0f)

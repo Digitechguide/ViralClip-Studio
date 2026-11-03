@@ -358,6 +358,21 @@ fun StudioScreen(
                                         Text("Fetch & Analyze with Gemini AI")
                                     }
                                 }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                OutlinedButton(
+                                    onClick = { viewModel.loadVideoForManualCropping() },
+                                    enabled = !state.isLoading,
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, AccentCyan.copy(alpha = 0.8f)),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AccentCyan)
+                                ) {
+                                    Icon(Icons.Default.ContentCut, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("✂️ Custom Length & Place Cropper", fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                     }
