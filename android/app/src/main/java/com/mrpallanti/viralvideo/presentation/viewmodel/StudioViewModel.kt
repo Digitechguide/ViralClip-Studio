@@ -209,14 +209,24 @@ class StudioViewModel(
         val newStart = positionSec.coerceAtLeast(0f)
         val newEnd = if (newStart >= currentEnd) (newStart + 30f) else currentEnd
         updateTrimRange(newStart, newEnd)
-        _uiState.update { it.copy(successMessage = "Start set to ${formatSeconds(newStart)}") }
+        _uiState.update { 
+            it.copy(
+                playerCurrentPositionSec = newStart,
+                successMessage = "Start set to ${formatSeconds(newStart)}"
+            ) 
+        }
     }
 
     fun setEndToCurrentPlayback(positionSec: Float) {
         val currentStart = _uiState.value.trimRange.startSeconds
         val newEnd = positionSec.coerceAtLeast(currentStart + 1f)
         updateTrimRange(currentStart, newEnd)
-        _uiState.update { it.copy(successMessage = "End set to ${formatSeconds(newEnd)}") }
+        _uiState.update { 
+            it.copy(
+                playerCurrentPositionSec = newEnd,
+                successMessage = "End set to ${formatSeconds(newEnd)}"
+            ) 
+        }
     }
 
     fun setPresetDuration(targetDurationSec: Float) {
@@ -455,9 +465,15 @@ class StudioViewModel(
     fun loadVideoForManualCropping(url: String = _uiState.value.urlInput, cacheDir: File? = null) {
         val effectiveUrl = url.ifBlank { _uiState.value.urlInput }
 
-        // Case 1: Video is already loaded
-        if (_uiState.value.currentVideo != null && effectiveUrl.isBlank()) {
-            val current = _uiState.value.currentVideo!!
+        // Case 1: Video is already loaded (either from previous analysis or URL)
+        val current = _uiState.value.currentVideo
+        val isAlreadyLoadedVideo = current != null && (
+            effectiveUrl.isBlank() || 
+            effectiveUrl == _uiState.value.urlInput || 
+            (current.id.isNotBlank() && effectiveUrl.contains(current.id))
+        )
+
+        if (isAlreadyLoadedVideo && current != null) {
             if (current.localUri.isNullOrBlank() && cacheDir != null) {
                 cacheVideoForPlayback(cacheDir)
             }

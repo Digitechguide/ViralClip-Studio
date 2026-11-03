@@ -8,12 +8,14 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -42,13 +44,27 @@ import com.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudioScreen(
-    viewModel: StudioViewModel
+    viewModel: StudioViewModel,
+    onNavigateBack: () -> Unit = {}
 ) {
-    val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val state by viewModel.uiState.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    // Video Picker Launcher for Local Gallery Videos
+    // Clipboard link detection
+    val clipboard = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager }
+    var detectedClipboardUrl by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        try {
+            val clip = clipboard?.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
+            if (clip.contains("youtube.com") || clip.contains("youtu.be")) {
+                detectedClipboardUrl = clip.trim()
+            }
+        } catch (_: Exception) {}
+    }
+
+    // Local Video Picker
     val videoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -57,25 +73,26 @@ fun StudioScreen(
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(context, uri)
                 val durStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                val durationSec = (durStr?.toLongOrNull() ?: 30000L) / 1000L
+                val durMs = durStr?.toLongOrNull() ?: 60000L
+                val title = uri.lastPathSegment ?: "Local Video"
                 retriever.release()
 
-                val fileName = uri.lastPathSegment?.substringAfterLast('/') ?: "Selected Video"
                 viewModel.onLocalVideoSelected(
                     uriString = uri.toString(),
-                    title = fileName,
-                    durationSeconds = durationSec
+                    title = title,
+                    durationSeconds = durMs / 1000
                 )
             } catch (e: Exception) {
                 viewModel.onLocalVideoSelected(
                     uriString = uri.toString(),
-                    title = "Gallery Video",
+                    title = "Imported Video",
                     durationSeconds = 60
                 )
             }
         }
     }
 
+    // Toast Notifications
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let {
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
@@ -143,8 +160,8 @@ fun StudioScreen(
                 TextButton(
                     onClick = {
                         val blueprint = viewModel.getViralBlueprintText()
-                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        clipboard.setPrimaryClip(ClipData.newPlainText("Viral Blueprint", blueprint))
+                        val clipMgr = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                        clipMgr.setPrimaryClip(ClipData.newPlainText("Viral Blueprint", blueprint))
                         Toast.makeText(context, "📋 Copied Viral Blueprint! Ready for CapCut.", Toast.LENGTH_SHORT).show()
                         viewModel.dismissVideoPickerPrompt()
                     }
@@ -160,7 +177,7 @@ fun StudioScreen(
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Sign Out", fontWeight = FontWeight.Bold, color = TextPrimary) },
+            title = { Text("Sign Out", fontWeight = FontWeight.Bold) },
             text = { Text("Are you sure you want to sign out of ViralClip Studio?", color = TextSecondary) },
             confirmButton = {
                 Button(
@@ -168,9 +185,9 @@ fun StudioScreen(
                         showLogoutDialog = false
                         viewModel.logout()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                    colors = ButtonDefaults.buttonColors(containerColor = DangerRed)
                 ) {
-                    Text("Sign Out", color = Color.White)
+                    Text("Sign Out")
                 }
             },
             dismissButton = {
@@ -187,44 +204,52 @@ fun StudioScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Bolt,
-                            contentDescription = "Logo",
-                            tint = PrimaryPurple,
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    Brush.linearGradient(listOf(PrimaryPurple, AccentCyan))
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Bolt,
+                                contentDescription = "Logo",
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = "ViralClip Studio",
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.ExtraBold,
                                     color = TextPrimary,
                                     fontSize = 17.sp
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Surface(
-                                    color = PrimaryPurple.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(4.dp)
+                                    color = PrimaryPurple.copy(alpha = 0.25f),
+                                    shape = RoundedCornerShape(6.dp),
+                                    border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.5f))
                                 ) {
                                     Text(
                                         text = "PRO",
-                                        color = PrimaryPurple,
+                                        color = Color.White,
                                         fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                        fontWeight = FontWeight.ExtraBold,
+                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                                     )
                                 }
                             }
-                            state.currentUser?.let { user ->
-                                Text(
-                                    text = user.email,
-                                    color = TextSecondary,
-                                    fontSize = 11.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
+                            Text(
+                                text = "🟢 Hardware Engine: 60fps Ready",
+                                color = SuccessGreen,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                     }
                 },
@@ -238,7 +263,7 @@ fun StudioScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = BgDark
+                    containerColor = Color(0xFF070B14)
                 )
             )
         },
@@ -265,29 +290,46 @@ fun StudioScreen(
         ) {
             when (state.currentTab) {
                 StudioTab.STUDIO -> {
-                    // 1. YouTube Link & Gallery Picker Input Section
+                    // 1. YouTube Link & Gallery Picker Hero Input Section
                     item {
                         Card(
                             colors = CardDefaults.cardColors(containerColor = CardDark),
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.border(1.dp, BorderDark, RoundedCornerShape(16.dp))
+                            shape = RoundedCornerShape(22.dp),
+                            border = BorderStroke(
+                                1.dp,
+                                Brush.horizontalGradient(
+                                    listOf(
+                                        PrimaryPurple.copy(alpha = 0.4f),
+                                        AccentCyan.copy(alpha = 0.3f),
+                                        BorderDark
+                                    )
+                                )
+                            )
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
+                            Column(modifier = Modifier.padding(18.dp)) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = "Source Video Input",
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = TextPrimary,
-                                        fontSize = 15.sp
-                                    )
+                                    Column {
+                                        Text(
+                                            text = "Source Video Input",
+                                            fontWeight = FontWeight.Bold,
+                                            color = TextPrimary,
+                                            fontSize = 16.sp
+                                        )
+                                        Text(
+                                            text = "Paste any YouTube link or pick from gallery",
+                                            color = TextSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
 
                                     Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = PrimaryPurple.copy(alpha = 0.15f),
+                                        shape = RoundedCornerShape(10.dp),
+                                        color = AccentCyan.copy(alpha = 0.15f),
+                                        border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.4f)),
                                         modifier = Modifier.clickable {
                                             videoPickerLauncher.launch("video/*")
                                         }
@@ -297,15 +339,15 @@ fun StudioScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Icon(
-                                                Icons.Default.VideoFile,
+                                                Icons.Default.FolderOpen,
                                                 contentDescription = null,
-                                                tint = PrimaryPurple,
+                                                tint = AccentCyan,
                                                 modifier = Modifier.size(16.dp)
                                             )
                                             Spacer(modifier = Modifier.width(6.dp))
                                             Text(
-                                                text = "Pick Local Video",
-                                                color = PrimaryPurple,
+                                                text = "Gallery",
+                                                color = AccentCyan,
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold
                                             )
@@ -313,17 +355,16 @@ fun StudioScreen(
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
 
                                 OutlinedTextField(
                                     value = state.urlInput,
                                     onValueChange = { viewModel.onUrlChanged(it) },
-                                    placeholder = { Text("Paste YouTube or Shorts URL...", color = TextSecondary) },
+                                    placeholder = { Text("Paste YouTube, Shorts, or Podcast URL...", color = TextSecondary, fontSize = 13.sp) },
                                     singleLine = true,
                                     trailingIcon = {
                                         IconButton(onClick = {
-                                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                            val clip = clipboard.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
+                                            val clip = clipboard?.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
                                             if (clip.isNotBlank()) {
                                                 viewModel.onUrlChanged(clip)
                                             }
@@ -337,52 +378,132 @@ fun StudioScreen(
                                         focusedTextColor = TextPrimary,
                                         unfocusedTextColor = TextPrimary
                                     ),
+                                    shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
-                                Spacer(modifier = Modifier.height(12.dp))
+                                // Auto-clipboard detected pill
+                                if (detectedClipboardUrl.isNotBlank() && state.urlInput != detectedClipboardUrl) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Surface(
+                                        shape = RoundedCornerShape(8.dp),
+                                        color = PrimaryPurple.copy(alpha = 0.15f),
+                                        border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.4f)),
+                                        modifier = Modifier.clickable {
+                                            viewModel.onUrlChanged(detectedClipboardUrl)
+                                        }
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(Icons.Default.ContentPaste, contentDescription = null, tint = PrimaryPurple, modifier = Modifier.size(14.dp))
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "Detected Link: ${detectedClipboardUrl.take(30)}... (Tap to paste)",
+                                                fontSize = 11.sp,
+                                                color = PrimaryPurple,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
+                                }
 
-                                Button(
-                                    onClick = { viewModel.fetchAndAnalyze() },
-                                    enabled = !state.isLoading,
-                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                Spacer(modifier = Modifier.height(14.dp))
+
+                                // DUAL CHOICE CREATOR ACTION CARDS
+                                // 1. AI Magic Hook Analysis Card
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(enabled = !state.isLoading) { viewModel.fetchAndAnalyze() },
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF16102E)),
+                                    shape = RoundedCornerShape(14.dp),
+                                    border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.7f))
                                 ) {
-                                    if (state.isLoading) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(20.dp),
-                                            color = Color.White,
-                                            strokeWidth = 2.dp
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(state.loadingMessage.ifBlank { "Processing..." })
-                                    } else {
-                                        Icon(Icons.Default.AutoAwesome, contentDescription = null)
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Fetch & Analyze with Gemini AI")
+                                    Row(
+                                        modifier = Modifier.padding(14.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(42.dp)
+                                                .clip(CircleShape)
+                                                .background(PrimaryPurple.copy(alpha = 0.25f)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (state.isLoading) {
+                                                CircularProgressIndicator(
+                                                    modifier = Modifier.size(20.dp),
+                                                    color = PrimaryPurple,
+                                                    strokeWidth = 2.dp
+                                                )
+                                            } else {
+                                                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PrimaryPurple, modifier = Modifier.size(22.dp))
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text("Gemini AI Viral Hooks", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Surface(color = PrimaryPurple.copy(alpha = 0.3f), shape = RoundedCornerShape(4.dp)) {
+                                                    Text("AUTO", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PrimaryPurple, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp))
+                                                }
+                                            }
+                                            Text(
+                                                text = if (state.isLoading) state.loadingMessage else "Scans speech transcript & ranks best viral hooks",
+                                                color = TextSecondary,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = PrimaryPurple, modifier = Modifier.size(18.dp))
                                     }
                                 }
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                OutlinedButton(
-                                    onClick = { viewModel.loadVideoForManualCropping(cacheDir = context.cacheDir) },
-                                    enabled = !state.isLoading,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, AccentCyan.copy(alpha = 0.8f)),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AccentCyan)
+                                // 2. Custom Length & Place Cropper Card
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable(enabled = !state.isLoading) { viewModel.loadVideoForManualCropping(cacheDir = context.cacheDir) },
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF091426)),
+                                    shape = RoundedCornerShape(14.dp),
+                                    border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.7f))
                                 ) {
-                                    Icon(Icons.Default.ContentCut, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("✂️ Custom Length & Place Cropper", fontWeight = FontWeight.Bold)
+                                    Row(
+                                        modifier = Modifier.padding(14.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(42.dp)
+                                                .clip(CircleShape)
+                                                .background(AccentCyan.copy(alpha = 0.2f)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(Icons.Default.ContentCut, contentDescription = null, tint = AccentCyan, modifier = Modifier.size(22.dp))
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text("Manual Length & Place Cropper", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Surface(color = AccentCyan.copy(alpha = 0.3f), shape = RoundedCornerShape(4.dp)) {
+                                                    Text("CUSTOM", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = AccentCyan, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp))
+                                                }
+                                            }
+                                            Text("Auto-caches offline for frame scrubbing & 9:16 place", color = TextSecondary, fontSize = 11.sp)
+                                        }
+                                        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = AccentCyan, modifier = Modifier.size(18.dp))
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // 2. 9:16 Mobile Mockup Frame & Live Hook Preview
+                    // 2. Realistic 9:16 Mobile Mockup Frame & Live Hook Preview
                     item {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -390,91 +511,143 @@ fun StudioScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .width(220.dp)
-                                    .height(390.dp)
-                                    .clip(RoundedCornerShape(28.dp))
-                                    .background(Color.Black)
-                                    .border(3.dp, BorderDark, RoundedCornerShape(28.dp)),
+                                    .width(230.dp)
+                                    .height(410.dp)
+                                    .clip(RoundedCornerShape(32.dp))
+                                    .background(Color(0xFF070B14))
+                                    .border(
+                                        BorderStroke(
+                                            3.dp,
+                                            Brush.verticalGradient(
+                                                listOf(
+                                                    PrimaryPurple.copy(alpha = 0.8f),
+                                                    AccentCyan.copy(alpha = 0.5f),
+                                                    BorderDark
+                                                )
+                                            )
+                                        ),
+                                        RoundedCornerShape(32.dp)
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
+                                // Top Camera Notch Pill
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = 10.dp)
+                                        .width(60.dp)
+                                        .height(5.dp)
+                                        .background(Color.White.copy(alpha = 0.25f), CircleShape)
+                                )
+
                                 if (state.currentVideo != null) {
                                     Column(
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .background(CardDark)
-                                            .padding(12.dp),
+                                            .padding(14.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         verticalArrangement = Arrangement.Center
                                     ) {
-                                        Icon(
-                                            Icons.Default.PlayCircle,
-                                            contentDescription = null,
-                                            tint = PrimaryPurple,
-                                            modifier = Modifier.size(48.dp)
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Surface(
+                                            color = PrimaryPurple.copy(alpha = 0.2f),
+                                            shape = CircleShape,
+                                            modifier = Modifier.size(54.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(
+                                                    Icons.Default.PlayCircle,
+                                                    contentDescription = null,
+                                                    tint = PrimaryPurple,
+                                                    modifier = Modifier.size(36.dp)
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(10.dp))
                                         Text(
                                             text = state.currentVideo?.title ?: "",
                                             maxLines = 3,
                                             overflow = TextOverflow.Ellipsis,
                                             textAlign = TextAlign.Center,
                                             fontSize = 12.sp,
-                                            color = TextPrimary
+                                            color = TextPrimary,
+                                            fontWeight = FontWeight.Bold
                                         )
-                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Spacer(modifier = Modifier.height(8.dp))
                                         Surface(
                                             color = if (state.currentVideo?.localUri != null) SuccessGreen.copy(alpha = 0.2f) else PrimaryPurple.copy(alpha = 0.2f),
-                                            shape = RoundedCornerShape(6.dp)
+                                            shape = RoundedCornerShape(8.dp)
                                         ) {
                                             Text(
-                                                text = if (state.currentVideo?.localUri != null) "📱 Local File Ready" else "🌐 YouTube Hook Ready",
+                                                text = if (state.currentVideo?.localUri != null) "📱 Local File Ready" else "🌐 YouTube Stream Ready",
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = if (state.currentVideo?.localUri != null) SuccessGreen else PrimaryPurple,
-                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                                             )
                                         }
                                     }
                                 } else {
-                                    Text(
-                                        text = "9:16 Shorts Preview",
-                                        color = TextSecondary,
-                                        fontSize = 13.sp
-                                    )
-                                }
-
-                                // Live Hook Banner Overlay
-                                if (state.hookText.isNotBlank()) {
-                                    Box(
-                                        modifier = Modifier
-                                            .align(Alignment.TopCenter)
-                                            .padding(top = 40.dp, start = 12.dp, end = 12.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(Color.Black.copy(alpha = 0.75f))
-                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
                                     ) {
+                                        Icon(
+                                            Icons.Default.CropPortrait,
+                                            contentDescription = null,
+                                            tint = TextSecondary.copy(alpha = 0.4f),
+                                            modifier = Modifier.size(48.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
                                         Text(
-                                            text = state.hookText,
-                                            color = Color.White,
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            textAlign = TextAlign.Center
+                                            text = "9:16 Shorts Mockup",
+                                            color = TextSecondary,
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "Paste a link to preview",
+                                            color = TextSecondary.copy(alpha = 0.6f),
+                                            fontSize = 11.sp
                                         )
                                     }
                                 }
 
-                                // Duration badge
-                                Box(
+                                // Live Hook Caption Overlay on Mockup
+                                if (state.hookText.isNotBlank()) {
+                                    Surface(
+                                        modifier = Modifier
+                                            .align(Alignment.TopCenter)
+                                            .padding(top = 28.dp, start = 12.dp, end = 12.dp),
+                                        color = Color.Black.copy(alpha = 0.85f),
+                                        shape = RoundedCornerShape(10.dp),
+                                        border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.6f))
+                                    ) {
+                                        Text(
+                                            text = state.hookText,
+                                            color = Color.White,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                                        )
+                                    }
+                                }
+
+                                // Duration & Aspect badge on Mockup
+                                Surface(
                                     modifier = Modifier
                                         .align(Alignment.BottomEnd)
-                                        .padding(12.dp)
-                                        .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(6.dp))
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        .padding(12.dp),
+                                    color = Color.Black.copy(alpha = 0.75f),
+                                    shape = RoundedCornerShape(6.dp)
                                 ) {
                                     Text(
-                                        text = "${state.trimRange.durationSeconds.toInt()}s Short",
+                                        text = "${state.trimRange.durationSeconds.toInt()}s • 9:16",
                                         color = Color.White,
-                                        fontSize = 10.sp
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                     )
                                 }
                             }
@@ -486,15 +659,15 @@ fun StudioScreen(
                         item {
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = CardDark),
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.border(1.dp, BorderDark, RoundedCornerShape(16.dp))
+                                shape = RoundedCornerShape(22.dp),
+                                border = BorderStroke(1.dp, BorderDark)
                             ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
+                                Column(modifier = Modifier.padding(18.dp)) {
                                     Text(
                                         text = "Viral Hook Caption Overlay",
-                                        fontWeight = FontWeight.SemiBold,
+                                        fontWeight = FontWeight.Bold,
                                         color = TextPrimary,
-                                        fontSize = 14.sp
+                                        fontSize = 15.sp
                                     )
                                     Spacer(modifier = Modifier.height(6.dp))
                                     OutlinedTextField(
@@ -507,6 +680,7 @@ fun StudioScreen(
                                             focusedTextColor = TextPrimary,
                                             unfocusedTextColor = TextPrimary
                                         ),
+                                        shape = RoundedCornerShape(12.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     )
 
@@ -517,25 +691,36 @@ fun StudioScreen(
                                         onClick = { viewModel.startRenderShort(context.cacheDir) },
                                         enabled = !state.isRendering,
                                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                        shape = RoundedCornerShape(12.dp),
+                                        shape = RoundedCornerShape(14.dp),
+                                        contentPadding = PaddingValues(0.dp),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .background(
-                                                Brush.horizontalGradient(listOf(PrimaryPurple, AccentIndigo)),
-                                                RoundedCornerShape(12.dp)
-                                            )
+                                            .height(52.dp)
                                     ) {
-                                        Icon(Icons.Default.Download, contentDescription = null, tint = Color.White)
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = if (state.currentVideo?.localUri != null) "⚡ Render & Save 9:16 to Gallery" else "⚡ 1-Click Render Video to Gallery",
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White
-                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(
+                                                    Brush.horizontalGradient(listOf(PrimaryPurple, AccentIndigo)),
+                                                    RoundedCornerShape(14.dp)
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(Icons.Default.Download, contentDescription = null, tint = Color.White)
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = if (state.currentVideo?.localUri != null) "⚡ Render & Save 9:16 to Gallery" else "⚡ 1-Click Render Video to Gallery",
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = Color.White,
+                                                    fontSize = 14.sp
+                                                )
+                                            }
+                                        }
                                     }
 
                                     // Switch to Custom Clipper CTA
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(10.dp))
                                     OutlinedButton(
                                         onClick = { viewModel.setTab(StudioTab.CLIPPER) },
                                         shape = RoundedCornerShape(12.dp),
@@ -566,9 +751,9 @@ fun StudioScreen(
                                     OutlinedButton(
                                         onClick = {
                                             val blueprint = viewModel.getViralBlueprintText()
-                                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                            clipboard.setPrimaryClip(ClipData.newPlainText("Viral Blueprint", blueprint))
-                                            Toast.makeText(context, "📋 Copied Viral Blueprint! Ready to paste into CapCut or Shorts.", Toast.LENGTH_LONG).show()
+                                            val clipMgr = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                            clipMgr.setPrimaryClip(ClipData.newPlainText("Viral Blueprint", blueprint))
+                                            Toast.makeText(context, "📋 Copied Viral Blueprint! Ready for CapCut.", Toast.LENGTH_SHORT).show()
                                         },
                                         shape = RoundedCornerShape(12.dp),
                                         colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
@@ -580,7 +765,7 @@ fun StudioScreen(
                                     }
 
                                     if (state.isRendering) {
-                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Spacer(modifier = Modifier.height(14.dp))
                                         val currentJob = state.renderJob
                                         val progressVal = if (currentJob != null) {
                                             currentJob.progressPercent / 100f
@@ -615,12 +800,24 @@ fun StudioScreen(
                     // 4. Suggested AI Viral Clips
                     if (state.viralClips.isNotEmpty()) {
                         item {
-                            Text(
-                                text = "🔥 AI Viral Clip Recommendations (${state.viralClips.size})",
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary,
-                                fontSize = 16.sp
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "🔥 AI Viral Clip Recommendations (${state.viralClips.size})",
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = TextPrimary,
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = "Tap to apply",
+                                    color = PrimaryPurple,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
 
                         items(state.viralClips) { clip ->
@@ -677,19 +874,21 @@ fun ViralClipCard(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) CardDark.copy(alpha = 0.9f) else CardDark
+            containerColor = if (isSelected) Color(0xFF1B1438) else CardDark
         ),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
             .border(
-                1.5.dp,
-                if (isSelected) PrimaryPurple else BorderDark,
-                RoundedCornerShape(14.dp)
+                BorderStroke(
+                    1.5.dp,
+                    if (isSelected) PrimaryPurple else BorderDark
+                ),
+                RoundedCornerShape(16.dp)
             )
             .clickable { onApply() }
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -697,27 +896,30 @@ fun ViralClipCard(
             ) {
                 // Virality Pill
                 Surface(
-                    color = PrimaryPurple.copy(alpha = 0.15f),
-                    shape = RoundedCornerShape(20.dp)
+                    color = PrimaryPurple.copy(alpha = 0.2f),
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.4f))
                 ) {
                     Text(
                         text = "🔥 ${clip.viralityScore}% Virality",
-                        color = PrimaryPurple,
+                        color = Color.White,
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
 
                 // Duration Pill
                 Surface(
-                    color = Color.Black.copy(alpha = 0.4f),
-                    shape = RoundedCornerShape(20.dp)
+                    color = Color.Black.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(1.dp, BorderSubtle)
                 ) {
                     Text(
                         text = "${clip.startSeconds.toInt()}s - ${clip.endSeconds.toInt()}s (${(clip.endSeconds - clip.startSeconds).toInt()}s)",
                         color = TextSecondary,
                         fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -727,8 +929,8 @@ fun ViralClipCard(
 
             Text(
                 text = clip.title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 15.sp,
                 color = TextPrimary
             )
 
@@ -738,7 +940,7 @@ fun ViralClipCard(
                 text = clip.hookReason,
                 fontSize = 12.sp,
                 color = TextSecondary,
-                lineHeight = 16.sp
+                lineHeight = 17.sp
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -746,16 +948,17 @@ fun ViralClipCard(
             // Caption Hook Box
             Surface(
                 color = BgDark,
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(1.dp, BorderSubtle),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Hook:",
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         fontSize = 11.sp,
                         color = PrimaryPurple
                     )

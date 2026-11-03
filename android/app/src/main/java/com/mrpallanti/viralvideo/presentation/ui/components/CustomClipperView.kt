@@ -1,11 +1,13 @@
 package com.mrpallanti.viralvideo.presentation.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -46,45 +49,54 @@ fun CustomClipperView(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardDark),
-            shape = RoundedCornerShape(20.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
+            shape = RoundedCornerShape(24.dp),
+            border = BorderStroke(1.dp, BorderSubtle)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(32.dp),
+                    .padding(36.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.ContentCut,
-                    contentDescription = null,
-                    tint = PrimaryPurple,
-                    modifier = Modifier.size(54.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                Box(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(CircleShape)
+                        .background(PrimaryPurple.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ContentCut,
+                        contentDescription = null,
+                        tint = PrimaryPurple,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(18.dp))
                 Text(
-                    text = "No Video Loaded",
+                    text = "No Video Selected",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     color = TextPrimary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Enter a YouTube link or pick a video from your gallery to play, scrub custom length, and choose your 9:16 crop framing place.",
+                    text = "Paste a YouTube link in the AI Studio tab or select a local video from your device to begin custom length & place cropping.",
                     color = TextSecondary,
                     fontSize = 13.sp,
-                    lineHeight = 18.sp,
+                    lineHeight = 19.sp,
                     textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = onPickFromGallery,
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(14.dp),
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
                 ) {
-                    Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Select from Gallery")
+                    Text("Select from Gallery", fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -103,6 +115,13 @@ fun CustomClipperView(
     val currentPlacement = state.overlayConfig.cropPlacement
     val currentOffset = state.overlayConfig.cropHorizontalOffset
 
+    // Auto-cache YouTube video offline immediately if not cached yet
+    LaunchedEffect(video.id, hasLocalFile) {
+        if (!hasLocalFile && !video.id.startsWith("local_")) {
+            viewModel.cacheVideoForPlayback(context.cacheDir)
+        }
+    }
+
     // Auto-stop preview when playhead reaches endSec
     LaunchedEffect(playerPositionSec, endSec) {
         if (!isPlaybackPaused && playerPositionSec >= endSec && endSec > startSec) {
@@ -117,145 +136,271 @@ fun CustomClipperView(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // ----------------------------------------------------
-        // 1. IN-APP VIDEO PLAYER (Dual Engine: Local ExoPlayer / In-App YouTube)
+        // 1. IN-APP STUDIO VIDEO PLAYER (Dual Engine: Local ExoPlayer / In-App YouTube)
         // ----------------------------------------------------
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardDark),
-            shape = RoundedCornerShape(20.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
+            shape = RoundedCornerShape(24.dp),
+            border = BorderStroke(
+                1.dp,
+                Brush.horizontalGradient(
+                    listOf(
+                        PrimaryPurple.copy(alpha = 0.35f),
+                        AccentCyan.copy(alpha = 0.25f),
+                        BorderSubtle
+                    )
+                )
+            )
         ) {
-            Column(modifier = Modifier.padding(14.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                // Player Header Bar
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
+                        .padding(bottom = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (hasLocalFile) Icons.Default.PhoneAndroid else Icons.Default.PlayCircle,
-                            contentDescription = null,
-                            tint = if (hasLocalFile) SuccessGreen else PrimaryPurple,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = if (hasLocalFile) "Offline Local Player" else "In-App Stream Player",
-                            color = TextPrimary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Surface(
+                            color = if (hasLocalFile) SuccessGreen.copy(alpha = 0.15f) else AccentCyan.copy(alpha = 0.15f),
+                            shape = CircleShape,
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = if (hasLocalFile) Icons.Default.PhoneAndroid else Icons.Default.PlayCircle,
+                                    contentDescription = null,
+                                    tint = if (hasLocalFile) SuccessGreen else AccentCyan,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = if (hasLocalFile) "Offline Local Player" else "Stream Playback Player",
+                                color = TextPrimary,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = video.title,
+                                color = TextSecondary,
+                                fontSize = 11.sp,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                        }
                     }
+
                     Surface(
                         color = if (hasLocalFile) SuccessGreen.copy(alpha = 0.15f) else PrimaryPurple.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(6.dp)
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = if (hasLocalFile) "Offline Ready" else "Live Stream",
+                            text = if (hasLocalFile) "🟢 1080p Offline" else "🌐 Live Stream",
                             color = if (hasLocalFile) SuccessGreen else PrimaryPurple,
-                            fontSize = 10.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                 }
 
-                if (hasLocalFile) {
-                    // Local Gallery / Pre-downloaded video player (ExoPlayer)
-                    InAppVideoPlayer(
-                        uriString = video.localUri!!,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(210.dp),
-                        onPositionUpdate = { pos ->
-                            playerPositionSec = pos
-                            viewModel.updatePlayerPosition(pos)
-                        },
-                        onPlayerReady = { player ->
-                            exoPlayerInstance = player
+                // Video Display Surface
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(210.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.Black)
+                ) {
+                    if (hasLocalFile) {
+                        InAppVideoPlayer(
+                            uriString = video.localUri!!,
+                            modifier = Modifier.fillMaxSize(),
+                            onPositionUpdate = { pos ->
+                                playerPositionSec = pos
+                                viewModel.updatePlayerPosition(pos)
+                            },
+                            onIsPlayingChanged = { isPlaying ->
+                                isPlaybackPaused = !isPlaying
+                            },
+                            onPlayerReady = { player ->
+                                exoPlayerInstance = player
+                            }
+                        )
+                    } else if (!video.id.startsWith("local_")) {
+                        // High-tech Auto-Caching Indicator Surface (Bypasses YouTube Error 152 completely)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.radialGradient(
+                                        listOf(
+                                            Color(0xFF1E1035),
+                                            Color(0xFF090D1A)
+                                        )
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(36.dp),
+                                    color = AccentCyan,
+                                    strokeWidth = 3.dp
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = "Auto-Caching Video Offline...",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 14.sp
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = if (state.isLoading) state.loadingMessage else "Extracting 1080p stream for instant zero-lag scrubbing...",
+                                    color = TextSecondary,
+                                    fontSize = 11.sp,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Surface(
+                                        color = AccentCyan.copy(alpha = 0.15f),
+                                        shape = RoundedCornerShape(6.dp),
+                                        border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.4f))
+                                    ) {
+                                        Text(
+                                            text = "⚡ Zero Buffer Scrubbing",
+                                            color = AccentCyan,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                    Surface(
+                                        color = PrimaryPurple.copy(alpha = 0.15f),
+                                        shape = RoundedCornerShape(6.dp),
+                                        border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.4f))
+                                    ) {
+                                        Text(
+                                            text = "🛡️ Bypasses YouTube Error 152",
+                                            color = PrimaryPurple,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+                            }
                         }
-                    )
-                } else if (isYouTubeVideo) {
-                    // Embedded YouTube WebView player with live JS bridge & error recovery
-                    InAppYouTubePlayer(
-                        videoId = video.id,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(210.dp),
-                        onPositionUpdate = { pos ->
-                            playerPositionSec = pos
-                            viewModel.updatePlayerPosition(pos)
-                        },
-                        onPlayerReady = { controller ->
-                            ytControllerInstance = controller
-                        },
-                        onCacheVideo = {
-                            viewModel.cacheVideoForPlayback(context.cacheDir)
-                        },
-                        onPickFromGallery = onPickFromGallery
-                    )
-                } else if (!playableUri.isNullOrBlank()) {
-                    InAppVideoPlayer(
-                        uriString = playableUri,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(210.dp),
-                        onPositionUpdate = { pos ->
-                            playerPositionSec = pos
-                            viewModel.updatePlayerPosition(pos)
-                        },
-                        onPlayerReady = { player ->
-                            exoPlayerInstance = player
+                    } else if (!playableUri.isNullOrBlank()) {
+                        InAppVideoPlayer(
+                            uriString = playableUri,
+                            modifier = Modifier.fillMaxSize(),
+                            onPositionUpdate = { pos ->
+                                playerPositionSec = pos
+                                viewModel.updatePlayerPosition(pos)
+                            },
+                            onIsPlayingChanged = { isPlaying ->
+                                isPlaybackPaused = !isPlaying
+                            },
+                            onPlayerReady = { player ->
+                                exoPlayerInstance = player
+                            }
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No playable stream available", color = TextSecondary, fontSize = 13.sp)
                         }
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                            .background(Color.Black, RoundedCornerShape(12.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("No playable stream available", color = TextSecondary, fontSize = 13.sp)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                // Playback Position Row + Pause/Play toggle
+                // Playback Position Bar & Transport Controls
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Playhead timestamp
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Playhead: ${formatSec(playerPositionSec)} / ${formatSec(totalDurationSec)}",
-                            color = AccentCyan,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Surface(
+                            color = BgDark,
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, BorderSubtle)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = formatSec(playerPositionSec),
+                                    color = AccentCyan,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                                Text(
+                                    text = " / ${formatSec(totalDurationSec)}",
+                                    color = TextSecondary,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
                         if (isPlaybackPaused) {
-                            Spacer(modifier = Modifier.width(6.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Surface(
                                 color = Color(0xFFF59E0B).copy(alpha = 0.2f),
-                                shape = RoundedCornerShape(4.dp)
+                                shape = RoundedCornerShape(6.dp)
                             ) {
                                 Text(
                                     text = "PAUSED",
                                     color = Color(0xFFF59E0B),
                                     fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    fontWeight = FontWeight.ExtraBold,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                                 )
                             }
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Transport Actions: -5s / Play-Pause / +5s
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         FilledTonalIconButton(
+                            onClick = {
+                                val target = (playerPositionSec - 5f).coerceAtLeast(0f)
+                                exoPlayerInstance?.seekTo((target * 1000).toLong())
+                                ytControllerInstance?.seekTo(target)
+                            },
+                            modifier = Modifier.size(36.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("-5s", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        }
+
+                        FilledIconButton(
                             onClick = {
                                 if (isPlaybackPaused) {
                                     exoPlayerInstance?.play()
@@ -267,27 +412,185 @@ fun CustomClipperView(
                                     isPlaybackPaused = true
                                 }
                             },
-                            modifier = Modifier.size(34.dp)
+                            modifier = Modifier.size(40.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = if (isPlaybackPaused) PrimaryPurple else AccentCyan
+                            ),
+                            shape = CircleShape
                         ) {
                             Icon(
                                 imageVector = if (isPlaybackPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
                                 contentDescription = if (isPlaybackPaused) "Play" else "Pause",
-                                tint = TextPrimary,
-                                modifier = Modifier.size(18.dp)
+                                tint = if (isPlaybackPaused) Color.White else Color.Black,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
 
-                        if (!hasLocalFile) {
-                            Spacer(modifier = Modifier.width(6.dp))
-                            FilledTonalButton(
-                                onClick = { viewModel.cacheVideoForPlayback(context.cacheDir) },
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.filledTonalButtonColors(containerColor = PrimaryPurple.copy(alpha = 0.25f))
+                        FilledTonalIconButton(
+                            onClick = {
+                                val target = (playerPositionSec + 5f).coerceAtMost(totalDurationSec)
+                                exoPlayerInstance?.seekTo((target * 1000).toLong())
+                                ytControllerInstance?.seekTo(target)
+                            },
+                            modifier = Modifier.size(36.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // DUAL START & END TRIM CARDS (Tapping Pauses Video Immediately)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Start Trim Card
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0B1220)),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.5f))
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(12.dp), tint = PrimaryPurple)
-                                Spacer(modifier = Modifier.width(3.dp))
-                                Text("Cache", fontSize = 11.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                                Text("🟢 Start Time", fontSize = 11.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    FilledTonalIconButton(
+                                        onClick = {
+                                            val t = (startSec - 1f).coerceAtLeast(0f)
+                                            viewModel.updateTrimRange(t, endSec)
+                                            exoPlayerInstance?.seekTo((t * 1000).toLong())
+                                            ytControllerInstance?.seekTo(t)
+                                        },
+                                        modifier = Modifier.size(24.dp),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text("-1s", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    FilledTonalIconButton(
+                                        onClick = {
+                                            val t = (startSec + 1f).coerceAtMost(endSec - 1f)
+                                            viewModel.updateTrimRange(t, endSec)
+                                            exoPlayerInstance?.seekTo((t * 1000).toLong())
+                                            ytControllerInstance?.seekTo(t)
+                                        },
+                                        modifier = Modifier.size(24.dp),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text("+1s", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = formatSec(startSec),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = PrimaryPurple
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Button(
+                                onClick = {
+                                    exoPlayerInstance?.pause()
+                                    ytControllerInstance?.pause()
+                                    isPlaybackPaused = true
+                                    val currentPos = playerPositionSec
+                                    playerPositionSec = currentPos
+                                    viewModel.setStartToCurrentPlayback(currentPos)
+                                    exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
+                                    ytControllerInstance?.seekTo(currentPos)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(34.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
+                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+                            ) {
+                                Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Set Start & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    // End Trim Card
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF0B1220)),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.5f))
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("🔴 End Time", fontSize = 11.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    FilledTonalIconButton(
+                                        onClick = {
+                                            val t = (endSec - 1f).coerceAtLeast(startSec + 1f)
+                                            viewModel.updateTrimRange(startSec, t)
+                                            exoPlayerInstance?.seekTo((t * 1000).toLong())
+                                            ytControllerInstance?.seekTo(t)
+                                        },
+                                        modifier = Modifier.size(24.dp),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text("-1s", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    FilledTonalIconButton(
+                                        onClick = {
+                                            val t = (endSec + 1f).coerceAtMost(totalDurationSec)
+                                            viewModel.updateTrimRange(startSec, t)
+                                            exoPlayerInstance?.seekTo((t * 1000).toLong())
+                                            ytControllerInstance?.seekTo(t)
+                                        },
+                                        modifier = Modifier.size(24.dp),
+                                        shape = RoundedCornerShape(6.dp)
+                                    ) {
+                                        Text("+1s", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = formatSec(endSec),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = AccentCyan
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Button(
+                                onClick = {
+                                    exoPlayerInstance?.pause()
+                                    ytControllerInstance?.pause()
+                                    isPlaybackPaused = true
+                                    val currentPos = playerPositionSec
+                                    playerPositionSec = currentPos
+                                    viewModel.setEndToCurrentPlayback(currentPos)
+                                    exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
+                                    ytControllerInstance?.seekTo(currentPos)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(34.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = AccentCyan),
+                                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+                            ) {
+                                Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.Black)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Set End & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                             }
                         }
                     }
@@ -295,70 +598,8 @@ fun CustomClipperView(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Set Start & Set End Big Action Buttons (PAUSES PLAYBACK IMMEDIATELY)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            // 1. Immediately pause playback so timer stops!
-                            exoPlayerInstance?.pause()
-                            ytControllerInstance?.pause()
-                            isPlaybackPaused = true
-
-                            // 2. Lock start timestamp and seek
-                            val currentPos = playerPositionSec
-                            viewModel.setStartToCurrentPlayback(currentPos)
-                            exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
-                            ytControllerInstance?.seekTo(currentPos)
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(46.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple)
-                    ) {
-                        Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Set Start & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            Text("Start: ${formatSec(startSec)}", fontSize = 10.sp, color = AccentCyan)
-                        }
-                    }
-
-                    Button(
-                        onClick = {
-                            // 1. Immediately pause playback so timer stops!
-                            exoPlayerInstance?.pause()
-                            ytControllerInstance?.pause()
-                            isPlaybackPaused = true
-
-                            // 2. Lock end timestamp and seek
-                            val currentPos = playerPositionSec
-                            viewModel.setEndToCurrentPlayback(currentPos)
-                            exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
-                            ytControllerInstance?.seekTo(currentPos)
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(46.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AccentCyan)
-                    ) {
-                        Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.Black)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Set End & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                            Text("End: ${formatSec(endSec)}", fontSize = 10.sp, color = Color.Black.copy(alpha = 0.8f))
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 // Preview Range Button (Start -> End with auto-pause at End)
-                OutlinedButton(
+                Button(
                     onClick = {
                         exoPlayerInstance?.seekTo((startSec * 1000).toLong())
                         exoPlayerInstance?.play()
@@ -368,16 +609,19 @@ fun CustomClipperView(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(38.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.6f))
+                        .height(42.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryPurple.copy(alpha = 0.15f)
+                    ),
+                    border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.7f))
                 ) {
-                    Icon(Icons.Default.FastForward, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryPurple)
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(Icons.Default.FastForward, contentDescription = null, modifier = Modifier.size(18.dp), tint = PrimaryPurple)
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "▶ Preview Range (${formatSec(startSec)} ➔ ${formatSec(endSec)})",
-                        fontSize = 12.sp,
-                        color = TextPrimary,
+                        text = "▶ Preview Range: ${formatSec(startSec)} ➔ ${formatSec(endSec)} (${String.format("%.1f", durationSec)}s)",
+                        fontSize = 13.sp,
+                        color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -390,8 +634,8 @@ fun CustomClipperView(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardDark),
-            shape = RoundedCornerShape(20.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
+            shape = RoundedCornerShape(24.dp),
+            border = BorderStroke(1.dp, BorderSubtle)
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
                 // Header with placement title & badge (No wrap)
@@ -400,37 +644,39 @@ fun CustomClipperView(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Crop Place & Framing",
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                        fontSize = 15.sp
-                    )
+                    Column {
+                        Text(
+                            text = "Crop Place & Framing",
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary,
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "Position of 9:16 vertical window across 16:9 video",
+                            color = TextSecondary,
+                            fontSize = 11.sp
+                        )
+                    }
                     Surface(
-                        color = PrimaryPurple.copy(alpha = 0.18f),
-                        shape = RoundedCornerShape(8.dp)
+                        color = PrimaryPurple.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.4f))
                     ) {
                         Text(
                             text = when (currentPlacement) {
-                                CropPlacement.AUTO_FACE -> "🤖 Auto Face"
-                                CropPlacement.LEFT -> "👈 Left"
-                                CropPlacement.CENTER -> "🎯 Center"
-                                CropPlacement.RIGHT -> "👉 Right"
-                                CropPlacement.CUSTOM -> "🎚️ Custom"
+                                CropPlacement.AUTO_FACE -> "🤖 Auto Face-Track"
+                                CropPlacement.LEFT -> "👈 Left Focus (16%)"
+                                CropPlacement.CENTER -> "🎯 Center (50%)"
+                                CropPlacement.RIGHT -> "👉 Right Focus (84%)"
+                                CropPlacement.CUSTOM -> "🎚️ Custom (${(currentOffset * 100).toInt()}%)"
                             },
-                            color = PrimaryPurple,
-                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontWeight = FontWeight.ExtraBold,
                             fontSize = 11.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "Position of the 9:16 vertical Short across 16:9 widescreen",
-                    color = TextSecondary,
-                    fontSize = 11.sp
-                )
 
                 Spacer(modifier = Modifier.height(14.dp))
 
@@ -438,10 +684,10 @@ fun CustomClipperView(
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(110.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF070B14))
-                        .border(1.dp, BorderSubtle, RoundedCornerShape(12.dp))
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0xFF050811))
+                        .border(1.dp, BorderSubtle, RoundedCornerShape(14.dp))
                 ) {
                     val fullWidth = maxWidth
                     // 9:16 short takes ~31.64% width of a 16:9 widescreen frame
@@ -458,13 +704,26 @@ fun CustomClipperView(
 
                     val boxOffsetX = maxTravel * resolvedFraction
 
-                    // Background 16:9 Guide lines
+                    // Rule-of-Thirds Grid Guides
                     Row(
                         modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(BorderSubtle.copy(alpha = 0.4f)))
-                        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(BorderSubtle.copy(alpha = 0.4f)))
+                        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(BorderSubtle.copy(alpha = 0.35f)))
+                        Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(BorderSubtle.copy(alpha = 0.35f)))
+                    }
+
+                    // Zone Labels (Left, Center, Right)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Text("Left Speaker", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.5f))
+                        Text("Solo Center", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.5f))
+                        Text("Right Speaker", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.5f))
                     }
 
                     // Sliding 9:16 Framing Window
@@ -473,9 +732,16 @@ fun CustomClipperView(
                             .offset(x = boxOffsetX)
                             .width(cropBoxWidth)
                             .fillMaxHeight()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(PrimaryPurple.copy(alpha = 0.30f))
-                            .border(2.dp, PrimaryPurple, RoundedCornerShape(8.dp)),
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        PrimaryPurple.copy(alpha = 0.35f),
+                                        AccentCyan.copy(alpha = 0.20f)
+                                    )
+                                )
+                            )
+                            .border(2.dp, PrimaryPurple, RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -483,13 +749,13 @@ fun CustomClipperView(
                                 imageVector = if (currentPlacement == CropPlacement.AUTO_FACE) Icons.Default.Face else Icons.Default.CropPortrait,
                                 contentDescription = null,
                                 tint = Color.White,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = "9:16 CROP",
                                 color = Color.White,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.ExtraBold,
                                 fontSize = 10.sp
                             )
                         }
@@ -500,10 +766,11 @@ fun CustomClipperView(
                             modifier = Modifier
                                 .align(Alignment.TopCenter)
                                 .padding(6.dp)
-                                .background(Color.Black.copy(alpha = 0.7f), RoundedCornerShape(6.dp))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(8.dp))
+                                .border(1.dp, AccentCyan.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
                         ) {
-                            Text("🤖 Auto Tracking Speaker Face", color = AccentCyan, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            Text("🤖 AI Active Face Tracking", color = AccentCyan, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -511,7 +778,7 @@ fun CustomClipperView(
                 Spacer(modifier = Modifier.height(14.dp))
 
                 // Placement Selection Chips (Horizontally Scrollable - Never clipped)
-                Text("Select Framing Place:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                Text("Select Framing Preset:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
@@ -523,51 +790,51 @@ fun CustomClipperView(
                     FilterChip(
                         selected = currentPlacement == CropPlacement.AUTO_FACE,
                         onClick = { viewModel.setCropPlacement(CropPlacement.AUTO_FACE) },
-                        label = { Text("🤖 Auto Face", fontSize = 12.sp) },
+                        label = { Text("🤖 Auto Face-Track", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
-                            selectedLabelColor = TextPrimary
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                            selectedLabelColor = Color.White
                         )
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.LEFT,
                         onClick = { viewModel.setCropPlacement(CropPlacement.LEFT) },
-                        label = { Text("👈 Left (16%)", fontSize = 12.sp) },
+                        label = { Text("👈 Left (16%)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
-                            selectedLabelColor = TextPrimary
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                            selectedLabelColor = Color.White
                         )
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.CENTER,
                         onClick = { viewModel.setCropPlacement(CropPlacement.CENTER) },
-                        label = { Text("🎯 Center (50%)", fontSize = 12.sp) },
+                        label = { Text("🎯 Center (50%)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
-                            selectedLabelColor = TextPrimary
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                            selectedLabelColor = Color.White
                         )
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.RIGHT,
                         onClick = { viewModel.setCropPlacement(CropPlacement.RIGHT) },
-                        label = { Text("👉 Right (84%)", fontSize = 12.sp) },
+                        label = { Text("👉 Right (84%)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
-                            selectedLabelColor = TextPrimary
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                            selectedLabelColor = Color.White
                         )
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.CUSTOM,
                         onClick = { viewModel.setCropPlacement(CropPlacement.CUSTOM) },
-                        label = { Text("🎚️ Custom Slider", fontSize = 12.sp) },
+                        label = { Text("🎚️ Fine Slider", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
-                            selectedLabelColor = TextPrimary
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                            selectedLabelColor = Color.White
                         )
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Custom Slider option
                 Row(
@@ -575,8 +842,8 @@ fun CustomClipperView(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Fine Horizontal Placement Slider:", color = TextSecondary, fontSize = 11.sp)
-                    Text("${(currentOffset * 100).toInt()}%", color = AccentCyan, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                    Text("Continuous Horizontal Placement:", color = TextSecondary, fontSize = 11.sp)
+                    Text("${(currentOffset * 100).toInt()}%", color = AccentCyan, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                 }
                 Slider(
                     value = currentOffset,
@@ -591,21 +858,21 @@ fun CustomClipperView(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("0% (Left Edge)", fontSize = 10.sp, color = TextSecondary)
-                    Text("50% (Center)", fontSize = 10.sp, color = TextSecondary)
-                    Text("100% (Right Edge)", fontSize = 10.sp, color = TextSecondary)
+                    Text("0% (Far Left)", fontSize = 10.sp, color = TextSecondary)
+                    Text("50% (Exact Center)", fontSize = 10.sp, color = TextSecondary)
+                    Text("100% (Far Right)", fontSize = 10.sp, color = TextSecondary)
                 }
             }
         }
 
         // ----------------------------------------------------
-        // 3. CUSTOM LENGTH SELECTOR & SCRUBBER
+        // 3. DURATION PRESETS & SCRUBBER
         // ----------------------------------------------------
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardDark),
-            shape = RoundedCornerShape(20.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
+            shape = RoundedCornerShape(24.dp),
+            border = BorderStroke(1.dp, BorderSubtle)
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
                 Row(
@@ -615,67 +882,63 @@ fun CustomClipperView(
                 ) {
                     Column {
                         Text(
-                            text = "Custom Length Selector",
+                            text = "Target Clip Duration",
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary,
-                            fontSize = 15.sp
+                            fontSize = 16.sp
                         )
                         Text(
-                            text = "Trim precise start & end timestamps",
+                            text = "Choose viral platform duration or scrub range",
                             color = TextSecondary,
                             fontSize = 11.sp
                         )
                     }
                     Surface(
-                        color = if (durationSec in 15f..60f) SuccessGreen.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(12.dp)
+                        color = if (durationSec in 15f..60f) SuccessGreen.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, if (durationSec in 15f..60f) SuccessGreen.copy(alpha = 0.5f) else Color.Transparent)
                     ) {
                         Text(
-                            text = "${String.format("%.1f", durationSec)}s Duration",
+                            text = "✂️ ${String.format("%.1f", durationSec)}s Total",
                             color = if (durationSec in 15f..60f) SuccessGreen else TextPrimary,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.ExtraBold,
                             fontSize = 12.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Quick Preset Duration Chips
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(
+                        15f to "🎵 15s (TikTok)",
+                        30f to "🔥 30s (Viral)",
+                        45f to "⏱️ 45s (Reels)",
+                        60f to "🧠 60s (Deep)"
+                    ).forEach { (dur, label) ->
+                        FilterChip(
+                            selected = kotlin.math.abs(durationSec - dur) < 1.0f,
+                            onClick = { viewModel.setPresetDuration(dur) },
+                            label = { Text(label, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                                selectedLabelColor = Color.White
+                            )
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Start Time Scrubber
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Start: ${formatSec(startSec)}", color = TextSecondary, fontSize = 13.sp)
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.updateTrimRange(startSec - 1f, endSec)
-                                exoPlayerInstance?.seekTo(((startSec - 1f).coerceAtLeast(0f) * 1000).toLong())
-                                ytControllerInstance?.seekTo((startSec - 1f).coerceAtLeast(0f))
-                            },
-                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-                            shape = RoundedCornerShape(6.dp),
-                            modifier = Modifier.height(28.dp)
-                        ) {
-                            Text("-1s", fontSize = 11.sp, color = TextPrimary)
-                        }
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.updateTrimRange(startSec + 1f, endSec)
-                                exoPlayerInstance?.seekTo(((startSec + 1f) * 1000).toLong())
-                                ytControllerInstance?.seekTo(startSec + 1f)
-                            },
-                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-                            shape = RoundedCornerShape(6.dp),
-                            modifier = Modifier.height(28.dp)
-                        ) {
-                            Text("+1s", fontSize = 11.sp, color = TextPrimary)
-                        }
-                    }
-                }
+                // Start Time Scrubber Bar
+                Text("Start Point: ${formatSec(startSec)}", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Slider(
                     value = startSec,
                     onValueChange = { newStart ->
@@ -690,42 +953,10 @@ fun CustomClipperView(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                // End Time Scrubber
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("End: ${formatSec(endSec)}", color = TextSecondary, fontSize = 13.sp)
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.updateTrimRange(startSec, endSec - 1f)
-                                exoPlayerInstance?.seekTo(((endSec - 1f).coerceAtLeast(0f) * 1000).toLong())
-                                ytControllerInstance?.seekTo((endSec - 1f).coerceAtLeast(0f))
-                            },
-                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-                            shape = RoundedCornerShape(6.dp),
-                            modifier = Modifier.height(28.dp)
-                        ) {
-                            Text("-1s", fontSize = 11.sp, color = TextPrimary)
-                        }
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.updateTrimRange(startSec, endSec + 1f)
-                                exoPlayerInstance?.seekTo(((endSec + 1f) * 1000).toLong())
-                                ytControllerInstance?.seekTo(endSec + 1f)
-                            },
-                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
-                            shape = RoundedCornerShape(6.dp),
-                            modifier = Modifier.height(28.dp)
-                        ) {
-                            Text("+1s", fontSize = 11.sp, color = TextPrimary)
-                        }
-                    }
-                }
+                // End Time Scrubber Bar
+                Text("End Point: ${formatSec(endSec)}", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Slider(
                     value = endSec,
                     onValueChange = { newEnd ->
@@ -739,48 +970,29 @@ fun CustomClipperView(
                         activeTrackColor = AccentCyan
                     )
                 )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Quick Preset Duration Chips
-                Text("Quick Duration Presets:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf(15f to "15s (TikTok)", 30f to "30s (Viral)", 45f to "45s", 60f to "60s (Deep)").forEach { (dur, label) ->
-                        FilterChip(
-                            selected = kotlin.math.abs(durationSec - dur) < 1.0f,
-                            onClick = { viewModel.setPresetDuration(dur) },
-                            label = { Text(label, fontSize = 11.sp) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
-                                selectedLabelColor = TextPrimary
-                            )
-                        )
-                    }
-                }
             }
         }
 
         // ----------------------------------------------------
-        // 4. CLIP CAPTION OVERLAY
+        // 4. CLIP CAPTION OVERLAY & VIRAL HOOKS
         // ----------------------------------------------------
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = CardDark),
-            shape = RoundedCornerShape(20.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
+            shape = RoundedCornerShape(24.dp),
+            border = BorderStroke(1.dp, BorderSubtle)
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
                 Text(
-                    text = "Clip Caption Overlay",
+                    text = "Viral Hook Caption Overlay",
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary,
-                    fontSize = 14.sp
+                    fontSize = 15.sp
+                )
+                Text(
+                    text = "High-retention caption rendered on top of the vertical short",
+                    color = TextSecondary,
+                    fontSize = 11.sp
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
@@ -796,33 +1008,99 @@ fun CustomClipperView(
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Quick Inspiration Hook Chips
+                Text("Tap for instant viral inspiration:", color = TextSecondary, fontSize = 11.sp)
+                Spacer(modifier = Modifier.height(6.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    listOf(
+                        "WAIT TILL THE END... 🤯",
+                        "The 1 Secret Nobody Tells You 🤫",
+                        "Watch what happens next! 😱",
+                        "Top 3 Things You Need To Know 👇"
+                    ).forEach { suggestion ->
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = BgDark,
+                            border = BorderStroke(1.dp, BorderSubtle),
+                            modifier = Modifier.clickable {
+                                viewModel.onHookTextChanged(suggestion)
+                            }
+                        ) {
+                            Text(
+                                text = suggestion,
+                                fontSize = 11.sp,
+                                color = TextSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
 
         // ----------------------------------------------------
-        // 5. RENDER CTA BUTTON
+        // 5. HARDWARE RENDER CTA BUTTON
         // ----------------------------------------------------
         Button(
             onClick = { viewModel.startRenderShort(context.cacheDir) },
             enabled = !state.isRendering,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple)
+                .height(58.dp),
+            shape = RoundedCornerShape(18.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            contentPadding = PaddingValues(0.dp)
         ) {
-            if (state.isRendering) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(22.dp),
-                    color = Color.White,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text("Rendering Custom Short...", fontWeight = FontWeight.Bold)
-            } else {
-                Icon(Icons.Default.Movie, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Render 9:16 Custom Short (${String.format("%.0f", durationSec)}s)", fontWeight = FontWeight.Bold)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                PrimaryPurple,
+                                AccentIndigo,
+                                AccentCyan
+                            )
+                        ),
+                        RoundedCornerShape(18.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (state.isRendering) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(22.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Hardware Encoding 9:16 Short...",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 15.sp
+                        )
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Movie, contentDescription = null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Export 9:16 Custom Short (${String.format("%.0f", durationSec)}s)",
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                            fontSize = 15.sp
+                        )
+                    }
+                }
             }
         }
     }

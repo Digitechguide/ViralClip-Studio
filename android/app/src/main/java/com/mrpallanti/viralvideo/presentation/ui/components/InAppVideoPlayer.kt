@@ -32,6 +32,7 @@ fun InAppVideoPlayer(
     uriString: String,
     modifier: Modifier = Modifier,
     onPositionUpdate: (Float) -> Unit = {},
+    onIsPlayingChanged: (Boolean) -> Unit = {},
     onPlayerReady: (ExoPlayer) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -43,6 +44,11 @@ fun InAppVideoPlayer(
                 setMediaItem(mediaItem)
                 prepare()
                 playWhenReady = false
+                addListener(object : Player.Listener {
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        onIsPlayingChanged(isPlaying)
+                    }
+                })
             } catch (ignored: Exception) {}
         }
     }
@@ -56,7 +62,7 @@ fun InAppVideoPlayer(
                     onPositionUpdate(posSec)
                 }
             } catch (ignored: Exception) {}
-            delay(250)
+            delay(150)
         }
     }
 
@@ -78,9 +84,7 @@ fun InAppVideoPlayer(
             factory = { ctx ->
                 PlayerView(ctx).apply {
                     player = exoPlayer
-                    useController = true
-                    setShowNextButton(false)
-                    setShowPreviousButton(false)
+                    useController = false
                     layoutParams = FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
