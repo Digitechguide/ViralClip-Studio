@@ -3,7 +3,9 @@ package com.mrpallanti.viralvideo.presentation.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -117,12 +118,21 @@ fun CustomClipperView(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = if (hasLocalFile) "📱 Local Video Player" else "▶️ In-App YouTube Player",
-                        color = TextPrimary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (hasLocalFile) Icons.Default.PhoneAndroid else Icons.Default.PlayCircle,
+                            contentDescription = null,
+                            tint = if (hasLocalFile) SuccessGreen else PrimaryPurple,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = if (hasLocalFile) "Local Video Player" else "In-App YouTube Player",
+                            color = TextPrimary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                     Surface(
                         color = if (hasLocalFile) SuccessGreen.copy(alpha = 0.15f) else PrimaryPurple.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(6.dp)
@@ -150,7 +160,7 @@ fun CustomClipperView(
                         }
                     )
                 } else if (isYouTubeVideo) {
-                    // Embedded YouTube WebView player with live JS bridge
+                    // Embedded YouTube WebView player with live JS bridge & error recovery
                     InAppYouTubePlayer(
                         videoId = video.id,
                         modifier = Modifier
@@ -159,7 +169,11 @@ fun CustomClipperView(
                         onPositionUpdate = { pos ->
                             playerPositionSec = pos
                             viewModel.updatePlayerPosition(pos)
-                        }
+                        },
+                        onCacheVideo = {
+                            viewModel.cacheVideoForPlayback(context.cacheDir)
+                        },
+                        onPickFromGallery = onPickFromGallery
                     )
                 } else if (!playableUri.isNullOrBlank()) {
                     InAppVideoPlayer(
@@ -184,9 +198,9 @@ fun CustomClipperView(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                // Playback Position Bar & Set Start/End Quick Buttons
+                // Playback Position Row + Offline Cache Action
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -195,24 +209,55 @@ fun CustomClipperView(
                     Text(
                         text = "Playhead: ${formatSec(playerPositionSec)} / ${formatSec(totalDurationSec)}",
                         color = AccentCyan,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
                     )
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+
+                    if (!hasLocalFile) {
                         FilledTonalButton(
-                            onClick = { viewModel.setStartToCurrentPlayback(playerPositionSec) },
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                            shape = RoundedCornerShape(8.dp)
+                            onClick = { viewModel.cacheVideoForPlayback(context.cacheDir) },
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(containerColor = PrimaryPurple.copy(alpha = 0.25f))
                         ) {
-                            Text("Set Start [${formatSec(playerPositionSec)}]", fontSize = 11.sp)
+                            Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(14.dp), tint = PrimaryPurple)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Cache Offline", fontSize = 11.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
                         }
-                        FilledTonalButton(
-                            onClick = { viewModel.setEndToCurrentPlayback(playerPositionSec) },
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text("Set End [${formatSec(playerPositionSec)}]", fontSize = 11.sp)
-                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Set Start & Set End Big Action Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilledTonalButton(
+                        onClick = { viewModel.setStartToCurrentPlayback(playerPositionSec) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = PrimaryPurple.copy(alpha = 0.25f))
+                    ) {
+                        Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryPurple)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Set Start [${formatSec(playerPositionSec)}]", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    }
+
+                    FilledTonalButton(
+                        onClick = { viewModel.setEndToCurrentPlayback(playerPositionSec) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = AccentCyan.copy(alpha = 0.2f))
+                    ) {
+                        Icon(Icons.Default.Stop, contentDescription = null, modifier = Modifier.size(16.dp), tint = AccentCyan)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Set End [${formatSec(playerPositionSec)}]", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                     }
                 }
             }
@@ -228,35 +273,29 @@ fun CustomClipperView(
             border = androidx.compose.foundation.BorderStroke(1.dp, BorderSubtle)
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
+                // Header with placement title & badge (No wrap)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        Text(
-                            text = "Crop Place & Framing",
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
-                            fontSize = 15.sp
-                        )
-                        Text(
-                            text = "Position of the 9:16 vertical Short in 16:9 video",
-                            color = TextSecondary,
-                            fontSize = 11.sp
-                        )
-                    }
+                    Text(
+                        text = "Crop Place & Framing",
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary,
+                        fontSize = 15.sp
+                    )
                     Surface(
-                        color = PrimaryPurple.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(10.dp)
+                        color = PrimaryPurple.copy(alpha = 0.18f),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
                             text = when (currentPlacement) {
                                 CropPlacement.AUTO_FACE -> "🤖 Auto Face"
-                                CropPlacement.LEFT -> "👈 Left (16%)"
-                                CropPlacement.CENTER -> "🎯 Center (50%)"
-                                CropPlacement.RIGHT -> "👉 Right (84%)"
-                                CropPlacement.CUSTOM -> "🎚️ Custom (${(currentOffset * 100).toInt()}%)"
+                                CropPlacement.LEFT -> "👈 Left"
+                                CropPlacement.CENTER -> "🎯 Center"
+                                CropPlacement.RIGHT -> "👉 Right"
+                                CropPlacement.CUSTOM -> "🎚️ Custom"
                             },
                             color = PrimaryPurple,
                             fontWeight = FontWeight.Bold,
@@ -265,6 +304,12 @@ fun CustomClipperView(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Position of the 9:16 vertical Short across 16:9 widescreen",
+                    color = TextSecondary,
+                    fontSize = 11.sp
+                )
 
                 Spacer(modifier = Modifier.height(14.dp))
 
@@ -344,18 +389,20 @@ fun CustomClipperView(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Placement Selection Chips
+                // Placement Selection Chips (Horizontally Scrollable - Never clipped)
                 Text("Select Framing Place:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     FilterChip(
                         selected = currentPlacement == CropPlacement.AUTO_FACE,
                         onClick = { viewModel.setCropPlacement(CropPlacement.AUTO_FACE) },
-                        label = { Text("🤖 Auto Face", fontSize = 11.sp) },
+                        label = { Text("🤖 Auto Face", fontSize = 12.sp) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
                             selectedLabelColor = TextPrimary
@@ -364,7 +411,7 @@ fun CustomClipperView(
                     FilterChip(
                         selected = currentPlacement == CropPlacement.LEFT,
                         onClick = { viewModel.setCropPlacement(CropPlacement.LEFT) },
-                        label = { Text("👈 Left", fontSize = 11.sp) },
+                        label = { Text("👈 Left (16%)", fontSize = 12.sp) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
                             selectedLabelColor = TextPrimary
@@ -373,7 +420,7 @@ fun CustomClipperView(
                     FilterChip(
                         selected = currentPlacement == CropPlacement.CENTER,
                         onClick = { viewModel.setCropPlacement(CropPlacement.CENTER) },
-                        label = { Text("🎯 Center", fontSize = 11.sp) },
+                        label = { Text("🎯 Center (50%)", fontSize = 12.sp) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
                             selectedLabelColor = TextPrimary
@@ -382,7 +429,16 @@ fun CustomClipperView(
                     FilterChip(
                         selected = currentPlacement == CropPlacement.RIGHT,
                         onClick = { viewModel.setCropPlacement(CropPlacement.RIGHT) },
-                        label = { Text("👉 Right", fontSize = 11.sp) },
+                        label = { Text("👉 Right (84%)", fontSize = 12.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
+                            selectedLabelColor = TextPrimary
+                        )
+                    )
+                    FilterChip(
+                        selected = currentPlacement == CropPlacement.CUSTOM,
+                        onClick = { viewModel.setCropPlacement(CropPlacement.CUSTOM) },
+                        label = { Text("🎚️ Custom Slider", fontSize = 12.sp) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.3f),
                             selectedLabelColor = TextPrimary
@@ -390,7 +446,7 @@ fun CustomClipperView(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Custom Slider option
                 Row(
@@ -545,7 +601,9 @@ fun CustomClipperView(
                 Text("Quick Duration Presets:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     listOf(15f to "15s (TikTok)", 30f to "30s (Viral)", 45f to "45s", 60f to "60s (Deep)").forEach { (dur, label) ->

@@ -546,6 +546,69 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
         """.trimIndent()
     }
 
+    fun cacheVideoForPlayback(cacheDir: File) {
+        val state = _uiState.value
+        val video = state.currentVideo ?: return
+        if (!video.localUri.isNullOrBlank()) return
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    loadingMessage = "Initializing on-device engine for offline caching...",
+                    errorMessage = null
+                )
+            }
+
+            val dlUrl = state.urlInput.ifBlank { "https://www.youtube.com/watch?v=${video.id}" }
+            val dlResult = downloadYoutubeVideoUseCase(
+                url = dlUrl,
+                outputDir = cacheDir,
+                onProgress = { progress, status ->
+                    _uiState.update {
+                        it.copy(
+                            loadingMessage = if (progress in 1f..99f) {
+                                "Caching from YouTube: ${progress.toInt()}% (On-device engine)..."
+                            } else {
+                                status
+                            }
+                        )
+                    }
+                }
+            )
+
+            dlResult.fold(
+                onSuccess = { file ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            currentVideo = it.currentVideo?.copy(localUri = file.absolutePath),
+                            successMessage = "Cached on device! Smooth offline scrubbing enabled."
+                        )
+                    }
+                },
+                onFailure = { err ->
+                    val cleanError = err.message
+                        ?.lines()
+                        ?.firstOrNull { line ->
+                            val l = line.trim()
+                            l.isNotBlank() && !l.startsWith("WARNING", ignoreCase = true)
+                        }
+                        ?: err.message
+                        ?: "Could not download stream"
+
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            showVideoPickerPrompt = true,
+                            errorMessage = "Caching notice: $cleanError"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
     fun startRenderShort(cacheDir: File? = null) {
         val state = _uiState.value
         val video = state.currentVideo
