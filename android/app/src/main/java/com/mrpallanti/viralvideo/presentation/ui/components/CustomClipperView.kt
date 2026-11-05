@@ -1,5 +1,7 @@
 package com.mrpallanti.viralvideo.presentation.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.exoplayer.ExoPlayer
@@ -42,7 +45,6 @@ fun CustomClipperView(
     var playerPositionSec by remember { mutableFloatStateOf(0f) }
 
     var exoPlayerInstance by remember { mutableStateOf<ExoPlayer?>(null) }
-    var ytControllerInstance by remember { mutableStateOf<YouTubePlayerController?>(null) }
     var isPlaybackPaused by remember { mutableStateOf(false) }
 
     if (video == null) {
@@ -82,7 +84,7 @@ fun CustomClipperView(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Paste a YouTube link in the AI Studio tab or select a local video from your device to begin custom length & place cropping.",
+                    text = "Paste a YouTube link in the Studio tab or pick a local video from your device to begin custom length & place cropping.",
                     color = TextSecondary,
                     fontSize = 13.sp,
                     lineHeight = 19.sp,
@@ -109,7 +111,6 @@ fun CustomClipperView(
     val endSec = state.trimRange.endSeconds.coerceIn(startSec + 1f, totalDurationSec)
     val durationSec = endSec - startSec
 
-    val isYouTubeVideo = !video.id.startsWith("local_") && video.id.isNotBlank()
     val hasLocalFile = !video.localUri.isNullOrBlank()
     val playableUri = video.localUri ?: video.streamUrl
 
@@ -127,7 +128,6 @@ fun CustomClipperView(
     LaunchedEffect(playerPositionSec, endSec) {
         if (!isPlaybackPaused && playerPositionSec >= endSec && endSec > startSec) {
             exoPlayerInstance?.pause()
-            ytControllerInstance?.pause()
             isPlaybackPaused = true
         }
     }
@@ -137,7 +137,7 @@ fun CustomClipperView(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // ----------------------------------------------------
-        // 1. IN-APP STUDIO VIDEO PLAYER (Dual Engine: Local ExoPlayer / In-App YouTube)
+        // 1. IN-APP STUDIO VIDEO PLAYER & TIMELINE CONSOLE
         // ----------------------------------------------------
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -147,15 +147,15 @@ fun CustomClipperView(
                 1.dp,
                 Brush.horizontalGradient(
                     listOf(
-                        PrimaryPurple.copy(alpha = 0.35f),
-                        AccentCyan.copy(alpha = 0.25f),
+                        PrimaryPurple.copy(alpha = 0.45f),
+                        AccentCyan.copy(alpha = 0.35f),
                         BorderSubtle
                     )
                 )
             )
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                // Player Header Bar
+                // Header: Status Badge & Video Info
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -170,34 +170,37 @@ fun CustomClipperView(
                         Surface(
                             color = if (hasLocalFile) SuccessGreen.copy(alpha = 0.15f) else AccentCyan.copy(alpha = 0.15f),
                             shape = CircleShape,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(30.dp),
+                            border = BorderStroke(1.dp, if (hasLocalFile) SuccessGreen.copy(alpha = 0.4f) else AccentCyan.copy(alpha = 0.4f))
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = if (hasLocalFile) Icons.Default.PhoneAndroid else Icons.Default.PlayCircle,
+                                    imageVector = if (hasLocalFile) Icons.Default.CheckCircle else Icons.Default.Download,
                                     contentDescription = null,
                                     tint = if (hasLocalFile) SuccessGreen else AccentCyan,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if (hasLocalFile) "Offline Local Player" else "Stream Playback Player",
+                                text = video.title,
                                 color = TextPrimary,
                                 fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                text = video.title,
-                                color = TextSecondary,
-                                fontSize = 11.sp,
-                                maxLines = 1,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                text = if (hasLocalFile) "Offline Local Engine • 60fps Scrubbing" else "Auto-extracting high-bitrate stream...",
+                                color = if (hasLocalFile) SuccessGreen else TextSecondary,
+                                fontSize = 11.sp
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     Surface(
                         color = if (hasLocalFile) SuccessGreen.copy(alpha = 0.15f) else PrimaryPurple.copy(alpha = 0.15f),
@@ -209,7 +212,9 @@ fun CustomClipperView(
                             color = if (hasLocalFile) SuccessGreen else PrimaryPurple,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }
@@ -221,6 +226,7 @@ fun CustomClipperView(
                         .height(210.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.Black)
+                        .border(1.dp, BorderSubtle, RoundedCornerShape(16.dp))
                 ) {
                     if (hasLocalFile) {
                         InAppVideoPlayer(
@@ -270,7 +276,7 @@ fun CustomClipperView(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = if (state.isLoading) state.loadingMessage else "Extracting 1080p stream for instant zero-lag scrubbing...",
+                                    text = if (state.isLoading) state.loadingMessage else "Extracting ${state.selectedQuality.label} stream for zero-lag scrubbing...",
                                     color = TextSecondary,
                                     fontSize = 11.sp,
                                     textAlign = TextAlign.Center,
@@ -300,7 +306,7 @@ fun CustomClipperView(
                                         border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.4f))
                                     ) {
                                         Text(
-                                            text = "🛡️ Bypasses YouTube Error 152",
+                                            text = "🛡️ Direct Stream Extraction",
                                             color = PrimaryPurple,
                                             fontSize = 10.sp,
                                             fontWeight = FontWeight.Bold,
@@ -335,10 +341,11 @@ fun CustomClipperView(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(12.dp))
+
                 // ----------------------------------------------------
                 // Output Resolution & Cache Quality Selector Chips
                 // ----------------------------------------------------
-                Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -360,7 +367,7 @@ fun CustomClipperView(
                         )
                     }
                     Text(
-                        text = "${state.selectedQuality.width}x${state.selectedQuality.height}",
+                        text = "${state.selectedQuality.width} × ${state.selectedQuality.height}",
                         fontSize = 11.sp,
                         color = AccentCyan,
                         fontWeight = FontWeight.Bold
@@ -415,7 +422,28 @@ fun CustomClipperView(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // ----------------------------------------------------
+                // Real-Time Video Timeline Scrubber
+                // ----------------------------------------------------
+                Slider(
+                    value = playerPositionSec.coerceIn(0f, totalDurationSec),
+                    onValueChange = { pos ->
+                        playerPositionSec = pos
+                        exoPlayerInstance?.seekTo((pos * 1000).toLong())
+                        viewModel.updatePlayerPosition(pos)
+                    },
+                    valueRange = 0f..totalDurationSec,
+                    colors = SliderDefaults.colors(
+                        thumbColor = AccentCyan,
+                        activeTrackColor = AccentCyan,
+                        inactiveTrackColor = Color(0xFF1E293B)
+                    ),
+                    modifier = Modifier.fillMaxWidth().height(24.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Playback Position Bar & Transport Controls
                 Row(
@@ -448,20 +476,19 @@ fun CustomClipperView(
                             }
                         }
 
-                        if (isPlaybackPaused) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Surface(
-                                color = Color(0xFFF59E0B).copy(alpha = 0.2f),
-                                shape = RoundedCornerShape(6.dp)
-                            ) {
-                                Text(
-                                    text = "PAUSED",
-                                    color = Color(0xFFF59E0B),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-                                )
-                            }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Surface(
+                            color = if (isPlaybackPaused) Color(0xFFF59E0B).copy(alpha = 0.15f) else SuccessGreen.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(6.dp),
+                            border = BorderStroke(1.dp, if (isPlaybackPaused) Color(0xFFF59E0B).copy(alpha = 0.35f) else SuccessGreen.copy(alpha = 0.35f))
+                        ) {
+                            Text(
+                                text = if (isPlaybackPaused) "PAUSED" else "PLAYING",
+                                color = if (isPlaybackPaused) Color(0xFFF59E0B) else SuccessGreen,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                            )
                         }
                     }
 
@@ -474,7 +501,6 @@ fun CustomClipperView(
                             onClick = {
                                 val target = (playerPositionSec - 5f).coerceAtLeast(0f)
                                 exoPlayerInstance?.seekTo((target * 1000).toLong())
-                                ytControllerInstance?.seekTo(target)
                             },
                             modifier = Modifier.size(36.dp),
                             shape = RoundedCornerShape(10.dp)
@@ -486,15 +512,13 @@ fun CustomClipperView(
                             onClick = {
                                 if (isPlaybackPaused) {
                                     exoPlayerInstance?.play()
-                                    ytControllerInstance?.play()
                                     isPlaybackPaused = false
                                 } else {
                                     exoPlayerInstance?.pause()
-                                    ytControllerInstance?.pause()
                                     isPlaybackPaused = true
                                 }
                             },
-                            modifier = Modifier.size(40.dp),
+                            modifier = Modifier.size(42.dp),
                             colors = IconButtonDefaults.filledIconButtonColors(
                                 containerColor = if (isPlaybackPaused) PrimaryPurple else AccentCyan
                             ),
@@ -504,7 +528,7 @@ fun CustomClipperView(
                                 imageVector = if (isPlaybackPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
                                 contentDescription = if (isPlaybackPaused) "Play" else "Pause",
                                 tint = if (isPlaybackPaused) Color.White else Color.Black,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
 
@@ -512,13 +536,68 @@ fun CustomClipperView(
                             onClick = {
                                 val target = (playerPositionSec + 5f).coerceAtMost(totalDurationSec)
                                 exoPlayerInstance?.seekTo((target * 1000).toLong())
-                                ytControllerInstance?.seekTo(target)
                             },
                             modifier = Modifier.size(36.dp),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text("+5s", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                         }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // ----------------------------------------------------
+                // Quick Duration Presets (15s, 30s, 45s, 60s)
+                // ----------------------------------------------------
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Quick Duration Presets:", fontSize = 11.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                    Surface(
+                        color = PrimaryPurple.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(6.dp)
+                    ) {
+                        Text(
+                            text = "✂️ ${String.format("%.1f", durationSec)}s Selected",
+                            fontSize = 11.sp,
+                            color = PrimaryPurple,
+                            fontWeight = FontWeight.ExtraBold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(
+                        15f to "🎵 15s (TikTok)",
+                        30f to "🔥 30s (Viral)",
+                        45f to "⏱️ 45s (Reels)",
+                        60f to "🧠 60s (Deep)"
+                    ).forEach { (dur, label) ->
+                        val isPresetActive = kotlin.math.abs(durationSec - dur) < 1.0f
+                        FilterChip(
+                            selected = isPresetActive,
+                            onClick = {
+                                val newEnd = (startSec + dur).coerceAtMost(totalDurationSec)
+                                viewModel.updateTrimRange(startSec, newEnd)
+                            },
+                            label = { Text(label, fontSize = 11.sp, fontWeight = FontWeight.Bold) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                                selectedLabelColor = Color.White
+                            ),
+                            border = BorderStroke(1.dp, if (isPresetActive) PrimaryPurple else BorderSubtle)
+                        )
                     }
                 }
 
@@ -534,7 +613,7 @@ fun CustomClipperView(
                         modifier = Modifier.weight(1f),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF0B1220)),
                         shape = RoundedCornerShape(14.dp),
-                        border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.5f))
+                        border = BorderStroke(1.dp, SuccessGreen.copy(alpha = 0.5f))
                     ) {
                         Column(modifier = Modifier.padding(10.dp)) {
                             Row(
@@ -549,7 +628,6 @@ fun CustomClipperView(
                                             val t = (startSec - 1f).coerceAtLeast(0f)
                                             viewModel.updateTrimRange(t, endSec)
                                             exoPlayerInstance?.seekTo((t * 1000).toLong())
-                                            ytControllerInstance?.seekTo(t)
                                         },
                                         modifier = Modifier.size(24.dp),
                                         shape = RoundedCornerShape(6.dp)
@@ -561,7 +639,6 @@ fun CustomClipperView(
                                             val t = (startSec + 1f).coerceAtMost(endSec - 1f)
                                             viewModel.updateTrimRange(t, endSec)
                                             exoPlayerInstance?.seekTo((t * 1000).toLong())
-                                            ytControllerInstance?.seekTo(t)
                                         },
                                         modifier = Modifier.size(24.dp),
                                         shape = RoundedCornerShape(6.dp)
@@ -570,35 +647,32 @@ fun CustomClipperView(
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = formatSec(startSec),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = PrimaryPurple
+                                color = SuccessGreen
                             )
                             Spacer(modifier = Modifier.height(6.dp))
                             Button(
                                 onClick = {
                                     exoPlayerInstance?.pause()
-                                    ytControllerInstance?.pause()
                                     isPlaybackPaused = true
                                     val currentPos = playerPositionSec
-                                    playerPositionSec = currentPos
                                     viewModel.setStartToCurrentPlayback(currentPos)
                                     exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
-                                    ytControllerInstance?.seekTo(currentPos)
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(34.dp),
                                 shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryPurple),
+                                colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen),
                                 contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                             ) {
-                                Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.PauseCircle, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.Black)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Set Start & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("Set Start & Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                             }
                         }
                     }
@@ -623,7 +697,6 @@ fun CustomClipperView(
                                             val t = (endSec - 1f).coerceAtLeast(startSec + 1f)
                                             viewModel.updateTrimRange(startSec, t)
                                             exoPlayerInstance?.seekTo((t * 1000).toLong())
-                                            ytControllerInstance?.seekTo(t)
                                         },
                                         modifier = Modifier.size(24.dp),
                                         shape = RoundedCornerShape(6.dp)
@@ -635,7 +708,6 @@ fun CustomClipperView(
                                             val t = (endSec + 1f).coerceAtMost(totalDurationSec)
                                             viewModel.updateTrimRange(startSec, t)
                                             exoPlayerInstance?.seekTo((t * 1000).toLong())
-                                            ytControllerInstance?.seekTo(t)
                                         },
                                         modifier = Modifier.size(24.dp),
                                         shape = RoundedCornerShape(6.dp)
@@ -644,7 +716,7 @@ fun CustomClipperView(
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = formatSec(endSec),
                                 fontSize = 18.sp,
@@ -655,13 +727,10 @@ fun CustomClipperView(
                             Button(
                                 onClick = {
                                     exoPlayerInstance?.pause()
-                                    ytControllerInstance?.pause()
                                     isPlaybackPaused = true
                                     val currentPos = playerPositionSec
-                                    playerPositionSec = currentPos
                                     viewModel.setEndToCurrentPlayback(currentPos)
                                     exoPlayerInstance?.seekTo((currentPos * 1000).toLong())
-                                    ytControllerInstance?.seekTo(currentPos)
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -678,20 +747,18 @@ fun CustomClipperView(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Preview Range Button (Start -> End with auto-pause at End)
                 Button(
                     onClick = {
                         exoPlayerInstance?.seekTo((startSec * 1000).toLong())
                         exoPlayerInstance?.play()
-                        ytControllerInstance?.seekTo(startSec)
-                        ytControllerInstance?.play()
                         isPlaybackPaused = false
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(42.dp),
+                        .height(44.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PrimaryPurple.copy(alpha = 0.15f)
@@ -701,7 +768,7 @@ fun CustomClipperView(
                     Icon(Icons.Default.FastForward, contentDescription = null, modifier = Modifier.size(18.dp), tint = PrimaryPurple)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "▶ Preview Range: ${formatSec(startSec)} ➔ ${formatSec(endSec)} (${String.format("%.1f", durationSec)}s)",
+                        text = "▶ Preview Short: ${formatSec(startSec)} ➔ ${formatSec(endSec)} (${String.format("%.1f", durationSec)}s)",
                         fontSize = 13.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Bold
@@ -720,13 +787,13 @@ fun CustomClipperView(
             border = BorderStroke(1.dp, BorderSubtle)
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
-                // Header with placement title & badge (No wrap)
+                // Header with placement title & badge (With weight to prevent 2-line wrapping)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Crop Place & Framing",
                             fontWeight = FontWeight.Bold,
@@ -734,11 +801,14 @@ fun CustomClipperView(
                             fontSize = 16.sp
                         )
                         Text(
-                            text = "Position of 9:16 vertical window across 16:9 video",
+                            text = "Position of 9:16 vertical short across 16:9 frame",
                             color = TextSecondary,
                             fontSize = 11.sp
                         )
                     }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
                     Surface(
                         color = PrimaryPurple.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(10.dp),
@@ -755,7 +825,9 @@ fun CustomClipperView(
                             color = Color.White,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 11.sp,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }
@@ -766,7 +838,7 @@ fun CustomClipperView(
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp)
+                        .height(130.dp)
                         .clip(RoundedCornerShape(14.dp))
                         .background(Color(0xFF050811))
                         .border(1.dp, BorderSubtle, RoundedCornerShape(14.dp))
@@ -784,7 +856,13 @@ fun CustomClipperView(
                         CropPlacement.CUSTOM -> currentOffset.coerceIn(0.0f, 1.0f)
                     }
 
-                    val boxOffsetX = maxTravel * resolvedFraction
+                    val animatedFraction by animateFloatAsState(
+                        targetValue = resolvedFraction,
+                        animationSpec = tween(durationMillis = 250),
+                        label = "cropWindowAnimation"
+                    )
+
+                    val boxOffsetX = maxTravel * animatedFraction
 
                     // Rule-of-Thirds Grid Guides
                     Row(
@@ -803,9 +881,9 @@ fun CustomClipperView(
                             .padding(bottom = 6.dp),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
-                        Text("Left Speaker", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.5f))
-                        Text("Solo Center", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.5f))
-                        Text("Right Speaker", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.5f))
+                        Text("Left Speaker", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.6f))
+                        Text("Solo Center", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.6f))
+                        Text("Right Speaker", fontSize = 10.sp, color = TextSecondary.copy(alpha = 0.6f))
                     }
 
                     // Sliding 9:16 Framing Window
@@ -876,16 +954,18 @@ fun CustomClipperView(
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
                             selectedLabelColor = Color.White
-                        )
+                        ),
+                        border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.AUTO_FACE) PrimaryPurple else BorderSubtle)
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.LEFT,
                         onClick = { viewModel.setCropPlacement(CropPlacement.LEFT) },
-                        label = { Text("👈 Left (16%)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                        label = { Text("👈 Left Focus (16%)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
                             selectedLabelColor = Color.White
-                        )
+                        ),
+                        border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.LEFT) PrimaryPurple else BorderSubtle)
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.CENTER,
@@ -894,16 +974,18 @@ fun CustomClipperView(
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
                             selectedLabelColor = Color.White
-                        )
+                        ),
+                        border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.CENTER) PrimaryPurple else BorderSubtle)
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.RIGHT,
                         onClick = { viewModel.setCropPlacement(CropPlacement.RIGHT) },
-                        label = { Text("👉 Right (84%)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                        label = { Text("👉 Right Focus (84%)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
                             selectedLabelColor = Color.White
-                        )
+                        ),
+                        border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.RIGHT) PrimaryPurple else BorderSubtle)
                     )
                     FilterChip(
                         selected = currentPlacement == CropPlacement.CUSTOM,
@@ -912,7 +994,8 @@ fun CustomClipperView(
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
                             selectedLabelColor = Color.White
-                        )
+                        ),
+                        border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.CUSTOM) PrimaryPurple else BorderSubtle)
                     )
                 }
 
@@ -932,131 +1015,16 @@ fun CustomClipperView(
                     onValueChange = { viewModel.setCropHorizontalOffset(it) },
                     valueRange = 0.0f..1.0f,
                     colors = SliderDefaults.colors(
-                        thumbColor = PrimaryPurple,
-                        activeTrackColor = PrimaryPurple
-                    )
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("0% (Far Left)", fontSize = 10.sp, color = TextSecondary)
-                    Text("50% (Exact Center)", fontSize = 10.sp, color = TextSecondary)
-                    Text("100% (Far Right)", fontSize = 10.sp, color = TextSecondary)
-                }
-            }
-        }
-
-        // ----------------------------------------------------
-        // 3. DURATION PRESETS & SCRUBBER
-        // ----------------------------------------------------
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = CardDark),
-            shape = RoundedCornerShape(24.dp),
-            border = BorderStroke(1.dp, BorderSubtle)
-        ) {
-            Column(modifier = Modifier.padding(18.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "Target Clip Duration",
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary,
-                            fontSize = 16.sp
-                        )
-                        Text(
-                            text = "Choose viral platform duration or scrub range",
-                            color = TextSecondary,
-                            fontSize = 11.sp
-                        )
-                    }
-                    Surface(
-                        color = if (durationSec in 15f..60f) SuccessGreen.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(1.dp, if (durationSec in 15f..60f) SuccessGreen.copy(alpha = 0.5f) else Color.Transparent)
-                    ) {
-                        Text(
-                            text = "✂️ ${String.format("%.1f", durationSec)}s Total",
-                            color = if (durationSec in 15f..60f) SuccessGreen else TextPrimary,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Quick Preset Duration Chips
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    listOf(
-                        15f to "🎵 15s (TikTok)",
-                        30f to "🔥 30s (Viral)",
-                        45f to "⏱️ 45s (Reels)",
-                        60f to "🧠 60s (Deep)"
-                    ).forEach { (dur, label) ->
-                        FilterChip(
-                            selected = kotlin.math.abs(durationSec - dur) < 1.0f,
-                            onClick = { viewModel.setPresetDuration(dur) },
-                            label = { Text(label, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
-                                selectedLabelColor = Color.White
-                            )
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Start Time Scrubber Bar
-                Text("Start Point: ${formatSec(startSec)}", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Slider(
-                    value = startSec,
-                    onValueChange = { newStart ->
-                        viewModel.updateTrimRange(newStart, endSec)
-                        exoPlayerInstance?.seekTo((newStart * 1000).toLong())
-                        ytControllerInstance?.seekTo(newStart)
-                    },
-                    valueRange = 0f..totalDurationSec,
-                    colors = SliderDefaults.colors(
-                        thumbColor = PrimaryPurple,
-                        activeTrackColor = PrimaryPurple
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                // End Time Scrubber Bar
-                Text("End Point: ${formatSec(endSec)}", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Slider(
-                    value = endSec,
-                    onValueChange = { newEnd ->
-                        viewModel.updateTrimRange(startSec, newEnd)
-                        exoPlayerInstance?.seekTo((newEnd * 1000).toLong())
-                        ytControllerInstance?.seekTo(newEnd)
-                    },
-                    valueRange = 0f..totalDurationSec,
-                    colors = SliderDefaults.colors(
                         thumbColor = AccentCyan,
-                        activeTrackColor = AccentCyan
+                        activeTrackColor = AccentCyan,
+                        inactiveTrackColor = Color(0xFF1E293B)
                     )
                 )
             }
         }
 
         // ----------------------------------------------------
-        // 4. CLIP CAPTION OVERLAY & VIRAL HOOKS
+        // 3. CLIP CAPTION OVERLAY & VIRAL HOOKS
         // ----------------------------------------------------
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -1129,7 +1097,7 @@ fun CustomClipperView(
         }
 
         // ----------------------------------------------------
-        // 5. HARDWARE RENDER CTA BUTTON
+        // 4. HARDWARE RENDER CTA BUTTON
         // ----------------------------------------------------
         Button(
             onClick = { viewModel.startRenderShort(context.cacheDir) },
