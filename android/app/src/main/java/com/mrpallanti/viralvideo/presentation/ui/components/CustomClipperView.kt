@@ -407,10 +407,9 @@ fun CustomClipperView(
                                 containerColor = BgDark,
                                 labelColor = TextSecondary
                             ),
-                            border = FilterChipDefaults.filterChipBorder(
-                                borderColor = if (isSelected) AccentCyan else BorderSubtle,
-                                selectedBorderColor = AccentCyan,
-                                borderWidth = if (isSelected) 1.5.dp else 1.dp
+                            border = BorderStroke(
+                                width = if (isSelected) 1.5.dp else 1.dp,
+                                color = if (isSelected) AccentCyan else BorderSubtle
                             )
                         )
                     }

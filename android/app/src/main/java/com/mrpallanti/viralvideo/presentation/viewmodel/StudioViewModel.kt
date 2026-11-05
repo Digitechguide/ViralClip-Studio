@@ -10,6 +10,7 @@ import com.mrpallanti.viralvideo.domain.model.RenderJob
 import com.mrpallanti.viralvideo.domain.model.TextOverlayPosition
 import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
+import com.mrpallanti.viralvideo.domain.model.VideoQuality
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import com.mrpallanti.viralvideo.domain.model.WatermarkPosition
 import com.mrpallanti.viralvideo.domain.repository.AuthRepository
