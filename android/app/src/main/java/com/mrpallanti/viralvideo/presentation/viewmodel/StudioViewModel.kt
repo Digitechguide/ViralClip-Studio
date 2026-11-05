@@ -142,7 +142,7 @@ class StudioViewModel(
                     }
                     if (!pendingUrl.isNullOrBlank()) {
                         onUrlChanged(pendingUrl)
-                        fetchAndAnalyze(pendingUrl)
+                        loadVideoForManualCropping(pendingUrl)
                     }
                 },
                 onFailure = { err ->
@@ -175,7 +175,7 @@ class StudioViewModel(
     fun handleIncomingSharedUrl(sharedUrl: String) {
         if (_uiState.value.isLoggedIn) {
             onUrlChanged(sharedUrl)
-            fetchAndAnalyze(sharedUrl)
+            loadVideoForManualCropping(sharedUrl)
         } else {
             _uiState.update { it.copy(pendingSharedUrl = sharedUrl) }
         }
@@ -350,116 +350,26 @@ class StudioViewModel(
             localUri = uriString,
             streamUrl = uriString
         )
+        val defaultEnd = minOf(30f, metadata.durationSeconds.toFloat().coerceAtLeast(10f))
 
-        _uiState.update {
-            it.copy(
+        _uiState.update { state ->
+            state.copy(
                 currentVideo = metadata,
                 showVideoPickerPrompt = false,
-                isLoading = true,
-                loadingMessage = "Analyzing virality hooks for local video..."
-            )
-        }
-
-        viewModelScope.launch {
-            analyzeViralHooksUseCase(
-                title = metadata.title,
-                totalDurationSeconds = metadata.durationSeconds
-            ).fold(
-                onSuccess = { clips ->
-                    val firstClip = clips.firstOrNull()
-                    _uiState.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            viralClips = clips,
-                            selectedClip = firstClip,
-                            trimRange = firstClip?.let { TrimRange(it.startSeconds, it.endSeconds) }
-                                ?: TrimRange(0f, 30f),
-                            hookText = firstClip?.captionOverlay ?: "WAIT TILL THE END... 🤯",
-                            overlayConfig = state.overlayConfig.copy(
-                                customText = firstClip?.captionOverlay ?: state.overlayConfig.customText
-                            ),
-                            successMessage = "Loaded local video! ${clips.size} viral hooks suggested."
-                        )
-                    }
-                },
-                onFailure = { err ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "AI Hook error: ${err.message}"
-                        )
-                    }
-                }
+                isLoading = false,
+                currentTab = StudioTab.CLIPPER,
+                trimRange = TrimRange(0f, defaultEnd),
+                hookText = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" },
+                overlayConfig = state.overlayConfig.copy(
+                    customText = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" }
+                ),
+                successMessage = "Loaded local video! Choose length & place below."
             )
         }
     }
 
     fun fetchAndAnalyze(url: String = _uiState.value.urlInput) {
-        if (url.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Please enter a YouTube URL") }
-            return
-        }
-
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    isLoading = true,
-                    loadingMessage = "Extracting video details & streams...",
-                    errorMessage = null
-                )
-            }
-
-            extractYoutubeStreamUseCase(url).fold(
-                onSuccess = { metadata ->
-                    _uiState.update {
-                        it.copy(
-                            currentVideo = metadata,
-                            loadingMessage = "Analyzing virality & retention curve with Gemini AI..."
-                        )
-                    }
-
-                    // Run AI Virality Analysis
-                    analyzeViralHooksUseCase(
-                        title = metadata.title,
-                        totalDurationSeconds = metadata.durationSeconds
-                    ).fold(
-                        onSuccess = { clips ->
-                            val firstClip = clips.firstOrNull()
-                            _uiState.update { state ->
-                                state.copy(
-                                    isLoading = false,
-                                    viralClips = clips,
-                                    selectedClip = firstClip,
-                                    trimRange = firstClip?.let { TrimRange(it.startSeconds, it.endSeconds) }
-                                        ?: TrimRange(0f, 30f),
-                                    hookText = firstClip?.captionOverlay ?: "WAIT TILL THE END... 🤯",
-                                    overlayConfig = state.overlayConfig.copy(
-                                        customText = firstClip?.captionOverlay ?: state.overlayConfig.customText
-                                    ),
-                                    successMessage = "Analyzed with ${clips.size} viral clips ready!"
-                                )
-                            }
-                        },
-                        onFailure = { err ->
-                            _uiState.update {
-                                it.copy(
-                                    isLoading = false,
-                                    errorMessage = "AI Hook error: ${err.message}"
-                                )
-                            }
-                        }
-                    )
-                },
-                onFailure = { err ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = err.message ?: "Failed to load video"
-                        )
-                    }
-                }
-            )
-        }
+        loadVideoForManualCropping(url)
     }
 
     fun loadVideoForManualCropping(url: String = _uiState.value.urlInput, cacheDir: File? = null) {

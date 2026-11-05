@@ -63,7 +63,7 @@ fun StudioBottomNavigationBar(
             },
             label = {
                 Text(
-                    text = "AI Studio",
+                    text = "Studio",
                     fontSize = 11.sp,
                     fontWeight = if (currentTab == StudioTab.STUDIO) FontWeight.ExtraBold else FontWeight.Medium,
                     color = if (currentTab == StudioTab.STUDIO) Color.White else TextSecondary

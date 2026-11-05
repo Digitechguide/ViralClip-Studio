@@ -411,92 +411,68 @@ fun StudioScreen(
 
                                 Spacer(modifier = Modifier.height(14.dp))
 
-                                // DUAL CHOICE CREATOR ACTION CARDS
-                                // 1. AI Magic Hook Analysis Card
-                                Card(
+                                // Open Video Cropper Action Button
+                                Button(
+                                    onClick = { viewModel.loadVideoForManualCropping(cacheDir = context.cacheDir) },
+                                    enabled = !state.isLoading,
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                    shape = RoundedCornerShape(14.dp),
+                                    contentPadding = PaddingValues(0.dp),
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable(enabled = !state.isLoading) { viewModel.fetchAndAnalyze() },
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF16102E)),
-                                    shape = RoundedCornerShape(14.dp),
-                                    border = BorderStroke(1.dp, PrimaryPurple.copy(alpha = 0.7f))
+                                        .height(54.dp)
                                 ) {
-                                    Row(
-                                        modifier = Modifier.padding(14.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(
+                                                Brush.horizontalGradient(
+                                                    listOf(PrimaryPurple, AccentIndigo, AccentCyan)
+                                                ),
+                                                RoundedCornerShape(14.dp)
+                                            ),
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(42.dp)
-                                                .clip(CircleShape)
-                                                .background(PrimaryPurple.copy(alpha = 0.25f)),
-                                            contentAlignment = Alignment.Center
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
                                         ) {
                                             if (state.isLoading) {
                                                 CircularProgressIndicator(
                                                     modifier = Modifier.size(20.dp),
-                                                    color = PrimaryPurple,
+                                                    color = Color.White,
                                                     strokeWidth = 2.dp
                                                 )
+                                                Spacer(modifier = Modifier.width(10.dp))
+                                                Text(
+                                                    text = state.loadingMessage.ifBlank { "Loading Video..." },
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Color.White,
+                                                    fontSize = 14.sp
+                                                )
                                             } else {
-                                                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PrimaryPurple, modifier = Modifier.size(22.dp))
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text("Gemini AI Viral Hooks", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
+                                                Icon(
+                                                    imageVector = Icons.Default.ContentCut,
+                                                    contentDescription = null,
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = "Open Video Cropper & 9:16 Framing",
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    color = Color.White,
+                                                    fontSize = 14.sp
+                                                )
                                                 Spacer(modifier = Modifier.width(6.dp))
-                                                Surface(color = PrimaryPurple.copy(alpha = 0.3f), shape = RoundedCornerShape(4.dp)) {
-                                                    Text("AUTO", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PrimaryPurple, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp))
-                                                }
+                                                Icon(
+                                                    imageVector = Icons.Default.ArrowForward,
+                                                    contentDescription = null,
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
                                             }
-                                            Text(
-                                                text = if (state.isLoading) state.loadingMessage else "Scans speech transcript & ranks best viral hooks",
-                                                color = TextSecondary,
-                                                fontSize = 11.sp
-                                            )
                                         }
-                                        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = PrimaryPurple, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // 2. Custom Length & Place Cropper Card
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable(enabled = !state.isLoading) { viewModel.loadVideoForManualCropping(cacheDir = context.cacheDir) },
-                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF091426)),
-                                    shape = RoundedCornerShape(14.dp),
-                                    border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.7f))
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(14.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(42.dp)
-                                                .clip(CircleShape)
-                                                .background(AccentCyan.copy(alpha = 0.2f)),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(Icons.Default.ContentCut, contentDescription = null, tint = AccentCyan, modifier = Modifier.size(22.dp))
-                                        }
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Text("Manual Length & Place Cropper", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
-                                                Spacer(modifier = Modifier.width(6.dp))
-                                                Surface(color = AccentCyan.copy(alpha = 0.3f), shape = RoundedCornerShape(4.dp)) {
-                                                    Text("CUSTOM", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = AccentCyan, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp))
-                                                }
-                                            }
-                                            Text("Auto-caches offline for frame scrubbing & 9:16 place", color = TextSecondary, fontSize = 11.sp)
-                                        }
-                                        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = AccentCyan, modifier = Modifier.size(18.dp))
                                     }
                                 }
                             }
@@ -794,38 +770,6 @@ fun StudioScreen(
                                     }
                                 }
                             }
-                        }
-                    }
-
-                    // 4. Suggested AI Viral Clips
-                    if (state.viralClips.isNotEmpty()) {
-                        item {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "🔥 AI Viral Clip Recommendations (${state.viralClips.size})",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = TextPrimary,
-                                    fontSize = 16.sp
-                                )
-                                Text(
-                                    text = "Tap to apply",
-                                    color = PrimaryPurple,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-
-                        items(state.viralClips) { clip ->
-                            ViralClipCard(
-                                clip = clip,
-                                isSelected = state.selectedClip?.id == clip.id,
-                                onApply = { viewModel.applyClip(clip) }
-                            )
                         }
                     }
                 }

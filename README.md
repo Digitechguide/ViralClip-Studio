@@ -1,5 +1,5 @@
 # ViralClip Studio ⚡
-> Turn Long Videos into High-Retention Viral Shorts & Reels with Gemini AI.
+> Turn Long Videos into High-Retention Viral Shorts & Reels with Precision Length & Place Cropping.
 
 [![Architecture & Flow](https://img.shields.io/badge/Architecture-PROJECT__ARCHITECTURE__AND__FLOW.md-blueviolet?style=for-the-badge)](PROJECT_ARCHITECTURE_AND_FLOW.md)
 [![Latest Release](https://img.shields.io/badge/Release-v1.0.50-success?style=for-the-badge)](https://viral.mrpallanti.in/ViralClip-Studio-v1.0.50.apk)
@@ -11,20 +11,18 @@
 
 ## 🌟 Key Features
 
-1. **AI Viral Hook & Segment Finder**:
-   - Analyzes video content, title, and context using **Google Gemini 1.5 Flash** (Free tier).
-   - Identifies high-retention segments with virality scores (e.g. 96%), retention hooks, hashtags, and why the segment works.
-   - **One-click "Apply Segment"**: snaps the trimmer timeline and seeks the video directly to the recommended viral clip.
+1. **Precision Duration Trimmer & Scrubber**:
+   - Micro-step precision (`-1s`, `+1s`, `-5s`, `+5s`) and zero-latency playhead scrub.
+   - Dedicated "Set Start & Pause" and "Set End & Pause" buttons that freeze the playhead instantaneously.
+   - Quick duration presets and real-time range preview.
 
-2. **Interactive Duration Trimmer**:
-   - Dual-handle draggable timeline trimmer for exact Start and End points.
-   - Quick duration presets: **15s**, **30s**, **45s**, **60s**, or custom second inputs.
-   - Live scrubber with real-time clip duration readouts.
+2. **9:16 Vertical Video Studio (Shorts / Reels / TikTok)**:
+   - Rule-of-thirds widescreen preview grid with dynamic sliding 9:16 crop window.
+   - **Smart Framing Modes**: Auto Face-Tracking (Google ML Kit), Left Speaker (16%), Solo Center (50%), Right Speaker (84%), or custom horizontal slider.
 
-3. **9:16 Vertical Video Studio (Shorts / Reels / TikTok)**:
-   - Realistic smartphone viewport preview.
-   - **Smart Framing Modes**: Center (Speaker focus), Left, Right, or Fit (with blurred background).
-   - Aspect ratio switcher: `9:16` (Shorts), `1:1` (Instagram Post), `16:9` (Landscape).
+3. **Custom Branding & Watermark Engine**:
+   - Transparent PNG custom logo overlay with adjustable scale and position.
+   - Dynamic text watermarks with opacity and placement controls.
 
 4. **Viral Caption & Hook Styler**:
    - Customizable on-screen text overlays (e.g., `WAIT FOR THIS PART... 🤯`).

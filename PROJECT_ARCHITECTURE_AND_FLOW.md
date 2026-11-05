@@ -10,7 +10,7 @@
 **ViralClip Studio** (`com.mrpallanti.viralvideo`) is a dual-platform application (Native Android App + Web Studio) designed to convert long-form horizontal videos (16:9 YouTube, Podcasts, Interviews, Game streams) into high-engagement vertical short-form videos (9:16 for YouTube Shorts, Instagram Reels, and TikTok).
 
 ### Key Features
-1. **Gemini AI Viral Hooks Analysis:** Automatically extracts video transcripts, analyzes emotional triggers, retention hooks, and punchlines using Google Gemini Flash, outputting recommended timestamps and viral captions.
+1. **Direct Video Loading & Auto-Caching:** Loads any YouTube URL or device gallery video with zero waiting; auto-caches offline via high-speed on-device `yt-dlp` to eliminate YouTube WebView Error 152.
 2. **Custom Length & Place Cropper:** Allows creators to manually scrub videos with micro-step precision (`-1s`, `+1s`, `-5s`, `+5s`), set start/end markers with instant timer pause, and choose horizontal crop placement (`Left Focus 16%`, `Solo Center 50%`, `Right Focus 84%`, `Custom Slider 0-100%`, or `Auto Face-Track`).
 3. **On-Device ML Kit Face Tracking:** Uses Google ML Kit Face Detection to follow the active speaker across 16:9 widescreen footage and automatically keep them centered inside the 9:16 vertical crop window.
 4. **Hardware-Accelerated On-Device Rendering:** Employs AndroidX Media3 Transformer to render and encode 1080x1920 60fps MP4 videos directly using on-device GPU/hardware encoders, saving them straight to the user's Phone Gallery (`DCIM/ViralClips`).
@@ -48,14 +48,10 @@ flowchart TD
         Host["https://viral.mrpallanti.in/\n(Apache + StackCDN + PHP 8)"]
         AuthAPI["api/auth.php (Session & User Auth)"]
         SyncAPI["api/sync_apk.php (Direct GitHub Release Sync)"]
-        SuggestAPI["api/suggest.php (AI Transcript & Virality Helper)"]
-        Gemini["Google Gemini 1.5 Flash API"]
         
         Data --> AuthAPI
-        Data --> Gemini
         Host --> AuthAPI
         Host --> SyncAPI
-        Host --> SuggestAPI
     end
 
     subgraph CI_CD ["CI / CD & Release Automation"]
@@ -131,23 +127,17 @@ flowchart TD
 
 ## 4. Key Engineering Workflows
 
-### Flow A: AI Viral Hooks Workflow
-1. User enters YouTube URL in **AI Studio** tab or selects local file from gallery.
-2. `StudioViewModel.fetchAndAnalyze()` is called.
-3. Audio/transcript is processed and evaluated by Gemini Flash for virality score (0–100), start/end timestamps, and hook text.
-4. UI presents ranked viral recommendation cards.
-5. Tapping a card populates the trim range and transitions into the **Clipper** view.
-
-### Flow B: Custom Length & Place Cropper Workflow
-1. User clicks **"Manual Length & Place Cropper"** or taps the **Clipper** tab.
-2. `StudioViewModel.loadVideoForManualCropping()` runs:
-   - If the video is not cached locally, the on-device `yt-dlp` engine **auto-downloads** the 1080p stream to `context.cacheDir`.
+### Flow: Creator-Controlled Precision Cropper & Framing Workflow
+1. User enters YouTube URL in **Studio** tab or selects local file from gallery.
+2. Clicking **"Open Video Cropper & 9:16 Framing"** immediately invokes `StudioViewModel.loadVideoForManualCropping()`:
+   - For YouTube videos, the on-device `yt-dlp` engine **auto-downloads** the 1080p stream to `context.cacheDir`.
    - The UI shows an animated **"Auto-Caching Video Offline..."** indicator, bypassing YouTube WebView Error 152.
+   - For local videos, it loads into `InAppVideoPlayer` (ExoPlayer) instantly.
 3. Once cached, `InAppVideoPlayer` (ExoPlayer) loads the MP4 locally:
    - Playhead scrub has **0 buffering** and runs at 60fps.
    - Clicking **"Set Start & Pause"** or **"Set End & Pause"** immediately pauses ExoPlayer, sets `isPlaybackPaused = true`, seeks to the exact position, and updates the timestamp marker.
 4. User selects framing placement:
-   - `🤖 Auto Face-Track`: Continuously tracks speaker with ML Kit.
+   - `🤖 Auto Face-Track`: Continuously tracks speaker with ML Kit Face Detection.
    - `👈 Left (16%)` | `🎯 Center (50%)` | `👉 Right (84%)`: Standard interview/podcast presets.
    - `🎚️ Custom Slider`: Smooth horizontal offset (0.0 to 1.0).
 5. User clicks **"Export Vertical Short"**:
