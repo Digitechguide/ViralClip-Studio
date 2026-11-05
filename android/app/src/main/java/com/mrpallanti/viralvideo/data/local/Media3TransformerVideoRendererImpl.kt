@@ -95,10 +95,11 @@ class Media3TransformerVideoRendererImpl(
             val leftNdc = (centerNdc - halfCropWidthNdc).coerceIn(-1.0f, maxLeftNdc)
             val rightNdc = leftNdc + (2.0f * halfCropWidthNdc)
 
+            val quality = overlayConfig.videoQuality
             val cropEffect = Crop(leftNdc, rightNdc, -1.0f, 1.0f)
             val presentationEffect = Presentation.createForWidthAndHeight(
-                1080,
-                1920,
+                quality.width,
+                quality.height,
                 Presentation.LAYOUT_SCALE_TO_FIT
             )
 
@@ -116,8 +117,8 @@ class Media3TransformerVideoRendererImpl(
 
             val overlayBitmap = VideoOverlayHelper.createOverlayBitmap(
                 context = context,
-                width = 1080,
-                height = 1920,
+                width = quality.width,
+                height = quality.height,
                 hookText = hookText,
                 overlayConfig = overlayConfig
             )

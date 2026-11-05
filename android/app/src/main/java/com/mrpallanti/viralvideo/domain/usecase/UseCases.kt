@@ -5,6 +5,7 @@ import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
 import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
+import com.mrpallanti.viralvideo.domain.model.VideoQuality
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
 import com.mrpallanti.viralvideo.domain.repository.GeneratedShortsRepository
@@ -30,12 +31,13 @@ class DownloadYoutubeVideoUseCase(
     suspend operator fun invoke(
         url: String,
         outputDir: File,
+        targetQuality: VideoQuality = VideoQuality.FULL_HD_1080P,
         onProgress: (Float, String) -> Unit = { _, _ -> }
     ): Result<File> {
         if (url.isBlank()) {
             return Result.failure(IllegalArgumentException("URL cannot be empty"))
         }
-        return repository.downloadDirectVideo(url.trim(), outputDir, onProgress)
+        return repository.downloadDirectVideo(url.trim(), outputDir, targetQuality, onProgress)
     }
 }
 

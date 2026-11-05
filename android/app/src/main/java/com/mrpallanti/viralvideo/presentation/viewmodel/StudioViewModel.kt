@@ -63,6 +63,9 @@ data class StudioUiState(
     // Custom Overlay & Branding
     val overlayConfig: OverlayConfig = OverlayConfig(),
 
+    // Selected Output Video Quality
+    val selectedQuality: VideoQuality = VideoQuality.FULL_HD_1080P,
+
     // Recently Generated Videos
     val recentShorts: List<GeneratedShortItem> = emptyList(),
     val playingShort: GeneratedShortItem? = null,
@@ -433,6 +436,7 @@ class StudioViewModel(
                         val dlResult = downloadYoutubeVideoUseCase(
                             url = effectiveUrl,
                             outputDir = cacheDir,
+                            targetQuality = _uiState.value.selectedQuality,
                             onProgress = { progress, status ->
                                 _uiState.update {
                                     it.copy(
@@ -534,6 +538,92 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
         """.trimIndent()
     }
 
+    fun setVideoQuality(quality: VideoQuality, cacheDir: File) {
+        _uiState.update {
+            it.copy(
+                selectedQuality = quality,
+                overlayConfig = it.overlayConfig.copy(videoQuality = quality)
+            )
+        }
+
+        val video = _uiState.value.currentVideo ?: return
+        if (video.id.startsWith("local_")) {
+            _uiState.update { it.copy(successMessage = "Output quality set to ${quality.label}") }
+            return
+        }
+
+        // Check if file is already cached at this quality on disk
+        val qualityTag = "${quality.targetHeight}p"
+        val expectedFile = File(cacheDir, "${video.id}_${qualityTag}.mp4")
+        if (expectedFile.exists() && expectedFile.length() > 500_000) {
+            _uiState.update {
+                it.copy(
+                    currentVideo = video.copy(localUri = expectedFile.absolutePath, streamUrl = expectedFile.absolutePath),
+                    successMessage = "Loaded cached ${quality.label} video!"
+                )
+            }
+            return
+        }
+
+        // Recache video from YouTube at selected quality
+        recacheVideoForQuality(quality, cacheDir)
+    }
+
+    fun recacheVideoForQuality(quality: VideoQuality, cacheDir: File) {
+        val state = _uiState.value
+        val video = state.currentVideo ?: return
+        if (video.id.startsWith("local_")) return
+
+        val dlUrl = state.urlInput.ifBlank { "https://www.youtube.com/watch?v=${video.id}" }
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    loadingMessage = "Caching ${quality.label} stream via on-device engine...",
+                    errorMessage = null
+                )
+            }
+
+            val dlResult = downloadYoutubeVideoUseCase(
+                url = dlUrl,
+                outputDir = cacheDir,
+                targetQuality = quality,
+                onProgress = { progress, status ->
+                    _uiState.update {
+                        it.copy(
+                            loadingMessage = if (progress in 1f..99f) {
+                                "Downloading ${quality.label}: ${progress.toInt()}%..."
+                            } else {
+                                status
+                            }
+                        )
+                    }
+                }
+            )
+
+            dlResult.fold(
+                onSuccess = { file ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            currentVideo = it.currentVideo?.copy(localUri = file.absolutePath, streamUrl = file.absolutePath),
+                            successMessage = "Ready in ${quality.label}! Crisp frame scrubbing enabled."
+                        )
+                    }
+                },
+                onFailure = { err ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Recache note: ${err.message?.lines()?.firstOrNull() ?: "Could not download stream"}"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
     fun cacheVideoForPlayback(cacheDir: File) {
         val state = _uiState.value
         val video = state.currentVideo ?: return
@@ -552,6 +642,7 @@ Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
             val dlResult = downloadYoutubeVideoUseCase(
                 url = dlUrl,
                 outputDir = cacheDir,
+                targetQuality = state.selectedQuality,
                 onProgress = { progress, status ->
                     _uiState.update {
                         it.copy(

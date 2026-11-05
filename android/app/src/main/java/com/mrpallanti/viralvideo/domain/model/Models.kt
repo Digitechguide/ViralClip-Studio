@@ -47,6 +47,20 @@ enum class TextOverlayPosition {
 }
 
 @Serializable
+enum class VideoQuality(
+    val label: String,
+    val shortLabel: String,
+    val width: Int,
+    val height: Int,
+    val targetHeight: Int
+) {
+    FULL_HD_1080P("1080p Full HD", "1080p", 1080, 1920, 1080),
+    HD_720P("720p HD", "720p", 720, 1280, 720),
+    QUAD_HD_1440P("1440p 2K QHD", "2K", 1440, 2560, 1440),
+    SD_480P("480p SD", "480p", 480, 854, 480)
+}
+
+@Serializable
 enum class CropPlacement {
     AUTO_FACE, // AI Face-Centered Auto Framing
     LEFT,      // Left side of 16:9 frame (0.16)
@@ -66,7 +80,8 @@ data class OverlayConfig(
     val watermarkPosition: WatermarkPosition = WatermarkPosition.TOP_RIGHT,
     val watermarkOpacity: Float = 0.85f,
     val cropPlacement: CropPlacement = CropPlacement.AUTO_FACE,
-    val cropHorizontalOffset: Float = 0.50f
+    val cropHorizontalOffset: Float = 0.50f,
+    val videoQuality: VideoQuality = VideoQuality.FULL_HD_1080P
 )
 
 @Serializable

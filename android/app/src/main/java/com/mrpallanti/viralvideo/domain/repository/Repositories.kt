@@ -5,6 +5,7 @@ import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
 import com.mrpallanti.viralvideo.domain.model.TrimRange
 import com.mrpallanti.viralvideo.domain.model.VideoMetadata
+import com.mrpallanti.viralvideo.domain.model.VideoQuality
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import kotlinx.coroutines.flow.Flow
 import java.io.File
@@ -14,6 +15,7 @@ interface VideoStreamRepository {
     suspend fun downloadDirectVideo(
         url: String,
         outputDir: File,
+        targetQuality: VideoQuality = VideoQuality.FULL_HD_1080P,
         onProgress: (Float, String) -> Unit
     ): Result<File>
 }

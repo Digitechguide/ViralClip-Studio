@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.exoplayer.ExoPlayer
 import com.mrpallanti.viralvideo.domain.model.CropPlacement
+import com.mrpallanti.viralvideo.domain.model.VideoQuality
 import com.mrpallanti.viralvideo.presentation.ui.theme.*
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioViewModel
@@ -200,10 +201,11 @@ fun CustomClipperView(
 
                     Surface(
                         color = if (hasLocalFile) SuccessGreen.copy(alpha = 0.15f) else PrimaryPurple.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, if (hasLocalFile) SuccessGreen.copy(alpha = 0.4f) else PrimaryPurple.copy(alpha = 0.4f))
                     ) {
                         Text(
-                            text = if (hasLocalFile) "🟢 1080p Offline" else "🌐 Live Stream",
+                            text = if (hasLocalFile) "🟢 ${state.selectedQuality.shortLabel} Ready" else "📥 Caching ${state.selectedQuality.shortLabel}...",
                             color = if (hasLocalFile) SuccessGreen else PrimaryPurple,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
@@ -330,6 +332,87 @@ fun CustomClipperView(
                         ) {
                             Text("No playable stream available", color = TextSecondary, fontSize = 13.sp)
                         }
+                    }
+                }
+
+                // ----------------------------------------------------
+                // Output Resolution & Cache Quality Selector Chips
+                // ----------------------------------------------------
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.HighQuality,
+                            contentDescription = null,
+                            tint = AccentCyan,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Output Quality & Cache:",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                    }
+                    Text(
+                        text = "${state.selectedQuality.width}x${state.selectedQuality.height}",
+                        fontSize = 11.sp,
+                        color = AccentCyan,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    VideoQuality.values().forEach { quality ->
+                        val isSelected = state.selectedQuality == quality
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                if (!isSelected) {
+                                    viewModel.setVideoQuality(quality, context.cacheDir)
+                                }
+                            },
+                            label = {
+                                Text(
+                                    text = quality.label,
+                                    fontSize = 12.sp,
+                                    fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium
+                                )
+                            },
+                            leadingIcon = if (isSelected) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(14.dp),
+                                        tint = AccentCyan
+                                    )
+                                }
+                            } else null,
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = AccentCyan.copy(alpha = 0.2f),
+                                selectedLabelColor = Color.White,
+                                containerColor = BgDark,
+                                labelColor = TextSecondary
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                borderColor = if (isSelected) AccentCyan else BorderSubtle,
+                                selectedBorderColor = AccentCyan,
+                                borderWidth = if (isSelected) 1.5.dp else 1.dp
+                            )
+                        )
                     }
                 }
 
@@ -1094,7 +1177,7 @@ fun CustomClipperView(
                         Icon(Icons.Default.Movie, contentDescription = null, tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Export 9:16 Custom Short (${String.format("%.0f", durationSec)}s)",
+                            text = "Export 9:16 Short (${String.format("%.0f", durationSec)}s • ${state.selectedQuality.shortLabel})",
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
                             fontSize = 15.sp

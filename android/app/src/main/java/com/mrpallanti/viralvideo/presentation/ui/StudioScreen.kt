@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mrpallanti.viralvideo.domain.model.VideoQuality
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import com.mrpallanti.viralvideo.presentation.ui.components.BrandingOverlayView
 import com.mrpallanti.viralvideo.presentation.ui.components.CustomClipperView
@@ -406,6 +407,54 @@ fun StudioScreen(
                                                 fontWeight = FontWeight.Bold
                                             )
                                         }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // Video Quality Preference Selector
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Target Render Quality:",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextSecondary
+                                    )
+                                    Text(
+                                        text = state.selectedQuality.label,
+                                        fontSize = 11.sp,
+                                        color = AccentCyan,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    VideoQuality.values().forEach { quality ->
+                                        val isSelected = state.selectedQuality == quality
+                                        FilterChip(
+                                            selected = isSelected,
+                                            onClick = { viewModel.setVideoQuality(quality, context.cacheDir) },
+                                            label = {
+                                                Text(
+                                                    text = quality.shortLabel,
+                                                    fontSize = 12.sp,
+                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                                )
+                                            },
+                                            colors = FilterChipDefaults.filterChipColors(
+                                                selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                                                selectedLabelColor = Color.White
+                                            )
+                                        )
                                     }
                                 }
 

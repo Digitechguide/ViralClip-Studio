@@ -119,6 +119,7 @@ class YoutubeStreamExtractorImpl(
     override suspend fun downloadDirectVideo(
         url: String,
         outputDir: File,
+        targetQuality: com.mrpallanti.viralvideo.domain.model.VideoQuality,
         onProgress: (Float, String) -> Unit
     ): Result<File> = withContext(Dispatchers.IO) {
         try {
@@ -127,11 +128,12 @@ class YoutubeStreamExtractorImpl(
             }
 
             val videoId = extractVideoId(url) ?: "video_${System.currentTimeMillis()}"
-            val expectedOutputFile = File(outputDir, "${videoId}.mp4")
+            val qualityTag = "${targetQuality.targetHeight}p"
+            val expectedOutputFile = File(outputDir, "${videoId}_${qualityTag}.mp4")
 
-            // Check if already downloaded and valid
+            // Check if already downloaded at this specific quality and valid
             if (expectedOutputFile.exists() && expectedOutputFile.length() > 500_000) {
-                onProgress(100f, "Cached video ready!")
+                onProgress(100f, "Cached ${targetQuality.label} video ready!")
                 return@withContext Result.success(expectedOutputFile)
             }
 
@@ -144,33 +146,40 @@ class YoutubeStreamExtractorImpl(
             }
 
             fun createYtDlpRequest(): YoutubeDLRequest {
+                val h = targetQuality.targetHeight
+                // Prioritize crisp MP4 video + M4A audio, fallback to bestvideo+bestaudio merged
+                val formatSelector = if (h >= 720) {
+                    "bestvideo[height<=$h][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=$h]+bestaudio/best[height<=$h]/bestvideo+bestaudio/best"
+                } else {
+                    "bestvideo[height<=$h]+bestaudio/best[height<=$h]/best"
+                }
+
                 return YoutubeDLRequest(url).apply {
-                    // Best video up to 1080p + best audio, automatically muxed into mp4
-                    addOption("-f", "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best")
+                    addOption("-f", formatSelector)
                     addOption("--merge-output-format", "mp4")
-                    addOption("-o", File(outputDir, "${videoId}.%(ext)s").absolutePath)
+                    addOption("-o", File(outputDir, "${videoId}_${qualityTag}.%(ext)s").absolutePath)
                     addOption("--no-mtime")
                     addOption("--no-playlist")
                     addOption("--force-overwrites")
                     addOption("--no-warnings")
                     addOption("--no-check-certificates")
-                    // Android client emulation bypasses YouTube Botguard / PO-token challenges on mobile IPs
-                    addOption("--extractor-args", "youtube:player_client=android,web")
+                    // iOS client gives clean 1080p/720p H264 MP4 streams with zero botguard throttling
+                    addOption("--extractor-args", "youtube:player_client=ios,web,android")
                 }
             }
 
-            onProgress(5f, "Connecting to YouTube stream via embedded engine...")
+            onProgress(5f, "Downloading ${targetQuality.label} stream via on-device engine...")
 
             var executionOutput = ""
             try {
-                val response = YoutubeDL.getInstance().execute(createYtDlpRequest(), "dl_$videoId") { progress, etaInSeconds, line ->
-                    val statusText = line ?: "Downloading... ${progress.toInt()}%"
+                val response = YoutubeDL.getInstance().execute(createYtDlpRequest(), "dl_${videoId}_${qualityTag}") { progress, etaInSeconds, line ->
+                    val statusText = line ?: "Downloading ${targetQuality.label}... ${progress.toInt()}%"
                     onProgress(progress.coerceIn(0f, 100f), statusText)
                 }
                 executionOutput = response.out ?: ""
             } catch (initialErr: Throwable) {
                 Log.w("YoutubeStreamExtractor", "First attempt hit warning/error: ${initialErr.message}. Triggering yt-dlp update...")
-                onProgress(10f, "Updating on-device yt-dlp engine to latest version...")
+                onProgress(10f, "Updating on-device engine for ${targetQuality.label}...")
                 try {
                     val updateResult = YoutubeDL.getInstance().updateYoutubeDL(context, YoutubeDL.UpdateChannel.STABLE)
                     Log.d("YoutubeStreamExtractor", "Dynamic update completed: $updateResult")
@@ -178,22 +187,23 @@ class YoutubeStreamExtractorImpl(
                     Log.w("YoutubeStreamExtractor", "Update attempt note: ${updateErr.message}")
                 }
 
-                onProgress(15f, "Retrying direct download with latest engine...")
-                val retryResponse = YoutubeDL.getInstance().execute(createYtDlpRequest(), "dl_${videoId}_retry") { progress, etaInSeconds, line ->
-                    val statusText = line ?: "Downloading... ${progress.toInt()}%"
+                onProgress(15f, "Retrying ${targetQuality.label} download...")
+                val retryResponse = YoutubeDL.getInstance().execute(createYtDlpRequest(), "dl_${videoId}_${qualityTag}_retry") { progress, etaInSeconds, line ->
+                    val statusText = line ?: "Downloading ${targetQuality.label}... ${progress.toInt()}%"
                     onProgress(progress.coerceIn(0f, 100f), statusText)
                 }
                 executionOutput = retryResponse.out ?: ""
             }
 
             if (expectedOutputFile.exists() && expectedOutputFile.length() > 50_000) {
-                onProgress(100f, "Download complete!")
+                onProgress(100f, "Download complete (${targetQuality.label})!")
                 Result.success(expectedOutputFile)
             } else {
-                // Find any matching file in directory starting with videoId
-                val matched = outputDir.listFiles()?.firstOrNull { it.name.startsWith(videoId) && it.length() > 50_000 }
+                // Find any matching file in directory starting with videoId and qualityTag
+                val matched = outputDir.listFiles()?.firstOrNull { it.name.startsWith("${videoId}_${qualityTag}") && it.length() > 50_000 }
+                    ?: outputDir.listFiles()?.firstOrNull { it.name.startsWith(videoId) && it.length() > 50_000 }
                 if (matched != null) {
-                    onProgress(100f, "Download complete!")
+                    onProgress(100f, "Download complete (${targetQuality.label})!")
                     Result.success(matched)
                 } else {
                     Result.failure(Exception("Download failed: output file not found. Response: $executionOutput"))
