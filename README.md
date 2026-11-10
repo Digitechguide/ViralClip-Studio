@@ -1,11 +1,13 @@
 # ViralClip Studio ⚡
 > Turn Long Videos into High-Retention Viral Shorts & Reels with Precision Length & Place Cropping.
 
+[![AI Memory & Runbook](https://img.shields.io/badge/AI__Memory-AI__MEMORY.md-purple?style=for-the-badge)](AI_MEMORY.md)
 [![Architecture & Flow](https://img.shields.io/badge/Architecture-PROJECT__ARCHITECTURE__AND__FLOW.md-blueviolet?style=for-the-badge)](PROJECT_ARCHITECTURE_AND_FLOW.md)
-[![Latest Release](https://img.shields.io/badge/Release-v1.0.50-success?style=for-the-badge)](https://viral.mrpallanti.in/ViralClip-Studio-v1.0.50.apk)
+[![Latest Release](https://img.shields.io/badge/Release-v1.0.58-success?style=for-the-badge)](https://viral.mrpallanti.in/ViralClip-Studio-v1.0.58.apk)
 [![Live Production](https://img.shields.io/badge/Live-viral.mrpallanti.in-cyan?style=for-the-badge)](https://viral.mrpallanti.in/)
 
-> 📖 **Developer / AI Memory & System Flow:** See [PROJECT_ARCHITECTURE_AND_FLOW.md](PROJECT_ARCHITECTURE_AND_FLOW.md) for full architectural blueprints, data flow diagrams, clean architecture specifications, CI/CD pipeline, and deployment instructions.
+> 🧠 **AI Memory & Cross-Device Guide:** See [AI_MEMORY.md](AI_MEMORY.md) for full context, environment setup, solved gotchas, and automated deployment runbooks.
+> 📖 **Architecture & Flow:** See [PROJECT_ARCHITECTURE_AND_FLOW.md](PROJECT_ARCHITECTURE_AND_FLOW.md) for comprehensive system design and technical specifications.
 
 ---
 

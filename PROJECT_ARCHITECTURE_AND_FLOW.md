@@ -16,6 +16,10 @@
 4. **Hardware-Accelerated On-Device Rendering:** Employs AndroidX Media3 Transformer to render and encode 1080x1920 60fps MP4 videos directly using on-device GPU/hardware encoders, saving them straight to the user's Phone Gallery (`DCIM/ViralClips`).
 5. **Branding & Watermark Engine:** Adds custom transparent PNG logos, customizable watermarks (opacity & position), and viral hook captions with configurable color schemes.
 6. **Recent Shorts Library:** Local persistent history of generated shorts with in-app playback, file size metrics, and one-tap Android system share.
+7. **Multi-Resolution Quality Selector:** Lets creators select target video quality (`1080p Full HD`, `720p HD`, `1440p 2K QHD`, `480p SD`). The app dynamically re-caches the source video at the chosen resolution and encodes the vertical short to that exact dimension.
+8. **Real-Time Seek Scrubber & Animated Framing:** Smooth interactive slider for frame scrubbing with animated 9:16 crop window motion via `animateFloatAsState`.
+
+> 🧠 **Quick AI Memory & Device Transfer:** Refer to [AI_MEMORY.md](AI_MEMORY.md) for quick-start rules, environment constraints, and release procedures.
 
 ---
 
