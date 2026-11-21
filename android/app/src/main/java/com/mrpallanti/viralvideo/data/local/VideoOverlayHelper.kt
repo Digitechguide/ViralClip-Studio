@@ -12,6 +12,7 @@ import android.net.Uri
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
+import com.mrpallanti.viralvideo.domain.model.EditorialStyle
 import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.TextOverlayPosition
 import com.mrpallanti.viralvideo.domain.model.WatermarkPosition
@@ -150,12 +151,30 @@ object VideoOverlayHelper {
         config: OverlayConfig
     ) {
         val maxTextWidth = 900
+        val style = config.editorialStyle
+
+        val textColor = when (style) {
+            EditorialStyle.STREET -> Color.parseColor("#0A0A0A")
+            EditorialStyle.CINEMA -> Color.parseColor("#FDE047")
+            EditorialStyle.EDITORIAL -> Color.parseColor("#F8FAFC")
+            EditorialStyle.NEWS -> Color.WHITE
+            EditorialStyle.CLASSIC -> try { Color.parseColor(config.textColorHex) } catch (e: Exception) { Color.WHITE }
+        }
+
+        val typeface = when (style) {
+            EditorialStyle.EDITORIAL -> Typeface.create(Typeface.SERIF, Typeface.BOLD)
+            EditorialStyle.STREET -> Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            else -> Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        }
+
         val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = try { Color.parseColor(config.textColorHex) } catch (e: Exception) { Color.WHITE }
-            textSize = 50f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            color = textColor
+            textSize = if (style == EditorialStyle.STREET) 54f else 50f
+            this.typeface = typeface
             textAlign = Paint.Align.CENTER
-            setShadowLayer(10f, 3f, 3f, Color.BLACK)
+            if (style != EditorialStyle.STREET) {
+                setShadowLayer(10f, 3f, 3f, Color.BLACK)
+            }
         }
 
         // StaticLayout for multi-line centered text wrapping
@@ -173,8 +192,8 @@ object VideoOverlayHelper {
         val layoutWidth = staticLayout.width
         val layoutHeight = staticLayout.height
 
-        val paddingH = 36f
-        val paddingV = 24f
+        val paddingH = if (style == EditorialStyle.STREET) 42f else 36f
+        val paddingV = if (style == EditorialStyle.NEWS) 32f else 24f
         val totalBoxW = (layoutWidth + paddingH * 2).coerceAtMost(width - 80f)
         val totalBoxH = layoutHeight + paddingV * 2
 
@@ -185,25 +204,91 @@ object VideoOverlayHelper {
             TextOverlayPosition.BOTTOM -> height - totalBoxH - 320f
         }
 
-        // Background pill
+        // 1. Optional CINEMA Letterbox bars
+        if (style == EditorialStyle.CINEMA) {
+            val letterboxPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.BLACK
+            }
+            canvas.drawRect(0f, 0f, width.toFloat(), 120f, letterboxPaint)
+            canvas.drawRect(0f, height - 120f, width.toFloat(), height.toFloat(), letterboxPaint)
+        }
+
+        // 2. Background pill styling
         val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = try {
-                Color.parseColor(config.textBgColorHex)
-            } catch (e: Exception) {
-                Color.argb(200, 10, 10, 15)
+            color = when (style) {
+                EditorialStyle.STREET -> Color.parseColor("#FFE600")
+                EditorialStyle.EDITORIAL -> Color.argb(225, 15, 23, 42)
+                EditorialStyle.NEWS -> Color.argb(235, 11, 15, 25)
+                EditorialStyle.CINEMA -> Color.argb(190, 0, 0, 0)
+                EditorialStyle.CLASSIC -> try {
+                    Color.parseColor(config.textBgColorHex)
+                } catch (e: Exception) {
+                    Color.argb(200, 10, 10, 15)
+                }
             }
         }
 
-        val boxRect = RectF(boxX, boxY, boxX + totalBoxW, boxY + totalBoxH)
-        canvas.drawRoundRect(boxRect, 28f, 28f, bgPaint)
-
-        // Draw border accent (neon purple tint)
-        val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.argb(120, 168, 85, 247)
-            style = Paint.Style.STROKE
-            strokeWidth = 3f
+        val cornerRadius = when (style) {
+            EditorialStyle.STREET -> 8f
+            EditorialStyle.EDITORIAL -> 16f
+            EditorialStyle.NEWS -> 12f
+            else -> 28f
         }
-        canvas.drawRoundRect(boxRect, 28f, 28f, borderPaint)
+
+        val boxRect = RectF(boxX, boxY, boxX + totalBoxW, boxY + totalBoxH)
+        canvas.drawRoundRect(boxRect, cornerRadius, cornerRadius, bgPaint)
+
+        // 3. Border styling
+        val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            when (style) {
+                EditorialStyle.STREET -> {
+                    color = Color.BLACK
+                    style = Paint.Style.STROKE
+                    strokeWidth = 6f
+                }
+                EditorialStyle.EDITORIAL -> {
+                    color = Color.argb(160, 241, 245, 249)
+                    style = Paint.Style.STROKE
+                    strokeWidth = 2f
+                }
+                EditorialStyle.NEWS -> {
+                    color = Color.parseColor("#EF4444")
+                    style = Paint.Style.STROKE
+                    strokeWidth = 4f
+                }
+                EditorialStyle.CINEMA -> {
+                    color = Color.argb(100, 253, 224, 71)
+                    style = Paint.Style.STROKE
+                    strokeWidth = 2f
+                }
+                EditorialStyle.CLASSIC -> {
+                    color = Color.argb(120, 168, 85, 247)
+                    style = Paint.Style.STROKE
+                    strokeWidth = 3f
+                }
+            }
+        }
+        canvas.drawRoundRect(boxRect, cornerRadius, cornerRadius, borderPaint)
+
+        // 4. Special NEWS badge header ("🚨 BREAKING NEWS")
+        if (style == EditorialStyle.NEWS) {
+            val badgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#DC2626")
+            }
+            val badgeTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                textSize = 24f
+                typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                textAlign = Paint.Align.CENTER
+            }
+            val badgeW = 240f
+            val badgeH = 42f
+            val badgeX = boxX + 24f
+            val badgeY = boxY - (badgeH / 2f)
+            val badgeRect = RectF(badgeX, badgeY, badgeX + badgeW, badgeY + badgeH)
+            canvas.drawRoundRect(badgeRect, 6f, 6f, badgePaint)
+            canvas.drawText("🚨 BREAKING", badgeX + (badgeW / 2f), badgeY + 28f, badgeTextPaint)
+        }
 
         // Draw static layout centered
         canvas.save()

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrpallanti.viralvideo.domain.model.AuthUser
 import com.mrpallanti.viralvideo.domain.model.CropPlacement
+import com.mrpallanti.viralvideo.domain.model.EditorialStyle
 import com.mrpallanti.viralvideo.domain.model.GeneratedShortItem
 import com.mrpallanti.viralvideo.domain.model.OverlayConfig
 import com.mrpallanti.viralvideo.domain.model.RenderJob
@@ -265,7 +266,27 @@ class StudioViewModel(
                     CropPlacement.CENTER -> "Framed to Center (0.50)"
                     CropPlacement.RIGHT -> "Framed to Right side (0.84)"
                     CropPlacement.CUSTOM -> "Custom placement enabled"
+                    CropPlacement.SPLIT_PODCAST -> "🎙️ Split 2-Speaker Podcast Layout activated"
+                    CropPlacement.SCREENCAST_PIP -> "💻 Screencast PiP Layout activated"
                 }
+            )
+        }
+    }
+
+    fun setEditorialStyle(style: EditorialStyle) {
+        _uiState.update {
+            it.copy(
+                overlayConfig = it.overlayConfig.copy(editorialStyle = style),
+                successMessage = "Style: ${style.label} activated"
+            )
+        }
+    }
+
+    fun togglePunchIn(enabled: Boolean) {
+        _uiState.update {
+            it.copy(
+                overlayConfig = it.overlayConfig.copy(enablePunchIn = enabled),
+                successMessage = if (enabled) "🎯 Dynamic Punch-In (1.12x) enabled" else "Dynamic Punch-In disabled"
             )
         }
     }
@@ -503,13 +524,37 @@ class StudioViewModel(
     }
 
     fun applyClip(clip: ViralClip) {
+        val resolvedPlacement = when (clip.recommendedLayout.lowercase()) {
+            "split", "split_podcast", "interview" -> CropPlacement.SPLIT_PODCAST
+            "screencast", "screencast_pip" -> CropPlacement.SCREENCAST_PIP
+            "left" -> CropPlacement.LEFT
+            "center" -> CropPlacement.CENTER
+            "right" -> CropPlacement.RIGHT
+            else -> _uiState.value.overlayConfig.cropPlacement
+        }
+
+        val resolvedStyle = when (clip.editorialStyle.lowercase()) {
+            "editorial" -> EditorialStyle.EDITORIAL
+            "street" -> EditorialStyle.STREET
+            "news" -> EditorialStyle.NEWS
+            "cinema" -> EditorialStyle.CINEMA
+            else -> _uiState.value.overlayConfig.editorialStyle
+        }
+
+        val hasPunchIn = clip.emphasisTimes.isNotEmpty()
+
         _uiState.update {
             it.copy(
                 selectedClip = clip,
                 trimRange = TrimRange(clip.startSeconds, clip.endSeconds),
                 hookText = clip.captionOverlay,
-                overlayConfig = it.overlayConfig.copy(customText = clip.captionOverlay),
-                successMessage = "Applied '${clip.title}'"
+                overlayConfig = it.overlayConfig.copy(
+                    customText = clip.captionOverlay,
+                    cropPlacement = resolvedPlacement,
+                    editorialStyle = resolvedStyle,
+                    enablePunchIn = if (hasPunchIn) true else it.overlayConfig.enablePunchIn
+                ),
+                successMessage = "Applied '${clip.title}' with ${resolvedStyle.label}"
             )
         }
     }
@@ -524,18 +569,45 @@ class StudioViewModel(
         val durSec = state.trimRange.durationSeconds.toInt()
         val hook = state.hookText.ifBlank { "WAIT TILL THE END... 🤯" }
         val score = clip?.viralityScore ?: 95
+        val reason = clip?.hookReason ?: "High curiosity gap and retention curve"
+        val style = state.overlayConfig.editorialStyle.label
+        val placement = when (state.overlayConfig.cropPlacement) {
+            CropPlacement.AUTO_FACE -> "Auto Face-Track"
+            CropPlacement.LEFT -> "Left Speaker (16%)"
+            CropPlacement.CENTER -> "Center (50%)"
+            CropPlacement.RIGHT -> "Right Speaker (84%)"
+            CropPlacement.CUSTOM -> "Custom Offset"
+            CropPlacement.SPLIT_PODCAST -> "Split 2-Speaker Stack"
+            CropPlacement.SCREENCAST_PIP -> "Screencast PiP"
+        }
+        val punchIn = if (state.overlayConfig.enablePunchIn) "Active (1.12x)" else "Off"
+
+        val pkg = clip?.socialPackage
 
         return """
-🎬 VIRAL SHORT BLUEPRINT (ViralClip Studio)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 Title: $title
-⏱️ Timestamp: ${startSec}s - ${endSec}s (${durSec}s total)
+🎬 VIRAL SOCIAL PUBLISHING KIT (AutoClip & OpenShorts)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 Master Title: $title
+⏱️ Segment: ${startSec}s - ${endSec}s (${durSec}s total)
 🔥 Virality Score: $score%
 💡 Hook Caption: "$hook"
-🏷️ Recommended Hashtags:
-#Shorts #Viral #Trending #Reels #ContentCreator #ViralClipStudio
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Ready for CapCut, YouTube Shorts, TikTok & IG Reels!
+🧠 Retention Reason: $reason
+🎨 Editorial Style: $style
+📐 Framing Layout: $placement | Dynamic Punch-In: $punchIn
+
+📱 TIKTOK READY:
+Title: ${pkg?.tiktokTitle ?: title}
+${pkg?.tiktokHashtags?.joinToString(" ") ?: "#fyp #viral #trending #Shorts"}
+
+📸 INSTAGRAM REELS READY:
+Title: ${pkg?.reelsTitle ?: title}
+${pkg?.reelsHashtags?.joinToString(" ") ?: "#reels #explore #creator #viral"}
+
+▶️ YOUTUBE SHORTS READY:
+Title: ${pkg?.shortsTitle ?: "$title #Shorts"}
+${pkg?.shortsHashtags?.joinToString(" ") ?: "#Shorts #youtubeshorts #viral"}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Ready for instant upload & 60fps local GPU export!
         """.trimIndent()
     }
 

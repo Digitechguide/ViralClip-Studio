@@ -26,8 +26,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
 import androidx.media3.exoplayer.ExoPlayer
 import com.mrpallanti.viralvideo.domain.model.CropPlacement
+import com.mrpallanti.viralvideo.domain.model.EditorialStyle
 import com.mrpallanti.viralvideo.domain.model.VideoQuality
 import com.mrpallanti.viralvideo.presentation.ui.theme.*
 import com.mrpallanti.viralvideo.presentation.viewmodel.StudioUiState
@@ -821,6 +826,8 @@ fun CustomClipperView(
                                 CropPlacement.CENTER -> "🎯 Center (50%)"
                                 CropPlacement.RIGHT -> "👉 Right Focus (84%)"
                                 CropPlacement.CUSTOM -> "🎚️ Custom (${(currentOffset * 100).toInt()}%)"
+                                CropPlacement.SPLIT_PODCAST -> "🎙️ Split 2-Speaker"
+                                CropPlacement.SCREENCAST_PIP -> "💻 Screencast PiP"
                             },
                             color = Color.White,
                             fontWeight = FontWeight.ExtraBold,
@@ -854,6 +861,8 @@ fun CustomClipperView(
                         CropPlacement.CENTER -> 0.50f
                         CropPlacement.RIGHT -> 1.0f
                         CropPlacement.CUSTOM -> currentOffset.coerceIn(0.0f, 1.0f)
+                        CropPlacement.SPLIT_PODCAST -> 0.50f
+                        CropPlacement.SCREENCAST_PIP -> 0.50f
                     }
 
                     val animatedFraction by animateFloatAsState(
@@ -988,6 +997,26 @@ fun CustomClipperView(
                         border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.RIGHT) PrimaryPurple else BorderSubtle)
                     )
                     FilterChip(
+                        selected = currentPlacement == CropPlacement.SPLIT_PODCAST,
+                        onClick = { viewModel.setCropPlacement(CropPlacement.SPLIT_PODCAST) },
+                        label = { Text("🎙️ Split 2-Speaker", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                            selectedLabelColor = Color.White
+                        ),
+                        border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.SPLIT_PODCAST) PrimaryPurple else BorderSubtle)
+                    )
+                    FilterChip(
+                        selected = currentPlacement == CropPlacement.SCREENCAST_PIP,
+                        onClick = { viewModel.setCropPlacement(CropPlacement.SCREENCAST_PIP) },
+                        label = { Text("💻 Screencast PiP", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = PrimaryPurple.copy(alpha = 0.35f),
+                            selectedLabelColor = Color.White
+                        ),
+                        border = BorderStroke(1.dp, if (currentPlacement == CropPlacement.SCREENCAST_PIP) PrimaryPurple else BorderSubtle)
+                    )
+                    FilterChip(
                         selected = currentPlacement == CropPlacement.CUSTOM,
                         onClick = { viewModel.setCropPlacement(CropPlacement.CUSTOM) },
                         label = { Text("🎚️ Fine Slider", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
@@ -1020,6 +1049,111 @@ fun CustomClipperView(
                         inactiveTrackColor = Color(0xFF1E293B)
                     )
                 )
+            }
+        }
+
+        // ----------------------------------------------------
+        // 3. EDITORIAL STYLES & DYNAMIC PUNCH-IN (AutoClip & OpenShorts)
+        // ----------------------------------------------------
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = CardDark),
+            shape = RoundedCornerShape(24.dp),
+            border = BorderStroke(1.dp, BorderSubtle)
+        ) {
+            Column(modifier = Modifier.padding(18.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Editorial Style & Kinetic Engine",
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary,
+                            fontSize = 16.sp
+                        )
+                        Text(
+                            text = "5 curation styles & dynamic beat punch-in from AutoClip & OpenShorts",
+                            color = TextSecondary,
+                            fontSize = 11.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Surface(
+                        color = AccentCyan.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(10.dp),
+                        border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.4f))
+                    ) {
+                        Text(
+                            text = state.overlayConfig.editorialStyle.label,
+                            color = AccentCyan,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text("Select Visual Theme:", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    EditorialStyle.values().forEach { style ->
+                        FilterChip(
+                            selected = state.overlayConfig.editorialStyle == style,
+                            onClick = { viewModel.setEditorialStyle(style) },
+                            label = { Text(style.label, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = AccentCyan.copy(alpha = 0.35f),
+                                selectedLabelColor = Color.White
+                            ),
+                            border = BorderStroke(1.dp, if (state.overlayConfig.editorialStyle == style) AccentCyan else BorderSubtle)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // OpenShorts Dynamic Punch-In Beat Zoom (1.12x)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFF0B132B))
+                        .border(1.dp, BorderSubtle, RoundedCornerShape(12.dp))
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("🎯 Dynamic Beat Punch-In (1.12x)", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                        Text("Subtle 1.12x push on hook/emphasis beats to prevent scroll fatigue", fontSize = 11.sp, color = TextSecondary)
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Switch(
+                        checked = state.overlayConfig.enablePunchIn,
+                        onCheckedChange = { viewModel.togglePunchIn(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = AccentCyan,
+                            checkedTrackColor = AccentCyan.copy(alpha = 0.5f),
+                            uncheckedThumbColor = TextSecondary,
+                            uncheckedTrackColor = Color(0xFF1E293B)
+                        )
+                    )
+                }
             }
         }
 
@@ -1152,6 +1286,36 @@ fun CustomClipperView(
                     }
                 }
             }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // AutoClip & OpenShorts Social Publishing Kit Button
+        OutlinedButton(
+            onClick = {
+                val blueprint = viewModel.getViralBlueprintText()
+                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("Viral Publishing Kit", blueprint)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(context, "📋 Copied Publishing Kit (TikTok / Reels / Shorts) to clipboard!", Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = RoundedCornerShape(14.dp),
+            border = BorderStroke(1.dp, AccentCyan.copy(alpha = 0.6f)),
+            colors = ButtonDefaults.outlinedButtonColors(
+                containerColor = AccentCyan.copy(alpha = 0.08f)
+            )
+        ) {
+            Icon(Icons.Default.ContentCopy, contentDescription = null, tint = AccentCyan, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Copy Publishing Kit (TikTok / Reels / Shorts)",
+                color = AccentCyan,
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp
+            )
         }
     }
 }

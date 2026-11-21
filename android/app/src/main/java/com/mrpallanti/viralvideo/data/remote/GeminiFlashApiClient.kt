@@ -1,5 +1,6 @@
 package com.mrpallanti.viralvideo.data.remote
 
+import com.mrpallanti.viralvideo.domain.model.SocialPackage
 import com.mrpallanti.viralvideo.domain.model.ViralClip
 import com.mrpallanti.viralvideo.domain.repository.AiViralityRepository
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +102,32 @@ class GeminiFlashApiClient(
                     }
                 }
 
+                val layoutRec = clipObj.optString("recommended_layout", "auto")
+                val editorialStyle = clipObj.optString("editorial_style", "classic")
+
+                val emphasisList = mutableListOf<Float>()
+                val empArr = clipObj.optJSONArray("emphasis_seconds")
+                if (empArr != null) {
+                    for (e in 0 until empArr.length()) {
+                        emphasisList.add(empArr.optDouble(e, 0.0).toFloat())
+                    }
+                }
+
+                val socialPkgObj = clipObj.optJSONObject("social_package")
+                val socialPackage = if (socialPkgObj != null) {
+                    val ttObj = socialPkgObj.optJSONObject("tiktok")
+                    val reelsObj = socialPkgObj.optJSONObject("reels")
+                    val shortsObj = socialPkgObj.optJSONObject("shorts")
+                    SocialPackage(
+                        tiktokTitle = ttObj?.optString("title", "") ?: "",
+                        tiktokHashtags = parseJsonStringArray(ttObj?.optJSONArray("hashtags")),
+                        reelsTitle = reelsObj?.optString("title", "") ?: "",
+                        reelsHashtags = parseJsonStringArray(reelsObj?.optJSONArray("hashtags")),
+                        shortsTitle = shortsObj?.optString("title", "") ?: "",
+                        shortsHashtags = parseJsonStringArray(shortsObj?.optJSONArray("hashtags"))
+                    )
+                } else null
+
                 clips.add(
                     ViralClip(
                         id = clipObj.optInt("id", i + 1),
@@ -111,7 +138,11 @@ class GeminiFlashApiClient(
                         viralityScore = clipObj.optInt("virality_score", 90),
                         hookReason = clipObj.optString("hook_reason", "High-energy hook"),
                         captionOverlay = clipObj.optString("caption_overlay", "WAIT TILL THE END... 🤯"),
-                        hashtags = tags
+                        hashtags = tags,
+                        recommendedLayout = layoutRec,
+                        editorialStyle = editorialStyle,
+                        emphasisTimes = emphasisList,
+                        socialPackage = socialPackage
                     )
                 )
             }
@@ -119,6 +150,15 @@ class GeminiFlashApiClient(
             e.printStackTrace()
         }
         return clips
+    }
+
+    private fun parseJsonStringArray(arr: JSONArray?): List<String> {
+        if (arr == null) return emptyList()
+        val list = mutableListOf<String>()
+        for (i in 0 until arr.length()) {
+            list.add(arr.optString(i, ""))
+        }
+        return list.filter { it.isNotBlank() }
     }
 
     private fun generateAlgorithmicFallback(
@@ -145,7 +185,18 @@ class GeminiFlashApiClient(
                 viralityScore = 96,
                 hookReason = "Immediate curiosity gap prevents the user from swiping away in the first 3 seconds.",
                 captionOverlay = "YOU NEED TO HEAR THIS... 🤯",
-                hashtags = listOf("#Shorts", "#Viral", "#FYP")
+                hashtags = listOf("#Shorts", "#Viral", "#FYP"),
+                recommendedLayout = "auto",
+                editorialStyle = "editorial",
+                emphasisTimes = listOf(3.5f, 12.0f),
+                socialPackage = SocialPackage(
+                    tiktokTitle = "You won't believe what was said in the first 30 seconds... 🤯",
+                    tiktokHashtags = listOf("#fyp", "#viral", "#foryou", "#mindblown"),
+                    reelsTitle = "The opening that shook the entire conversation 👇",
+                    reelsHashtags = listOf("#reels", "#explore", "#creator", "#insight"),
+                    shortsTitle = "$title (Best Moment) #Shorts",
+                    shortsHashtags = listOf("#Shorts", "#youtubeshorts", "#trending")
+                )
             ),
             ViralClip(
                 id = 2,
@@ -156,7 +207,18 @@ class GeminiFlashApiClient(
                 viralityScore = 93,
                 hookReason = "High cognitive density where the main punchline or breakthrough is delivered.",
                 captionOverlay = "THE PART NOBODY TALKS ABOUT ⚡",
-                hashtags = listOf("#MindBlowing", "#Reels", "#Trending")
+                hashtags = listOf("#MindBlowing", "#Reels", "#Trending"),
+                recommendedLayout = "split_podcast",
+                editorialStyle = "street",
+                emphasisTimes = listOf(5.0f, 18.5f),
+                socialPackage = SocialPackage(
+                    tiktokTitle = "Wait for the reaction when he says this 😱",
+                    tiktokHashtags = listOf("#fyp", "#trending", "#viral", "#podcast"),
+                    reelsTitle = "Listen closely to what happened here ⚡",
+                    reelsHashtags = listOf("#reels", "#explore", "#viral", "#truth"),
+                    shortsTitle = "The Revelation Nobody Expected #Shorts",
+                    shortsHashtags = listOf("#Shorts", "#breakthrough", "#viral")
+                )
             ),
             ViralClip(
                 id = 3,
@@ -167,7 +229,18 @@ class GeminiFlashApiClient(
                 viralityScore = 89,
                 hookReason = "Emotional takeaway that triggers high share rate, saves, and comments.",
                 captionOverlay = "SAVE THIS BEFORE IT'S GONE! 📌",
-                hashtags = listOf("#Tips", "#ShortsFeed", "#ViralVideo")
+                hashtags = listOf("#Tips", "#ShortsFeed", "#ViralVideo"),
+                recommendedLayout = "screencast_pip",
+                editorialStyle = "news",
+                emphasisTimes = listOf(4.0f, 15.0f),
+                socialPackage = SocialPackage(
+                    tiktokTitle = "Save this right now before you forget 📌",
+                    tiktokHashtags = listOf("#fyp", "#tips", "#learnontiktok", "#lifehacks"),
+                    reelsTitle = "3 seconds of truth you will remember forever 📌",
+                    reelsHashtags = listOf("#reels", "#motivation", "#lifeadvice"),
+                    shortsTitle = "The Most Important Part of the Video #Shorts",
+                    shortsHashtags = listOf("#Shorts", "#tips", "#takeaway")
+                )
             )
         )
     }

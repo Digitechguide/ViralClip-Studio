@@ -80,8 +80,15 @@
 - **Problem:** Crop frame position jumped abruptly, and framing preset buttons wrapped awkwardly on small mobile screens.
 - **Solution:**
   - Framing window uses `animateFloatAsState(targetValue = resolvedFraction, animationSpec = tween(250))` for smooth sliding.
-  - Framing preset chips (`Auto Face-Track`, `Left 16%`, `Center 50%`, `Right 84%`, `Custom Slider`) are wrapped in `horizontalScroll(rememberScrollState())` with standard `BorderStroke`.
+  - Framing preset chips (`Auto Face-Track`, `Left 16%`, `Center 50%`, `Right 84%`, `Custom Slider`, `🎙️ Split 2-Speaker`, `💻 Screencast PiP`) are wrapped in `horizontalScroll(rememberScrollState())` with standard `BorderStroke`.
   - Header badge uses `Modifier.weight(1f)` on the title column and `maxLines = 1, softWrap = false` on the badge to prevent multi-line wrapping.
+
+### 5. AutoClip & OpenShorts Skills Integration
+- **OpenShorts Split Stack & Screencast PiP (`CropPlacement.SPLIT_PODCAST`, `SCREENCAST_PIP`):** Solves the single-face crop failure on multi-speaker interviews and reaction videos by stacking speakers vertically (1080x960 each) or setting top 65% content with bottom 35% webcam preview.
+- **OpenShorts Dynamic Punch-In Beat Zoom (1.12x):** Applies Media3 `ScaleAndRotateTransformation` (1.12x zoom) on hook and emphasis beats to eliminate static shot fatigue.
+- **AutoClip 5 Curated Editorial Styles (`EditorialStyle`):** Adds `Editorial`, `Street`, `News`, `Cinema`, and `Classic` visual templates into `VideoOverlayHelper` and web `video-engine.js`.
+- **AutoClip Multi-Platform Publishing Kit:** Bundles tailored titles, descriptions, and hashtags for TikTok (`#fyp`), Instagram Reels (`#reels`), and YouTube Shorts (`#Shorts`) with 1-tap clipboard copying.
+- **Antigravity Skills:** Installed both `autoclip` and `openshorts` skills into `/Users/mrpallanti/.gemini/config/skills/` for agent workflows.
 
 ---
 

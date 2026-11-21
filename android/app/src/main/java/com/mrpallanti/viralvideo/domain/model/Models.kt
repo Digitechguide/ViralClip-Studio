@@ -12,6 +12,17 @@ data class VideoMetadata(
     val localUri: String? = null
 )
 
+@Serializable
+data class SocialPackage(
+    val tiktokTitle: String = "",
+    val tiktokHashtags: List<String> = listOf("#fyp", "#viral", "#foryou"),
+    val reelsTitle: String = "",
+    val reelsHashtags: List<String> = listOf("#reels", "#explore", "#trending"),
+    val shortsTitle: String = "",
+    val shortsHashtags: List<String> = listOf("#Shorts", "#youtubeshorts")
+)
+
+@Serializable
 data class ViralClip(
     val id: Int,
     val title: String,
@@ -21,7 +32,11 @@ data class ViralClip(
     val viralityScore: Int,
     val hookReason: String,
     val captionOverlay: String,
-    val hashtags: List<String>
+    val hashtags: List<String>,
+    val recommendedLayout: String = "auto",
+    val editorialStyle: String = "classic",
+    val emphasisTimes: List<Float> = emptyList(),
+    val socialPackage: SocialPackage? = null
 )
 
 data class TrimRange(
@@ -62,11 +77,26 @@ enum class VideoQuality(
 
 @Serializable
 enum class CropPlacement {
-    AUTO_FACE, // AI Face-Centered Auto Framing
-    LEFT,      // Left side of 16:9 frame (0.16)
-    CENTER,    // Center of 16:9 frame (0.50)
-    RIGHT,     // Right side of 16:9 frame (0.84)
-    CUSTOM     // Custom user-defined horizontal offset (0.0 to 1.0)
+    AUTO_FACE,      // AI Face-Centered Auto Framing (ML Kit)
+    LEFT,           // Left side of 16:9 frame (0.16)
+    CENTER,         // Center of 16:9 frame (0.50)
+    RIGHT,          // Right side of 16:9 frame (0.84)
+    CUSTOM,         // Custom user-defined horizontal offset (0.0 to 1.0)
+    SPLIT_PODCAST,  // OpenShorts 2-Speaker Split Stack Layout (Top & Bottom halves)
+    SCREENCAST_PIP  // OpenShorts Screencast PiP (Screen top + Speaker bottom)
+}
+
+@Serializable
+enum class EditorialStyle(
+    val label: String,
+    val shortLabel: String,
+    val description: String
+) {
+    CLASSIC("Classic Clean", "Classic", "High-contrast clean social caption"),
+    EDITORIAL("Magazine Editorial", "Editorial", "Vogue & New Yorker refined aesthetic with elegant borders"),
+    STREET("Street Kinetic", "Street", "High-energy bold neon yellow with impact punch"),
+    NEWS("News Headline", "News", "Urgent breaking news red alert banner"),
+    CINEMA("Cinematic Letterbox", "Cinema", "Film letterbox with warm golden cinematic subtitles")
 }
 
 @Serializable
@@ -81,7 +111,10 @@ data class OverlayConfig(
     val watermarkOpacity: Float = 0.85f,
     val cropPlacement: CropPlacement = CropPlacement.AUTO_FACE,
     val cropHorizontalOffset: Float = 0.50f,
-    val videoQuality: VideoQuality = VideoQuality.FULL_HD_1080P
+    val videoQuality: VideoQuality = VideoQuality.FULL_HD_1080P,
+    val editorialStyle: EditorialStyle = EditorialStyle.CLASSIC,
+    val enablePunchIn: Boolean = false,
+    val punchInZoom: Float = 1.12f
 )
 
 @Serializable

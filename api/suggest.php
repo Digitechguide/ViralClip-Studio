@@ -40,7 +40,7 @@ if (empty($apiKey) || $apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
 }
 
 $prompt = <<<EOT
-You are an elite short-form video editor and YouTube Shorts virality consultant (specializing in MrBeast retention tactics, TikTok psychology, and high watch-time hooks).
+You are an elite short-form video editor and YouTube Shorts virality consultant (specializing in MrBeast retention tactics, TikTok psychology, AutoClip editorial styling, and OpenShorts kinetic layout architectures).
 
 Analyze this video information:
 - Title: "{$title}"
@@ -49,7 +49,13 @@ Analyze this video information:
 - Desired Short Duration: ~{$targetDuration} seconds (between 15 to 60 seconds)
 
 Find 3 to 4 best potential viral clip segments from this video.
-For each segment, select realistic start and end timestamps (in seconds, must be within 0 and {$duration}), create an irresistible hook, a virality score, and an on-screen text caption overlay.
+For each segment:
+1. Select realistic start and end timestamps (in seconds, must be within 0 and {$duration}).
+2. Create an irresistible high-retention hook headline and an on-screen caption overlay.
+3. Choose the optimal framing layout ("auto", "split_podcast" for 2-speaker dialogues, or "screencast_pip" for demos/slides).
+4. Choose the optimal editorial style ("editorial" for magazine elegance, "street" for high-energy neon yellow, "news" for breaking headline alerts, "cinema" for letterboxed filmic vibe, or "classic").
+5. Provide 1 to 3 punch-in emphasis timestamps (in seconds relative to clip start) for dynamic beat zoom (1.12x).
+6. Provide a complete multi-platform publishing package for TikTok, Instagram Reels, and YouTube Shorts (title + hashtags).
 
 Respond strictly with valid JSON with this exact schema:
 {
@@ -64,7 +70,24 @@ Respond strictly with valid JSON with this exact schema:
       "virality_score": 96,
       "hook_reason": "Why the first 3 seconds hook viewers and prevent scrolling",
       "caption_overlay": "WAIT TILL YOU SEE THIS... 🤯",
-      "hashtags": ["#Shorts", "#Viral", "#FYP"]
+      "recommended_layout": "auto",
+      "editorial_style": "editorial",
+      "emphasis_seconds": [3.5, 14.0],
+      "hashtags": ["#Shorts", "#Viral", "#FYP"],
+      "social_package": {
+        "tiktok": {
+          "title": "Wait for the reaction in the first 30 seconds... 🤯",
+          "hashtags": ["#fyp", "#viral", "#foryou", "#trending"]
+        },
+        "reels": {
+          "title": "The breakthrough moment that changed everything 👇",
+          "hashtags": ["#reels", "#explore", "#creator", "#insight"]
+        },
+        "shorts": {
+          "title": "The Moment Nobody Expected #Shorts",
+          "hashtags": ["#Shorts", "#youtubeshorts", "#viral"]
+        }
+      }
     }
   ]
 }
@@ -168,7 +191,7 @@ function generateFallbackSuggestions($title, $totalDuration, $targetDuration) {
     $clip3End = min($clip3Start + $clipLen, $duration);
 
     return [
-        'premise' => 'Algorithmic high-retention segments based on viewer drop-off curves',
+        'premise' => 'Algorithmic high-retention segments based on viewer drop-off curves (AutoClip & OpenShorts)',
         'clips' => [
             [
                 'id' => 1,
@@ -179,7 +202,15 @@ function generateFallbackSuggestions($title, $totalDuration, $targetDuration) {
                 'virality_score' => 95,
                 'hook_reason' => 'First impression determines whether the viewer stays or swipes immediately.',
                 'caption_overlay' => 'YOU WON\'T BELIEVE THIS... 🤯',
-                'hashtags' => ['#Viral', '#Shorts', '#Trending']
+                'recommended_layout' => 'auto',
+                'editorial_style' => 'editorial',
+                'emphasis_seconds' => [3.5, 12.0],
+                'hashtags' => ['#Viral', '#Shorts', '#Trending'],
+                'social_package' => [
+                    'tiktok' => ['title' => 'Wait till you see what happens first 🤯', 'hashtags' => ['#fyp', '#viral', '#foryou']],
+                    'reels' => ['title' => 'The truth is finally out 👇', 'hashtags' => ['#reels', '#explore', '#creator']],
+                    'shorts' => ['title' => 'Unbelievable First 30 Seconds #Shorts', 'hashtags' => ['#Shorts', '#youtubeshorts']]
+                ]
             ],
             [
                 'id' => 2,
@@ -190,7 +221,15 @@ function generateFallbackSuggestions($title, $totalDuration, $targetDuration) {
                 'virality_score' => 91,
                 'hook_reason' => 'Peak information density where the main question or suspense is answered.',
                 'caption_overlay' => 'THE TRUTH FINALLY REVEALED ⚡',
-                'hashtags' => ['#MustWatch', '#ShortsFeed', '#FYP']
+                'recommended_layout' => 'split_podcast',
+                'editorial_style' => 'street',
+                'emphasis_seconds' => [5.0, 18.0],
+                'hashtags' => ['#MustWatch', '#ShortsFeed', '#FYP'],
+                'social_package' => [
+                    'tiktok' => ['title' => 'The part nobody talks about 🤫', 'hashtags' => ['#fyp', '#trending', '#podcast']],
+                    'reels' => ['title' => 'Look at the reaction here ⚡', 'hashtags' => ['#reels', '#viral', '#insights']],
+                    'shorts' => ['title' => 'The Revelation Nobody Expected #Shorts', 'hashtags' => ['#Shorts', '#breakthrough']]
+                ]
             ],
             [
                 'id' => 3,
@@ -201,7 +240,15 @@ function generateFallbackSuggestions($title, $totalDuration, $targetDuration) {
                 'virality_score' => 88,
                 'hook_reason' => 'High emotional punchline or payoff that drives comments and shares.',
                 'caption_overlay' => 'WAIT FOR THE END! 🎯',
-                'hashtags' => ['#Mindblown', '#LifeHacks', '#Shorts']
+                'recommended_layout' => 'screencast_pip',
+                'editorial_style' => 'news',
+                'emphasis_seconds' => [4.0, 15.0],
+                'hashtags' => ['#Mindblown', '#LifeHacks', '#Shorts'],
+                'social_package' => [
+                    'tiktok' => ['title' => 'Save this right now before it disappears 📌', 'hashtags' => ['#fyp', '#tips', '#lifehacks']],
+                    'reels' => ['title' => 'One rule you must never forget 🎯', 'hashtags' => ['#reels', '#motivation', '#advice']],
+                    'shorts' => ['title' => 'The Ending You Cannot Miss #Shorts', 'hashtags' => ['#Shorts', '#tips', '#climax']]
+                ]
             ]
         ]
     ];

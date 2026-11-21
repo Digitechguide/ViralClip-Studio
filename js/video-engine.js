@@ -266,6 +266,37 @@ const VideoEngine = (function() {
         const dx = (cw - dw) / 2;
         const dy = (ch - dh) / 2;
         ctx.drawImage(videoEl, dx, dy, dw, dh);
+      } else if (cropMode === 'split') {
+        // OpenShorts SPLIT layout: Top Speaker (left crop) + Bottom Speaker (right crop)
+        const halfH = ch / 2;
+        const halfCropW = vw * 0.45;
+        // Top half: left speaker
+        ctx.drawImage(videoEl, 0, 0, halfCropW, vh, 0, 0, cw, halfH);
+        // Bottom half: right speaker
+        ctx.drawImage(videoEl, vw - halfCropW, 0, halfCropW, vh, 0, halfH, cw, halfH);
+        // Clean dividing boundary
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, halfH);
+        ctx.lineTo(cw, halfH);
+        ctx.stroke();
+      } else if (cropMode === 'screencast') {
+        // OpenShorts Screencast PiP layout: Main content top 65% + Speaker webcam bottom 35%
+        const topH = ch * 0.65;
+        const botH = ch * 0.35;
+        // Main content fit in top portion
+        ctx.drawImage(videoEl, 0, 0, vw, vh, 0, 0, cw, topH);
+        // Bottom speaker webcam crop
+        const camW = vw * 0.4;
+        ctx.drawImage(videoEl, (vw - camW) / 2, 0, camW, vh, 0, topH, cw, botH);
+        // Divider
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(0, topH);
+        ctx.lineTo(cw, topH);
+        ctx.stroke();
       } else {
         const targetRatio = cw / ch;
         const sourceRatio = vw / vh;
@@ -336,7 +367,7 @@ const VideoEngine = (function() {
       const bgW = textWidth + (padX * 2);
       const bgH = lineHeight + (padY * 2);
 
-      if (hookStyle === 'yellow-black') {
+      if (hookStyle === 'street' || hookStyle === 'yellow-black') {
         ctx.fillStyle = '#ffde00';
         ctx.beginPath();
         ctx.roundRect(bgX, bgY, bgW, bgH, 10);
@@ -346,12 +377,35 @@ const VideoEngine = (function() {
         ctx.strokeText(line, cw / 2, startY);
         ctx.fillStyle = '#000000';
         ctx.fillText(line, cw / 2, startY);
-      } else if (hookStyle === 'red-white') {
+      } else if (hookStyle === 'editorial') {
+        // AutoClip Magazine Editorial Style
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(bgX, bgY, bgW, bgH, 12);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillText(line, cw / 2, startY);
+      } else if (hookStyle === 'news' || hookStyle === 'red-white') {
+        // AutoClip News Headline Style
         ctx.fillStyle = '#dc2626';
         ctx.beginPath();
         ctx.roundRect(bgX, bgY, bgW, bgH, 8);
         ctx.fill();
         ctx.fillStyle = '#ffffff';
+        ctx.fillText(line, cw / 2, startY);
+      } else if (hookStyle === 'cinema') {
+        // AutoClip Cinema Style
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(bgX, bgY, bgW, bgH, 14);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#fde047';
         ctx.fillText(line, cw / 2, startY);
       } else if (hookStyle === 'neon-cyan') {
         ctx.fillStyle = 'rgba(10, 12, 20, 0.85)';
@@ -366,6 +420,7 @@ const VideoEngine = (function() {
         ctx.fillStyle = '#22d3ee';
         ctx.fillText(line, cw / 2, startY);
       } else {
+        // Classic Clean
         ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
         ctx.shadowBlur = 10;
         ctx.lineWidth = 6;

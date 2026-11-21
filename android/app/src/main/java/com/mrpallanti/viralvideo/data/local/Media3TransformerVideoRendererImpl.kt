@@ -16,6 +16,7 @@ import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.Crop
 import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.Presentation
+import androidx.media3.effect.ScaleAndRotateTransformation
 import androidx.media3.effect.TextureOverlay
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
@@ -85,6 +86,8 @@ class Media3TransformerVideoRendererImpl(
                 CropPlacement.CENTER -> 0.50f
                 CropPlacement.RIGHT -> 0.84f
                 CropPlacement.CUSTOM -> overlayConfig.cropHorizontalOffset.coerceIn(0.0f, 1.0f)
+                CropPlacement.SPLIT_PODCAST -> 0.50f
+                CropPlacement.SCREENCAST_PIP -> 0.50f
             }
 
             // Compute exact 9:16 crop window in NDC (-1.0f to 1.0f) centered on the chosen place.
@@ -114,6 +117,18 @@ class Media3TransformerVideoRendererImpl(
                 .build()
 
             val videoEffects = mutableListOf<androidx.media3.common.Effect>(cropEffect, presentationEffect)
+
+            // OpenShorts Dynamic Punch-In Beat Zoom Effect
+            if (overlayConfig.enablePunchIn) {
+                try {
+                    val punchInEffect = ScaleAndRotateTransformation.Builder()
+                        .setScale(overlayConfig.punchInZoom, overlayConfig.punchInZoom)
+                        .build()
+                    videoEffects.add(punchInEffect)
+                } catch (t: Throwable) {
+                    // Safe fallback if scale effect fails
+                }
+            }
 
             val overlayBitmap = VideoOverlayHelper.createOverlayBitmap(
                 context = context,

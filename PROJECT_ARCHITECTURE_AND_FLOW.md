@@ -18,6 +18,8 @@
 6. **Recent Shorts Library:** Local persistent history of generated shorts with in-app playback, file size metrics, and one-tap Android system share.
 7. **Multi-Resolution Quality Selector:** Lets creators select target video quality (`1080p Full HD`, `720p HD`, `1440p 2K QHD`, `480p SD`). The app dynamically re-caches the source video at the chosen resolution and encodes the vertical short to that exact dimension.
 8. **Real-Time Seek Scrubber & Animated Framing:** Smooth interactive slider for frame scrubbing with animated 9:16 crop window motion via `animateFloatAsState`.
+9. **OpenShorts Split Stack & Screencast PiP Layouts:** Multi-speaker stacked layout (`CropPlacement.SPLIT_PODCAST`) for 2-person dialogues and screencast mode (`CropPlacement.SCREENCAST_PIP`) with dynamic 1.12x beat punch-in zoom.
+10. **AutoClip 5 Editorial Styles & Multi-Platform Publishing:** Curated visual styling templates (`EditorialStyle`: Editorial, Street, News, Cinema, Classic) and 1-tap social publishing kits with optimized metadata for TikTok, Instagram Reels, and YouTube Shorts.
 
 > 🧠 **Quick AI Memory & Device Transfer:** Refer to [AI_MEMORY.md](AI_MEMORY.md) for quick-start rules, environment constraints, and release procedures.
 
