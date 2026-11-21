@@ -151,9 +151,9 @@ object VideoOverlayHelper {
         config: OverlayConfig
     ) {
         val maxTextWidth = 900
-        val style = config.editorialStyle
+        val theme = config.editorialStyle
 
-        val textColor = when (style) {
+        val textColor = when (theme) {
             EditorialStyle.STREET -> Color.parseColor("#0A0A0A")
             EditorialStyle.CINEMA -> Color.parseColor("#FDE047")
             EditorialStyle.EDITORIAL -> Color.parseColor("#F8FAFC")
@@ -161,7 +161,7 @@ object VideoOverlayHelper {
             EditorialStyle.CLASSIC -> try { Color.parseColor(config.textColorHex) } catch (e: Exception) { Color.WHITE }
         }
 
-        val typeface = when (style) {
+        val fontTypeface = when (theme) {
             EditorialStyle.EDITORIAL -> Typeface.create(Typeface.SERIF, Typeface.BOLD)
             EditorialStyle.STREET -> Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             else -> Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
@@ -169,10 +169,10 @@ object VideoOverlayHelper {
 
         val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
             color = textColor
-            textSize = if (style == EditorialStyle.STREET) 54f else 50f
-            this.typeface = typeface
+            textSize = if (theme == EditorialStyle.STREET) 54f else 50f
+            this.typeface = fontTypeface
             textAlign = Paint.Align.CENTER
-            if (style != EditorialStyle.STREET) {
+            if (theme != EditorialStyle.STREET) {
                 setShadowLayer(10f, 3f, 3f, Color.BLACK)
             }
         }
@@ -192,8 +192,8 @@ object VideoOverlayHelper {
         val layoutWidth = staticLayout.width
         val layoutHeight = staticLayout.height
 
-        val paddingH = if (style == EditorialStyle.STREET) 42f else 36f
-        val paddingV = if (style == EditorialStyle.NEWS) 32f else 24f
+        val paddingH = if (theme == EditorialStyle.STREET) 42f else 36f
+        val paddingV = if (theme == EditorialStyle.NEWS) 32f else 24f
         val totalBoxW = (layoutWidth + paddingH * 2).coerceAtMost(width - 80f)
         val totalBoxH = layoutHeight + paddingV * 2
 
@@ -205,7 +205,7 @@ object VideoOverlayHelper {
         }
 
         // 1. Optional CINEMA Letterbox bars
-        if (style == EditorialStyle.CINEMA) {
+        if (theme == EditorialStyle.CINEMA) {
             val letterboxPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.BLACK
             }
@@ -215,7 +215,7 @@ object VideoOverlayHelper {
 
         // 2. Background pill styling
         val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = when (style) {
+            color = when (theme) {
                 EditorialStyle.STREET -> Color.parseColor("#FFE600")
                 EditorialStyle.EDITORIAL -> Color.argb(225, 15, 23, 42)
                 EditorialStyle.NEWS -> Color.argb(235, 11, 15, 25)
@@ -228,7 +228,7 @@ object VideoOverlayHelper {
             }
         }
 
-        val cornerRadius = when (style) {
+        val cornerRadius = when (theme) {
             EditorialStyle.STREET -> 8f
             EditorialStyle.EDITORIAL -> 16f
             EditorialStyle.NEWS -> 12f
@@ -240,30 +240,26 @@ object VideoOverlayHelper {
 
         // 3. Border styling
         val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            when (style) {
+            this.style = Paint.Style.STROKE
+            when (theme) {
                 EditorialStyle.STREET -> {
                     color = Color.BLACK
-                    style = Paint.Style.STROKE
                     strokeWidth = 6f
                 }
                 EditorialStyle.EDITORIAL -> {
                     color = Color.argb(160, 241, 245, 249)
-                    style = Paint.Style.STROKE
                     strokeWidth = 2f
                 }
                 EditorialStyle.NEWS -> {
                     color = Color.parseColor("#EF4444")
-                    style = Paint.Style.STROKE
                     strokeWidth = 4f
                 }
                 EditorialStyle.CINEMA -> {
                     color = Color.argb(100, 253, 224, 71)
-                    style = Paint.Style.STROKE
                     strokeWidth = 2f
                 }
                 EditorialStyle.CLASSIC -> {
                     color = Color.argb(120, 168, 85, 247)
-                    style = Paint.Style.STROKE
                     strokeWidth = 3f
                 }
             }
@@ -271,14 +267,14 @@ object VideoOverlayHelper {
         canvas.drawRoundRect(boxRect, cornerRadius, cornerRadius, borderPaint)
 
         // 4. Special NEWS badge header ("🚨 BREAKING NEWS")
-        if (style == EditorialStyle.NEWS) {
+        if (theme == EditorialStyle.NEWS) {
             val badgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#DC2626")
             }
             val badgeTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.WHITE
                 textSize = 24f
-                typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                this.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textAlign = Paint.Align.CENTER
             }
             val badgeW = 240f
