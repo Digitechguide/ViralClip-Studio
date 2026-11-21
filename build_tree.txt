@@ -1,0 +1,1875 @@
+android/app/build:
+total 28
+drwxr-xr-x  7 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x  4 runner runner 4096 Nov 21 17:54 ..
+drwxr-xr-x  4 runner runner 4096 Nov 21 17:55 generated
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 intermediates
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 kotlin
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 outputs
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 tmp
+
+android/app/build/generated:
+total 16
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 7 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 res
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:54 source
+
+android/app/build/generated/res:
+total 16
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 pngs
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 resValues
+
+android/app/build/generated/res/pngs:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/generated/res/pngs/debug:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/generated/res/resValues:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/generated/res/resValues/debug:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/generated/source:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:54 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:54 buildConfig
+
+android/app/build/generated/source/buildConfig:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:54 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:54 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/generated/source/buildConfig/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:54 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 com
+
+android/app/build/generated/source/buildConfig/debug/com:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 mrpallanti
+
+android/app/build/generated/source/buildConfig/debug/com/mrpallanti:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 viralvideo
+
+android/app/build/generated/source/buildConfig/debug/com/mrpallanti/viralvideo:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  590 Nov 21 17:55 BuildConfig.java
+
+android/app/build/intermediates:
+total 128
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 .
+drwxr-xr-x  7 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 aar_metadata_check
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 annotation_processor_list
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 assets
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 compatible_screen_manifest
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 compile_and_runtime_not_namespaced_r_class_jar
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 compressed_assets
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 data_binding_layout_info_type_merge
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 data_binding_layout_info_type_package
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:57 dex
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 duplicate_classes_check
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 external_file_lib_dex_archives
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 global_synthetics_file_lib
+drwxr-xr-x  6 runner runner 4096 Nov 21 17:55 incremental
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 local_only_symbol_list
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 manifest_merge_blame_file
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 merged_jni_libs
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 merged_manifest
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 merged_manifests
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 merged_res
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 merged_res_blame_folder
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 merged_shaders
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 navigation_json
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 nested_resources_validation_report
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 packaged_manifests
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 packaged_res
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 processed_res
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 runtime_symbol_list
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 source_set_path_map
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 stable_resource_ids_file
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 symbol_list_with_package_name
+
+android/app/build/intermediates/aar_metadata_check:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/aar_metadata_check/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 checkDebugAarMetadata
+
+android/app/build/intermediates/aar_metadata_check/debug/checkDebugAarMetadata:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/annotation_processor_list:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/annotation_processor_list/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 javaPreCompileDebug
+
+android/app/build/intermediates/annotation_processor_list/debug/javaPreCompileDebug:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner    2 Nov 21 17:55 annotationProcessors.json
+
+android/app/build/intermediates/assets:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/assets/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 mergeDebugAssets
+
+android/app/build/intermediates/assets/debug/mergeDebugAssets:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 shaders
+
+android/app/build/intermediates/assets/debug/mergeDebugAssets/shaders:
+total 104
+drwxr-xr-x 2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  1000 Nov 21 17:54 fragment_shader_alpha_scale_es2.glsl
+-rw-r--r-- 1 runner runner   905 Nov 21 17:54 fragment_shader_copy_es2.glsl
+-rw-r--r-- 1 runner runner  2691 Nov 21 17:54 fragment_shader_hsl_es2.glsl
+-rw-r--r-- 1 runner runner  4769 Nov 21 17:54 fragment_shader_lut_es2.glsl
+-rw-r--r-- 1 runner runner  3895 Nov 21 17:54 fragment_shader_oetf_es3.glsl
+-rw-r--r-- 1 runner runner  4327 Nov 21 17:54 fragment_shader_separable_convolution_es2.glsl
+-rw-r--r-- 1 runner runner  1110 Nov 21 17:54 fragment_shader_transformation_es2.glsl
+-rw-r--r-- 1 runner runner 12899 Nov 21 17:54 fragment_shader_transformation_external_yuv_es3.glsl
+-rw-r--r-- 1 runner runner 12257 Nov 21 17:54 fragment_shader_transformation_hdr_internal_es3.glsl
+-rw-r--r-- 1 runner runner  4115 Nov 21 17:54 fragment_shader_transformation_sdr_external_es2.glsl
+-rw-r--r-- 1 runner runner  6067 Nov 21 17:54 fragment_shader_transformation_sdr_internal_es2.glsl
+-rw-r--r-- 1 runner runner  3167 Nov 21 17:54 fragment_shader_transformation_sdr_oetf_es2.glsl
+-rw-r--r-- 1 runner runner  1197 Nov 21 17:54 vertex_shader_thumbnail_strip_es2.glsl
+-rw-r--r-- 1 runner runner  1164 Nov 21 17:54 vertex_shader_transformation_es2.glsl
+-rw-r--r-- 1 runner runner  1156 Nov 21 17:54 vertex_shader_transformation_es3.glsl
+
+android/app/build/intermediates/compatible_screen_manifest:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/compatible_screen_manifest/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 createDebugCompatibleScreenManifests
+
+android/app/build/intermediates/compatible_screen_manifest/debug/createDebugCompatibleScreenManifests:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  201 Nov 21 17:55 output-metadata.json
+
+android/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugResources
+
+android/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/processDebugResources:
+total 416
+drwxr-xr-x 2 runner runner   4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner   4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 416106 Nov 21 17:55 R.jar
+
+android/app/build/intermediates/compressed_assets:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/compressed_assets/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 compressDebugAssets
+
+android/app/build/intermediates/compressed_assets/debug/compressDebugAssets:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 out
+
+android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 assets
+
+android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 shaders
+
+android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/shaders:
+total 76
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  786 Nov 21 17:55 fragment_shader_alpha_scale_es2.glsl.jar
+-rw-r--r-- 1 runner runner  730 Nov 21 17:55 fragment_shader_copy_es2.glsl.jar
+-rw-r--r-- 1 runner runner 1462 Nov 21 17:55 fragment_shader_hsl_es2.glsl.jar
+-rw-r--r-- 1 runner runner 2316 Nov 21 17:55 fragment_shader_lut_es2.glsl.jar
+-rw-r--r-- 1 runner runner 1892 Nov 21 17:55 fragment_shader_oetf_es3.glsl.jar
+-rw-r--r-- 1 runner runner 1940 Nov 21 17:55 fragment_shader_separable_convolution_es2.glsl.jar
+-rw-r--r-- 1 runner runner  838 Nov 21 17:55 fragment_shader_transformation_es2.glsl.jar
+-rw-r--r-- 1 runner runner 4604 Nov 21 17:55 fragment_shader_transformation_external_yuv_es3.glsl.jar
+-rw-r--r-- 1 runner runner 4371 Nov 21 17:55 fragment_shader_transformation_hdr_internal_es3.glsl.jar
+-rw-r--r-- 1 runner runner 1835 Nov 21 17:55 fragment_shader_transformation_sdr_external_es2.glsl.jar
+-rw-r--r-- 1 runner runner 2366 Nov 21 17:55 fragment_shader_transformation_sdr_internal_es2.glsl.jar
+-rw-r--r-- 1 runner runner 1595 Nov 21 17:55 fragment_shader_transformation_sdr_oetf_es2.glsl.jar
+-rw-r--r-- 1 runner runner  876 Nov 21 17:55 vertex_shader_thumbnail_strip_es2.glsl.jar
+-rw-r--r-- 1 runner runner  792 Nov 21 17:55 vertex_shader_transformation_es2.glsl.jar
+-rw-r--r-- 1 runner runner  792 Nov 21 17:55 vertex_shader_transformation_es3.glsl.jar
+
+android/app/build/intermediates/data_binding_layout_info_type_merge:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/data_binding_layout_info_type_merge/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 mergeDebugResources
+
+android/app/build/intermediates/data_binding_layout_info_type_merge/debug/mergeDebugResources:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 out
+
+android/app/build/intermediates/data_binding_layout_info_type_merge/debug/mergeDebugResources/out:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/data_binding_layout_info_type_package:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/data_binding_layout_info_type_package/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 packageDebugResources
+
+android/app/build/intermediates/data_binding_layout_info_type_package/debug/packageDebugResources:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 out
+
+android/app/build/intermediates/data_binding_layout_info_type_package/debug/packageDebugResources/out:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/dex:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:57 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:57 debug
+
+android/app/build/intermediates/dex/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:57 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:57 mergeExtDexDebug
+
+android/app/build/intermediates/dex/debug/mergeExtDexDebug:
+total 64008
+drwxr-xr-x 2 runner runner     4096 Nov 21 17:57 .
+drwxr-xr-x 3 runner runner     4096 Nov 21 17:57 ..
+-rw-r--r-- 1 runner runner 43292704 Nov 21 17:57 classes.dex
+-rw-r--r-- 1 runner runner 12064820 Nov 21 17:57 classes2.dex
+-rw-r--r-- 1 runner runner 10173232 Nov 21 17:57 classes3.dex
+
+android/app/build/intermediates/duplicate_classes_check:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/duplicate_classes_check/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 checkDebugDuplicateClasses
+
+android/app/build/intermediates/duplicate_classes_check/debug/checkDebugDuplicateClasses:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/external_file_lib_dex_archives:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/external_file_lib_dex_archives/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 desugarDebugFileDependencies
+
+android/app/build/intermediates/external_file_lib_dex_archives/debug/desugarDebugFileDependencies:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/global_synthetics_file_lib:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/global_synthetics_file_lib/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 desugarDebugFileDependencies
+
+android/app/build/intermediates/global_synthetics_file_lib/debug/desugarDebugFileDependencies:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/incremental:
+total 24
+drwxr-xr-x  6 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  4 runner runner 4096 Nov 21 17:55 debug
+drwxr-xr-x  2 runner runner 4096 Nov 21 17:55 mergeDebugAssets
+drwxr-xr-x  2 runner runner 4096 Nov 21 17:55 mergeDebugJniLibFolders
+drwxr-xr-x  2 runner runner 4096 Nov 21 17:55 mergeDebugShaders
+
+android/app/build/intermediates/incremental/debug:
+total 16
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 6 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 mergeDebugResources
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 packageDebugResources
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources:
+total 1836
+drwxr-xr-x   4 runner runner    4096 Nov 21 17:55 .
+drwxr-xr-x   4 runner runner    4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner     246 Nov 21 17:55 compile-file-map.properties
+drwxr-xr-x 109 runner runner    4096 Nov 21 17:55 merged.dir
+-rw-r--r--   1 runner runner 1858300 Nov 21 17:55 merger.xml
+drwxr-xr-x   2 runner runner    4096 Nov 21 17:55 stripped.dir
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir:
+total 436
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x   4 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-af
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-am
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ar
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-as
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-az
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-b+sr+Latn
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-be
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-bg
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-bn
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-bs
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ca
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-cs
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-da
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-de
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-el
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-en-rAU
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-en-rCA
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-en-rGB
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-en-rIN
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-en-rXC
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-es
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-es-rUS
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-et
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-eu
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-fa
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-fi
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-fr
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-fr-rCA
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-gl
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-gu
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-h720dp-v13
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-hdpi-v4
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-hi
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-hr
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-hu
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-hy
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-in
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-is
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-it
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-iw
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ja
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ka
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-kk
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-km
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-kn
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ko
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ky
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-land
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-large-v4
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ldltr-v21
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-lo
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-lt
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-lv
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-mk
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ml
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-mn
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-mr
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ms
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-my
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-nb
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ne
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-night-v8
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-nl
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-or
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-pa
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-pl
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-port
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-pt
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-pt-rBR
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-pt-rPT
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ro
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ru
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-si
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-sk
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-sl
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-sq
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-sr
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-sv
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-sw
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-sw600dp-v13
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ta
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-te
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-th
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-tl
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-tr
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-uk
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-ur
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-uz
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v16
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v17
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v18
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v21
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v22
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v23
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v24
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v25
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v26
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-v28
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-vi
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-watch-v20
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-watch-v21
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-xlarge-v4
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-zh-rCN
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-zh-rHK
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-zh-rTW
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 values-zu
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values:
+total 212
+drwxr-xr-x   2 runner runner   4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner   4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 206549 Nov 21 17:55 values.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-af:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15824 Nov 21 17:55 values-af.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-am:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 17813 Nov 21 17:55 values-am.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ar:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18850 Nov 21 17:55 values-ar.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-as:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 14404 Nov 21 17:55 values-as.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-az:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16400 Nov 21 17:55 values-az.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-b+sr+Latn:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16267 Nov 21 17:55 values-b+sr+Latn.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-be:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18882 Nov 21 17:55 values-be.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-bg:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18949 Nov 21 17:55 values-bg.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-bn:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 20770 Nov 21 17:55 values-bn.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-bs:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16428 Nov 21 17:55 values-bs.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ca:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16377 Nov 21 17:55 values-ca.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-cs:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16511 Nov 21 17:55 values-cs.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-da:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15792 Nov 21 17:55 values-da.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-de:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16320 Nov 21 17:55 values-de.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-el:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19193 Nov 21 17:55 values-el.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-en-rAU:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15611 Nov 21 17:55 values-en-rAU.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-en-rCA:
+total 20
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 11268 Nov 21 17:55 values-en-rCA.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-en-rGB:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15611 Nov 21 17:55 values-en-rGB.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-en-rIN:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15611 Nov 21 17:55 values-en-rIN.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-en-rXC:
+total 56
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 45297 Nov 21 17:55 values-en-rXC.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-es:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16287 Nov 21 17:55 values-es.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-es-rUS:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16195 Nov 21 17:55 values-es-rUS.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-et:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16080 Nov 21 17:55 values-et.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-eu:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16378 Nov 21 17:55 values-eu.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-fa:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 17837 Nov 21 17:55 values-fa.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-fi:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16104 Nov 21 17:55 values-fi.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-fr:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16512 Nov 21 17:55 values-fr.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-fr-rCA:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16687 Nov 21 17:55 values-fr-rCA.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-gl:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16468 Nov 21 17:55 values-gl.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-gu:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19919 Nov 21 17:55 values-gu.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-h720dp-v13:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  130 Nov 21 17:55 values-h720dp-v13.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-hdpi-v4:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  340 Nov 21 17:55 values-hdpi-v4.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-hi:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 20362 Nov 21 17:55 values-hi.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-hr:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16440 Nov 21 17:55 values-hr.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-hu:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16570 Nov 21 17:55 values-hu.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-hy:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18307 Nov 21 17:55 values-hy.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-in:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15940 Nov 21 17:55 values-in.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-is:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16020 Nov 21 17:55 values-is.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-it:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16326 Nov 21 17:55 values-it.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-iw:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 17282 Nov 21 17:55 values-iw.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ja:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16733 Nov 21 17:55 values-ja.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ka:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 20921 Nov 21 17:55 values-ka.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-kk:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18380 Nov 21 17:55 values-kk.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-km:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 20559 Nov 21 17:55 values-km.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-kn:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 21632 Nov 21 17:55 values-kn.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ko:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16130 Nov 21 17:55 values-ko.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ky:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18746 Nov 21 17:55 values-ky.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-land:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  272 Nov 21 17:55 values-land.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-large-v4:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  760 Nov 21 17:55 values-large-v4.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ldltr-v21:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  176 Nov 21 17:55 values-ldltr-v21.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-lo:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19648 Nov 21 17:55 values-lo.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-lt:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16703 Nov 21 17:55 values-lt.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-lv:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16857 Nov 21 17:55 values-lv.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-mk:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18536 Nov 21 17:55 values-mk.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ml:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 21998 Nov 21 17:55 values-ml.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-mn:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18372 Nov 21 17:55 values-mn.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-mr:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19964 Nov 21 17:55 values-mr.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ms:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15934 Nov 21 17:55 values-ms.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-my:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 21620 Nov 21 17:55 values-my.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-nb:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15828 Nov 21 17:55 values-nb.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ne:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 21600 Nov 21 17:55 values-ne.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-night-v8:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  784 Nov 21 17:55 values-night-v8.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-nl:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16008 Nov 21 17:55 values-nl.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-or:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 14710 Nov 21 17:55 values-or.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-pa:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19570 Nov 21 17:55 values-pa.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-pl:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16571 Nov 21 17:55 values-pl.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-port:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  119 Nov 21 17:55 values-port.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-pt:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16136 Nov 21 17:55 values-pt.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-pt-rBR:
+total 20
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 11597 Nov 21 17:55 values-pt-rBR.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-pt-rPT:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16278 Nov 21 17:55 values-pt-rPT.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ro:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16566 Nov 21 17:55 values-ro.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ru:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18787 Nov 21 17:55 values-ru.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-si:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19983 Nov 21 17:55 values-si.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-sk:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16604 Nov 21 17:55 values-sk.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-sl:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16542 Nov 21 17:55 values-sl.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-sq:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16356 Nov 21 17:55 values-sq.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-sr:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18388 Nov 21 17:55 values-sr.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-sv:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16111 Nov 21 17:55 values-sv.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-sw:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16047 Nov 21 17:55 values-sw.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-sw600dp-v13:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  619 Nov 21 17:55 values-sw600dp-v13.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ta:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 22575 Nov 21 17:55 values-ta.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-te:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 21724 Nov 21 17:55 values-te.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-th:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19722 Nov 21 17:55 values-th.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-tl:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16335 Nov 21 17:55 values-tl.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-tr:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16016 Nov 21 17:55 values-tr.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-uk:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 19071 Nov 21 17:55 values-uk.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-ur:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 18069 Nov 21 17:55 values-ur.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-uz:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16071 Nov 21 17:55 values-uz.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v16:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  302 Nov 21 17:55 values-v16.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v17:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 3553 Nov 21 17:55 values-v17.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v18:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  112 Nov 21 17:55 values-v18.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v21:
+total 32
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 20695 Nov 21 17:55 values-v21.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v22:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  777 Nov 21 17:55 values-v22.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v23:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 3240 Nov 21 17:55 values-v23.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v24:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  615 Nov 21 17:55 values-v24.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v25:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  427 Nov 21 17:55 values-v25.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v26:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  897 Nov 21 17:55 values-v26.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-v28:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  597 Nov 21 17:55 values-v28.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-vi:
+total 28
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16820 Nov 21 17:55 values-vi.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-watch-v20:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  566 Nov 21 17:55 values-watch-v20.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-watch-v21:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  737 Nov 21 17:55 values-watch-v21.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-xlarge-v4:
+total 12
+drwxr-xr-x   2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner  481 Nov 21 17:55 values-xlarge-v4.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-zh-rCN:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15721 Nov 21 17:55 values-zh-rCN.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-zh-rHK:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15672 Nov 21 17:55 values-zh-rHK.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-zh-rTW:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 15776 Nov 21 17:55 values-zh-rTW.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/merged.dir/values-zu:
+total 24
+drwxr-xr-x   2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 109 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r--   1 runner runner 16226 Nov 21 17:55 values-zu.xml
+
+android/app/build/intermediates/incremental/debug/mergeDebugResources/stripped.dir:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/incremental/debug/packageDebugResources:
+total 24
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  244 Nov 21 17:55 compile-file-map.properties
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 merged.dir
+-rw-r--r-- 1 runner runner 2811 Nov 21 17:55 merger.xml
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 stripped.dir
+
+android/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 values
+
+android/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir/values:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  479 Nov 21 17:55 values.xml
+
+android/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/incremental/mergeDebugAssets:
+total 16
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 6 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 4713 Nov 21 17:55 merger.xml
+
+android/app/build/intermediates/incremental/mergeDebugJniLibFolders:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 6 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  516 Nov 21 17:55 merger.xml
+
+android/app/build/intermediates/incremental/mergeDebugShaders:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 6 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  516 Nov 21 17:55 merger.xml
+
+android/app/build/intermediates/local_only_symbol_list:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/local_only_symbol_list/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 parseDebugLocalResources
+
+android/app/build/intermediates/local_only_symbol_list/debug/parseDebugLocalResources:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  140 Nov 21 17:55 R-def.txt
+
+android/app/build/intermediates/manifest_merge_blame_file:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/manifest_merge_blame_file/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugMainManifest
+
+android/app/build/intermediates/manifest_merge_blame_file/debug/processDebugMainManifest:
+total 24
+drwxr-xr-x 2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 16315 Nov 21 17:55 manifest-merger-blame-debug-report.txt
+
+android/app/build/intermediates/merged_jni_libs:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/merged_jni_libs/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 mergeDebugJniLibFolders
+
+android/app/build/intermediates/merged_jni_libs/debug/mergeDebugJniLibFolders:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 out
+
+android/app/build/intermediates/merged_jni_libs/debug/mergeDebugJniLibFolders/out:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/merged_manifest:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/merged_manifest/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugMainManifest
+
+android/app/build/intermediates/merged_manifest/debug/processDebugMainManifest:
+total 16
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 4305 Nov 21 17:55 AndroidManifest.xml
+
+android/app/build/intermediates/merged_manifests:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/merged_manifests/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugManifest
+
+android/app/build/intermediates/merged_manifests/debug/processDebugManifest:
+total 20
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 4305 Nov 21 17:55 AndroidManifest.xml
+-rw-r--r-- 1 runner runner  398 Nov 21 17:55 output-metadata.json
+
+android/app/build/intermediates/merged_res:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/merged_res/debug:
+total 20
+drwxr-xr-x 3 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner  4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 12288 Nov 21 17:55 mergeDebugResources
+
+android/app/build/intermediates/merged_res/debug/mergeDebugResources:
+total 1728
+drwxr-xr-x 2 runner runner  12288 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner   4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner    856 Nov 21 17:55 drawable_ic_launcher.xml.flat
+-rw-r--r-- 1 runner runner  12128 Nov 21 17:55 values-af_values-af.arsc.flat
+-rw-r--r-- 1 runner runner  14140 Nov 21 17:55 values-am_values-am.arsc.flat
+-rw-r--r-- 1 runner runner  14984 Nov 21 17:55 values-ar_values-ar.arsc.flat
+-rw-r--r-- 1 runner runner  10920 Nov 21 17:55 values-as_values-as.arsc.flat
+-rw-r--r-- 1 runner runner  12708 Nov 21 17:55 values-az_values-az.arsc.flat
+-rw-r--r-- 1 runner runner  13380 Nov 21 17:55 values-b+sr+Latn_values-b+sr+Latn.arsc.flat
+-rw-r--r-- 1 runner runner  15112 Nov 21 17:55 values-be_values-be.arsc.flat
+-rw-r--r-- 1 runner runner  15288 Nov 21 17:55 values-bg_values-bg.arsc.flat
+-rw-r--r-- 1 runner runner  17128 Nov 21 17:55 values-bn_values-bn.arsc.flat
+-rw-r--r-- 1 runner runner  12696 Nov 21 17:55 values-bs_values-bs.arsc.flat
+-rw-r--r-- 1 runner runner  12656 Nov 21 17:55 values-ca_values-ca.arsc.flat
+-rw-r--r-- 1 runner runner  12736 Nov 21 17:55 values-cs_values-cs.arsc.flat
+-rw-r--r-- 1 runner runner  12100 Nov 21 17:55 values-da_values-da.arsc.flat
+-rw-r--r-- 1 runner runner  12628 Nov 21 17:55 values-de_values-de.arsc.flat
+-rw-r--r-- 1 runner runner  15532 Nov 21 17:55 values-el_values-el.arsc.flat
+-rw-r--r-- 1 runner runner  12424 Nov 21 17:55 values-en-rAU_values-en-rAU.arsc.flat
+-rw-r--r-- 1 runner runner   8096 Nov 21 17:55 values-en-rCA_values-en-rCA.arsc.flat
+-rw-r--r-- 1 runner runner  12424 Nov 21 17:55 values-en-rGB_values-en-rGB.arsc.flat
+-rw-r--r-- 1 runner runner  12424 Nov 21 17:55 values-en-rIN_values-en-rIN.arsc.flat
+-rw-r--r-- 1 runner runner  42792 Nov 21 17:55 values-en-rXC_values-en-rXC.arsc.flat
+-rw-r--r-- 1 runner runner  13008 Nov 21 17:55 values-es-rUS_values-es-rUS.arsc.flat
+-rw-r--r-- 1 runner runner  12596 Nov 21 17:55 values-es_values-es.arsc.flat
+-rw-r--r-- 1 runner runner  12388 Nov 21 17:55 values-et_values-et.arsc.flat
+-rw-r--r-- 1 runner runner  12684 Nov 21 17:55 values-eu_values-eu.arsc.flat
+-rw-r--r-- 1 runner runner  14156 Nov 21 17:55 values-fa_values-fa.arsc.flat
+-rw-r--r-- 1 runner runner  12412 Nov 21 17:55 values-fi_values-fi.arsc.flat
+-rw-r--r-- 1 runner runner  13488 Nov 21 17:55 values-fr-rCA_values-fr-rCA.arsc.flat
+-rw-r--r-- 1 runner runner  12808 Nov 21 17:55 values-fr_values-fr.arsc.flat
+-rw-r--r-- 1 runner runner  12776 Nov 21 17:55 values-gl_values-gl.arsc.flat
+-rw-r--r-- 1 runner runner  16268 Nov 21 17:55 values-gu_values-gu.arsc.flat
+-rw-r--r-- 1 runner runner    284 Nov 21 17:55 values-h720dp-v13_values-h720dp-v13.arsc.flat
+-rw-r--r-- 1 runner runner    488 Nov 21 17:55 values-hdpi-v4_values-hdpi-v4.arsc.flat
+-rw-r--r-- 1 runner runner  16740 Nov 21 17:55 values-hi_values-hi.arsc.flat
+-rw-r--r-- 1 runner runner  12712 Nov 21 17:55 values-hr_values-hr.arsc.flat
+-rw-r--r-- 1 runner runner  12880 Nov 21 17:55 values-hu_values-hu.arsc.flat
+-rw-r--r-- 1 runner runner  14636 Nov 21 17:55 values-hy_values-hy.arsc.flat
+-rw-r--r-- 1 runner runner  12248 Nov 21 17:55 values-in_values-in.arsc.flat
+-rw-r--r-- 1 runner runner  12328 Nov 21 17:55 values-is_values-is.arsc.flat
+-rw-r--r-- 1 runner runner  12628 Nov 21 17:55 values-it_values-it.arsc.flat
+-rw-r--r-- 1 runner runner  13560 Nov 21 17:55 values-iw_values-iw.arsc.flat
+-rw-r--r-- 1 runner runner  13044 Nov 21 17:55 values-ja_values-ja.arsc.flat
+-rw-r--r-- 1 runner runner  17292 Nov 21 17:55 values-ka_values-ka.arsc.flat
+-rw-r--r-- 1 runner runner  14704 Nov 21 17:55 values-kk_values-kk.arsc.flat
+-rw-r--r-- 1 runner runner  16928 Nov 21 17:55 values-km_values-km.arsc.flat
+-rw-r--r-- 1 runner runner  18024 Nov 21 17:55 values-kn_values-kn.arsc.flat
+-rw-r--r-- 1 runner runner  12436 Nov 21 17:55 values-ko_values-ko.arsc.flat
+-rw-r--r-- 1 runner runner  15080 Nov 21 17:55 values-ky_values-ky.arsc.flat
+-rw-r--r-- 1 runner runner    400 Nov 21 17:55 values-land_values-land.arsc.flat
+-rw-r--r-- 1 runner runner    888 Nov 21 17:55 values-large-v4_values-large-v4.arsc.flat
+-rw-r--r-- 1 runner runner    344 Nov 21 17:55 values-ldltr-v21_values-ldltr-v21.arsc.flat
+-rw-r--r-- 1 runner runner  15992 Nov 21 17:55 values-lo_values-lo.arsc.flat
+-rw-r--r-- 1 runner runner  12928 Nov 21 17:55 values-lt_values-lt.arsc.flat
+-rw-r--r-- 1 runner runner  13120 Nov 21 17:55 values-lv_values-lv.arsc.flat
+-rw-r--r-- 1 runner runner  14864 Nov 21 17:55 values-mk_values-mk.arsc.flat
+-rw-r--r-- 1 runner runner  18396 Nov 21 17:55 values-ml_values-ml.arsc.flat
+-rw-r--r-- 1 runner runner  14716 Nov 21 17:55 values-mn_values-mn.arsc.flat
+-rw-r--r-- 1 runner runner  16316 Nov 21 17:55 values-mr_values-mr.arsc.flat
+-rw-r--r-- 1 runner runner  12240 Nov 21 17:55 values-ms_values-ms.arsc.flat
+-rw-r--r-- 1 runner runner  18012 Nov 21 17:55 values-my_values-my.arsc.flat
+-rw-r--r-- 1 runner runner  12136 Nov 21 17:55 values-nb_values-nb.arsc.flat
+-rw-r--r-- 1 runner runner  18008 Nov 21 17:55 values-ne_values-ne.arsc.flat
+-rw-r--r-- 1 runner runner   1040 Nov 21 17:55 values-night-v8_values-night-v8.arsc.flat
+-rw-r--r-- 1 runner runner  12316 Nov 21 17:55 values-nl_values-nl.arsc.flat
+-rw-r--r-- 1 runner runner  11232 Nov 21 17:55 values-or_values-or.arsc.flat
+-rw-r--r-- 1 runner runner  15912 Nov 21 17:55 values-pa_values-pa.arsc.flat
+-rw-r--r-- 1 runner runner  12796 Nov 21 17:55 values-pl_values-pl.arsc.flat
+-rw-r--r-- 1 runner runner    252 Nov 21 17:55 values-port_values-port.arsc.flat
+-rw-r--r-- 1 runner runner   8428 Nov 21 17:55 values-pt-rBR_values-pt-rBR.arsc.flat
+-rw-r--r-- 1 runner runner  13092 Nov 21 17:55 values-pt-rPT_values-pt-rPT.arsc.flat
+-rw-r--r-- 1 runner runner  12444 Nov 21 17:55 values-pt_values-pt.arsc.flat
+-rw-r--r-- 1 runner runner  12836 Nov 21 17:55 values-ro_values-ro.arsc.flat
+-rw-r--r-- 1 runner runner  15028 Nov 21 17:55 values-ru_values-ru.arsc.flat
+-rw-r--r-- 1 runner runner  16328 Nov 21 17:55 values-si_values-si.arsc.flat
+-rw-r--r-- 1 runner runner  12828 Nov 21 17:55 values-sk_values-sk.arsc.flat
+-rw-r--r-- 1 runner runner  12768 Nov 21 17:55 values-sl_values-sl.arsc.flat
+-rw-r--r-- 1 runner runner  12664 Nov 21 17:55 values-sq_values-sq.arsc.flat
+-rw-r--r-- 1 runner runner  14676 Nov 21 17:55 values-sr_values-sr.arsc.flat
+-rw-r--r-- 1 runner runner  12420 Nov 21 17:55 values-sv_values-sv.arsc.flat
+-rw-r--r-- 1 runner runner    776 Nov 21 17:55 values-sw600dp-v13_values-sw600dp-v13.arsc.flat
+-rw-r--r-- 1 runner runner  12356 Nov 21 17:55 values-sw_values-sw.arsc.flat
+-rw-r--r-- 1 runner runner  18988 Nov 21 17:55 values-ta_values-ta.arsc.flat
+-rw-r--r-- 1 runner runner  18116 Nov 21 17:55 values-te_values-te.arsc.flat
+-rw-r--r-- 1 runner runner  16072 Nov 21 17:55 values-th_values-th.arsc.flat
+-rw-r--r-- 1 runner runner  12640 Nov 21 17:55 values-tl_values-tl.arsc.flat
+-rw-r--r-- 1 runner runner  12320 Nov 21 17:55 values-tr_values-tr.arsc.flat
+-rw-r--r-- 1 runner runner  15320 Nov 21 17:55 values-uk_values-uk.arsc.flat
+-rw-r--r-- 1 runner runner  14392 Nov 21 17:55 values-ur_values-ur.arsc.flat
+-rw-r--r-- 1 runner runner  12376 Nov 21 17:55 values-uz_values-uz.arsc.flat
+-rw-r--r-- 1 runner runner    484 Nov 21 17:55 values-v16_values-v16.arsc.flat
+-rw-r--r-- 1 runner runner   3696 Nov 21 17:55 values-v17_values-v17.arsc.flat
+-rw-r--r-- 1 runner runner    248 Nov 21 17:55 values-v18_values-v18.arsc.flat
+-rw-r--r-- 1 runner runner  21908 Nov 21 17:55 values-v21_values-v21.arsc.flat
+-rw-r--r-- 1 runner runner    936 Nov 21 17:55 values-v22_values-v22.arsc.flat
+-rw-r--r-- 1 runner runner   3452 Nov 21 17:55 values-v23_values-v23.arsc.flat
+-rw-r--r-- 1 runner runner   1012 Nov 21 17:55 values-v24_values-v24.arsc.flat
+-rw-r--r-- 1 runner runner    584 Nov 21 17:55 values-v25_values-v25.arsc.flat
+-rw-r--r-- 1 runner runner   1056 Nov 21 17:55 values-v26_values-v26.arsc.flat
+-rw-r--r-- 1 runner runner    748 Nov 21 17:55 values-v28_values-v28.arsc.flat
+-rw-r--r-- 1 runner runner  13128 Nov 21 17:55 values-vi_values-vi.arsc.flat
+-rw-r--r-- 1 runner runner    728 Nov 21 17:55 values-watch-v20_values-watch-v20.arsc.flat
+-rw-r--r-- 1 runner runner    904 Nov 21 17:55 values-watch-v21_values-watch-v21.arsc.flat
+-rw-r--r-- 1 runner runner    584 Nov 21 17:55 values-xlarge-v4_values-xlarge-v4.arsc.flat
+-rw-r--r-- 1 runner runner  12532 Nov 21 17:55 values-zh-rCN_values-zh-rCN.arsc.flat
+-rw-r--r-- 1 runner runner  12484 Nov 21 17:55 values-zh-rHK_values-zh-rHK.arsc.flat
+-rw-r--r-- 1 runner runner  12588 Nov 21 17:55 values-zh-rTW_values-zh-rTW.arsc.flat
+-rw-r--r-- 1 runner runner  12532 Nov 21 17:55 values-zu_values-zu.arsc.flat
+-rw-r--r-- 1 runner runner 221072 Nov 21 17:55 values_values.arsc.flat
+
+android/app/build/intermediates/merged_res_blame_folder:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/merged_res_blame_folder/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 mergeDebugResources
+
+android/app/build/intermediates/merged_res_blame_folder/debug/mergeDebugResources:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 out
+
+android/app/build/intermediates/merged_res_blame_folder/debug/mergeDebugResources/out:
+total 16
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 multi-v2
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 single
+
+android/app/build/intermediates/merged_res_blame_folder/debug/mergeDebugResources/out/multi-v2:
+total 2208
+drwxr-xr-x 2 runner runner    4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner    4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 1068931 Nov 21 17:55 mergeDebugResources.json
+-rw-r--r-- 1 runner runner   11736 Nov 21 17:55 values-af.json
+-rw-r--r-- 1 runner runner   11700 Nov 21 17:55 values-am.json
+-rw-r--r-- 1 runner runner   11784 Nov 21 17:55 values-ar.json
+-rw-r--r-- 1 runner runner    7822 Nov 21 17:55 values-as.json
+-rw-r--r-- 1 runner runner   11761 Nov 21 17:55 values-az.json
+-rw-r--r-- 1 runner runner   11872 Nov 21 17:55 values-b+sr+Latn.json
+-rw-r--r-- 1 runner runner   11763 Nov 21 17:55 values-be.json
+-rw-r--r-- 1 runner runner   11770 Nov 21 17:55 values-bg.json
+-rw-r--r-- 1 runner runner   11772 Nov 21 17:55 values-bn.json
+-rw-r--r-- 1 runner runner   11767 Nov 21 17:55 values-bs.json
+-rw-r--r-- 1 runner runner   11771 Nov 21 17:55 values-ca.json
+-rw-r--r-- 1 runner runner   11774 Nov 21 17:55 values-cs.json
+-rw-r--r-- 1 runner runner   11730 Nov 21 17:55 values-da.json
+-rw-r--r-- 1 runner runner   11768 Nov 21 17:55 values-de.json
+-rw-r--r-- 1 runner runner   11780 Nov 21 17:55 values-el.json
+-rw-r--r-- 1 runner runner   11794 Nov 21 17:55 values-en-rAU.json
+-rw-r--r-- 1 runner runner    7845 Nov 21 17:55 values-en-rCA.json
+-rw-r--r-- 1 runner runner   11794 Nov 21 17:55 values-en-rGB.json
+-rw-r--r-- 1 runner runner   11794 Nov 21 17:55 values-en-rIN.json
+-rw-r--r-- 1 runner runner    8129 Nov 21 17:55 values-en-rXC.json
+-rw-r--r-- 1 runner runner   11812 Nov 21 17:55 values-es-rUS.json
+-rw-r--r-- 1 runner runner   11761 Nov 21 17:55 values-es.json
+-rw-r--r-- 1 runner runner   11760 Nov 21 17:55 values-et.json
+-rw-r--r-- 1 runner runner   11759 Nov 21 17:55 values-eu.json
+-rw-r--r-- 1 runner runner   11750 Nov 21 17:55 values-fa.json
+-rw-r--r-- 1 runner runner   11740 Nov 21 17:55 values-fi.json
+-rw-r--r-- 1 runner runner   11844 Nov 21 17:55 values-fr-rCA.json
+-rw-r--r-- 1 runner runner   11770 Nov 21 17:55 values-fr.json
+-rw-r--r-- 1 runner runner   11774 Nov 21 17:55 values-gl.json
+-rw-r--r-- 1 runner runner   11742 Nov 21 17:55 values-gu.json
+-rw-r--r-- 1 runner runner     690 Nov 21 17:55 values-h720dp-v13.json
+-rw-r--r-- 1 runner runner     719 Nov 21 17:55 values-hdpi-v4.json
+-rw-r--r-- 1 runner runner   11749 Nov 21 17:55 values-hi.json
+-rw-r--r-- 1 runner runner   11767 Nov 21 17:55 values-hr.json
+-rw-r--r-- 1 runner runner   11758 Nov 21 17:55 values-hu.json
+-rw-r--r-- 1 runner runner   11744 Nov 21 17:55 values-hy.json
+-rw-r--r-- 1 runner runner   11744 Nov 21 17:55 values-in.json
+-rw-r--r-- 1 runner runner   11746 Nov 21 17:55 values-is.json
+-rw-r--r-- 1 runner runner   11763 Nov 21 17:55 values-it.json
+-rw-r--r-- 1 runner runner   11736 Nov 21 17:55 values-iw.json
+-rw-r--r-- 1 runner runner   11675 Nov 21 17:55 values-ja.json
+-rw-r--r-- 1 runner runner   11757 Nov 21 17:55 values-ka.json
+-rw-r--r-- 1 runner runner   11756 Nov 21 17:55 values-kk.json
+-rw-r--r-- 1 runner runner   11750 Nov 21 17:55 values-km.json
+-rw-r--r-- 1 runner runner   11774 Nov 21 17:55 values-kn.json
+-rw-r--r-- 1 runner runner   11666 Nov 21 17:55 values-ko.json
+-rw-r--r-- 1 runner runner   11760 Nov 21 17:55 values-ky.json
+-rw-r--r-- 1 runner runner     696 Nov 21 17:55 values-land.json
+-rw-r--r-- 1 runner runner     805 Nov 21 17:55 values-large-v4.json
+-rw-r--r-- 1 runner runner     687 Nov 21 17:55 values-ldltr-v21.json
+-rw-r--r-- 1 runner runner   11734 Nov 21 17:55 values-lo.json
+-rw-r--r-- 1 runner runner   11778 Nov 21 17:55 values-lt.json
+-rw-r--r-- 1 runner runner   11794 Nov 21 17:55 values-lv.json
+-rw-r--r-- 1 runner runner   11754 Nov 21 17:55 values-mk.json
+-rw-r--r-- 1 runner runner   11783 Nov 21 17:55 values-ml.json
+-rw-r--r-- 1 runner runner   11744 Nov 21 17:55 values-mn.json
+-rw-r--r-- 1 runner runner   11745 Nov 21 17:55 values-mr.json
+-rw-r--r-- 1 runner runner   11749 Nov 21 17:55 values-ms.json
+-rw-r--r-- 1 runner runner   11778 Nov 21 17:55 values-my.json
+-rw-r--r-- 1 runner runner   11738 Nov 21 17:55 values-nb.json
+-rw-r--r-- 1 runner runner   11773 Nov 21 17:55 values-ne.json
+-rw-r--r-- 1 runner runner     789 Nov 21 17:55 values-night-v8.json
+-rw-r--r-- 1 runner runner   11752 Nov 21 17:55 values-nl.json
+-rw-r--r-- 1 runner runner    7833 Nov 21 17:55 values-or.json
+-rw-r--r-- 1 runner runner   11740 Nov 21 17:55 values-pa.json
+-rw-r--r-- 1 runner runner   11772 Nov 21 17:55 values-pl.json
+-rw-r--r-- 1 runner runner     666 Nov 21 17:55 values-port.json
+-rw-r--r-- 1 runner runner    7863 Nov 21 17:55 values-pt-rBR.json
+-rw-r--r-- 1 runner runner   11816 Nov 21 17:55 values-pt-rPT.json
+-rw-r--r-- 1 runner runner   11752 Nov 21 17:55 values-pt.json
+-rw-r--r-- 1 runner runner   11778 Nov 21 17:55 values-ro.json
+-rw-r--r-- 1 runner runner   11768 Nov 21 17:55 values-ru.json
+-rw-r--r-- 1 runner runner   11746 Nov 21 17:55 values-si.json
+-rw-r--r-- 1 runner runner   11770 Nov 21 17:55 values-sk.json
+-rw-r--r-- 1 runner runner   11780 Nov 21 17:55 values-sl.json
+-rw-r--r-- 1 runner runner   11752 Nov 21 17:55 values-sq.json
+-rw-r--r-- 1 runner runner   11760 Nov 21 17:55 values-sr.json
+-rw-r--r-- 1 runner runner   11746 Nov 21 17:55 values-sv.json
+-rw-r--r-- 1 runner runner   11752 Nov 21 17:55 values-sw.json
+-rw-r--r-- 1 runner runner     799 Nov 21 17:55 values-sw600dp-v13.json
+-rw-r--r-- 1 runner runner   11792 Nov 21 17:55 values-ta.json
+-rw-r--r-- 1 runner runner   11777 Nov 21 17:55 values-te.json
+-rw-r--r-- 1 runner runner   11734 Nov 21 17:55 values-th.json
+-rw-r--r-- 1 runner runner   11765 Nov 21 17:55 values-tl.json
+-rw-r--r-- 1 runner runner   11735 Nov 21 17:55 values-tr.json
+-rw-r--r-- 1 runner runner   11778 Nov 21 17:55 values-uk.json
+-rw-r--r-- 1 runner runner   11754 Nov 21 17:55 values-ur.json
+-rw-r--r-- 1 runner runner   11760 Nov 21 17:55 values-uz.json
+-rw-r--r-- 1 runner runner    1490 Nov 21 17:55 values-v16.json
+-rw-r--r-- 1 runner runner    1027 Nov 21 17:55 values-v17.json
+-rw-r--r-- 1 runner runner     661 Nov 21 17:55 values-v18.json
+-rw-r--r-- 1 runner runner    8185 Nov 21 17:55 values-v21.json
+-rw-r--r-- 1 runner runner     755 Nov 21 17:55 values-v22.json
+-rw-r--r-- 1 runner runner     969 Nov 21 17:55 values-v23.json
+-rw-r--r-- 1 runner runner    1515 Nov 21 17:55 values-v24.json
+-rw-r--r-- 1 runner runner     754 Nov 21 17:55 values-v25.json
+-rw-r--r-- 1 runner runner     793 Nov 21 17:55 values-v26.json
+-rw-r--r-- 1 runner runner     755 Nov 21 17:55 values-v28.json
+-rw-r--r-- 1 runner runner   11754 Nov 21 17:55 values-vi.json
+-rw-r--r-- 1 runner runner     762 Nov 21 17:55 values-watch-v20.json
+-rw-r--r-- 1 runner runner     763 Nov 21 17:55 values-watch-v21.json
+-rw-r--r-- 1 runner runner     761 Nov 21 17:55 values-xlarge-v4.json
+-rw-r--r-- 1 runner runner   11726 Nov 21 17:55 values-zh-rCN.json
+-rw-r--r-- 1 runner runner   11726 Nov 21 17:55 values-zh-rHK.json
+-rw-r--r-- 1 runner runner   11726 Nov 21 17:55 values-zh-rTW.json
+-rw-r--r-- 1 runner runner   11760 Nov 21 17:55 values-zu.json
+-rw-r--r-- 1 runner runner   66758 Nov 21 17:55 values.json
+
+android/app/build/intermediates/merged_res_blame_folder/debug/mergeDebugResources/out/single:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  190 Nov 21 17:55 mergeDebugResources.json
+
+android/app/build/intermediates/merged_shaders:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/merged_shaders/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 mergeDebugShaders
+
+android/app/build/intermediates/merged_shaders/debug/mergeDebugShaders:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 out
+
+android/app/build/intermediates/merged_shaders/debug/mergeDebugShaders/out:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/intermediates/navigation_json:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/navigation_json/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 extractDeepLinksDebug
+
+android/app/build/intermediates/navigation_json/debug/extractDeepLinksDebug:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner    2 Nov 21 17:55 navigation.json
+
+android/app/build/intermediates/nested_resources_validation_report:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/nested_resources_validation_report/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 generateDebugResources
+
+android/app/build/intermediates/nested_resources_validation_report/debug/generateDebugResources:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner   15 Nov 21 17:55 nestedResourcesValidationReport.txt
+
+android/app/build/intermediates/packaged_manifests:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/packaged_manifests/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugManifestForPackage
+
+android/app/build/intermediates/packaged_manifests/debug/processDebugManifestForPackage:
+total 20
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 4305 Nov 21 17:55 AndroidManifest.xml
+-rw-r--r-- 1 runner runner  400 Nov 21 17:55 output-metadata.json
+
+android/app/build/intermediates/packaged_res:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/packaged_res/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 packageDebugResources
+
+android/app/build/intermediates/packaged_res/debug/packageDebugResources:
+total 16
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 drawable
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 values
+
+android/app/build/intermediates/packaged_res/debug/packageDebugResources/drawable:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  442 Nov 21 17:53 ic_launcher.xml
+
+android/app/build/intermediates/packaged_res/debug/packageDebugResources/values:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 4 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner  479 Nov 21 17:55 values.xml
+
+android/app/build/intermediates/processed_res:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/processed_res/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 processDebugResources
+
+android/app/build/intermediates/processed_res/debug/processDebugResources:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 out
+
+android/app/build/intermediates/processed_res/debug/processDebugResources/out:
+total 4372
+drwxr-xr-x 2 runner runner    4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner    4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner     395 Nov 21 17:55 output-metadata.json
+-rw-r--r-- 1 runner runner 4464135 Nov 21 17:55 resources-debug.ap_
+
+android/app/build/intermediates/runtime_symbol_list:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/runtime_symbol_list/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugResources
+
+android/app/build/intermediates/runtime_symbol_list/debug/processDebugResources:
+total 124
+drwxr-xr-x 2 runner runner   4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner   4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 118722 Nov 21 17:55 R.txt
+
+android/app/build/intermediates/source_set_path_map:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/source_set_path_map/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 mapDebugSourceSetPaths
+
+android/app/build/intermediates/source_set_path_map/debug/mapDebugSourceSetPaths:
+total 20
+drwxr-xr-x 2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 10711 Nov 21 17:55 file-map.txt
+
+android/app/build/intermediates/stable_resource_ids_file:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/stable_resource_ids_file/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugResources
+
+android/app/build/intermediates/stable_resource_ids_file/debug/processDebugResources:
+total 136
+drwxr-xr-x 2 runner runner   4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner   4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 127467 Nov 21 17:55 stableIds.txt
+
+android/app/build/intermediates/symbol_list_with_package_name:
+total 12
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 32 runner runner 4096 Nov 21 17:57 ..
+drwxr-xr-x  3 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/intermediates/symbol_list_with_package_name/debug:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 processDebugResources
+
+android/app/build/intermediates/symbol_list_with_package_name/debug/processDebugResources:
+total 76
+drwxr-xr-x 2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 68651 Nov 21 17:55 package-aware-r.txt
+
+android/app/build/kotlin:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 7 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 compileDebugKotlin
+
+android/app/build/kotlin/compileDebugKotlin:
+total 20
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:56 cacheable
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 classpath-snapshot
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:56 local-state
+
+android/app/build/kotlin/compileDebugKotlin/cacheable:
+total 16
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:56 .
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 caches-jvm
+-rw-r--r-- 1 runner runner 3654 Nov 21 17:56 dirty-sources.txt
+
+android/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm:
+total 20
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:56 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 inputs
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 jvm
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 lookups
+
+android/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/inputs:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/jvm:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/kotlin/compileDebugKotlin/classpath-snapshot:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 ..
+
+android/app/build/kotlin/compileDebugKotlin/local-state:
+total 12
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:56 .
+drwxr-xr-x 5 runner runner 4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner   31 Nov 21 17:56 build-history.bin
+
+android/app/build/outputs:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 7 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 logs
+
+android/app/build/outputs/logs:
+total 80
+drwxr-xr-x 2 runner runner  4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner  4096 Nov 21 17:55 ..
+-rw-r--r-- 1 runner runner 69684 Nov 21 17:55 manifest-merger-debug-report.txt
+
+android/app/build/tmp:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 7 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 kotlin-classes
+
+android/app/build/tmp/kotlin-classes:
+total 12
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 debug
+
+android/app/build/tmp/kotlin-classes/debug:
+total 8
+drwxr-xr-x 2 runner runner 4096 Nov 21 17:55 .
+drwxr-xr-x 3 runner runner 4096 Nov 21 17:55 ..
