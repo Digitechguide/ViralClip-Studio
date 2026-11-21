@@ -3,7 +3,7 @@
 
 [![AI Memory & Runbook](https://img.shields.io/badge/AI__Memory-AI__MEMORY.md-purple?style=for-the-badge)](AI_MEMORY.md)
 [![Architecture & Flow](https://img.shields.io/badge/Architecture-PROJECT__ARCHITECTURE__AND__FLOW.md-blueviolet?style=for-the-badge)](PROJECT_ARCHITECTURE_AND_FLOW.md)
-[![Latest Release](https://img.shields.io/badge/Release-v1.0.58-success?style=for-the-badge)](https://viral.mrpallanti.in/ViralClip-Studio-v1.0.58.apk)
+[![Latest Release](https://img.shields.io/badge/Release-v1.0.61-success?style=for-the-badge)](https://viral.mrpallanti.in/ViralClip-Studio-v1.0.61.apk)
 [![Live Production](https://img.shields.io/badge/Live-viral.mrpallanti.in-cyan?style=for-the-badge)](https://viral.mrpallanti.in/)
 
 > 🧠 **AI Memory & Cross-Device Guide:** See [AI_MEMORY.md](AI_MEMORY.md) for full context, environment setup, solved gotchas, and automated deployment runbooks.

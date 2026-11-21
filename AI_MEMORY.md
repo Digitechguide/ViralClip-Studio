@@ -33,10 +33,14 @@
 
 ## 3. Critical Environment & Build Rules (Read Before Running Commands!)
 
-### ⚠️ Rule 1: NEVER Run `./gradlew` Locally on Windows
-- **Why:** The local workstation JRE is 32-bit Java 8, which immediately fails with:
-  `Could not reserve enough space for 2097152KB object heap`.
-- **How to Build:** Always push code to the `main` branch. GitHub Actions (`.github/workflows/build-apk.yml`) runs on a 64-bit Ubuntu runner with Temurin JDK 17, compiles Kotlin, signs the APK, and creates a tagged GitHub Release automatically.
+### ⚠️ Rule 1: Local Builds on macOS vs Windows
+- **macOS (Apple Silicon / ARM64):** Fully supported and verified locally! Run:
+  ```bash
+  export JAVA_HOME=/Users/mrpallanti/Library/Java/JavaVirtualMachines/jbr-17.0.14/Contents/Home
+  cd android && ./gradlew assembleDebug -PversionCode=$(git rev-list --count HEAD) -PversionName=1.0.$(git rev-list --count HEAD)
+  ```
+  Local build finishes in ~40s with `android/local.properties` pointing to `~/Library/Android/sdk`.
+- **Windows Workstation:** Workstation default JRE is 32-bit Java 8, which fails with `Could not reserve enough space for 2097152KB object heap`. Push to `main` for GitHub Actions to compile on 64-bit runner with JDK 17.
 
 ### ⚠️ Rule 2: Dynamic Semantic Versioning
 - **How It Works:** GitHub Actions computes version dynamically based on git commit count:
