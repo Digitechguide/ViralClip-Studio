@@ -247,7 +247,7 @@ fun InAppYouTubePlayer(
                         ) {
                             Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Gallery", fontSize = 12.sp, color = TextPrimary)
+                            Text("Gallery", fontSize = 12.sp, color = TextPrimary, maxLines = 1, softWrap = false)
                         }
                     }
                 }

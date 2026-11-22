@@ -315,7 +315,11 @@ fun StudioScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column {
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f, fill = false)
+                                            .padding(end = 8.dp)
+                                    ) {
                                         Text(
                                             text = "Source Video Input",
                                             fontWeight = FontWeight.Bold,
@@ -352,7 +356,9 @@ fun StudioScreen(
                                                 text = "Gallery",
                                                 color = AccentCyan,
                                                 fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold
+                                                fontWeight = FontWeight.Bold,
+                                                maxLines = 1,
+                                                softWrap = false
                                             )
                                         }
                                     }
